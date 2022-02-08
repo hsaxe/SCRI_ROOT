@@ -426,7 +426,7 @@ length(unique(impCG$GeneID))
 
 fwrite(impCG, 'Limma_results_table_CG.csv')
 
-# impCG = fread('Limma_results_table_CG.csv')
+impCG = fread('Limma_results_table_CG.csv')
 ```
 
 ## Total CG DEGs by haplotype
@@ -678,6 +678,8 @@ impPHY = impPHY %>%
 head(impPHY)
 
 fwrite(impPHY, 'Limma_results_table_PHY.csv')
+
+impPHY = fread('Limma_results_table_PHY.csv')
 ```
 
 
@@ -845,6 +847,8 @@ impNEM = impNEM %>%
 head(impNEM)
 
 fwrite(impNEM, 'Limma_results_table_NEM.csv')
+
+impNEM = fread('Limma_results_table_NEM.csv')
 ```
 
 
@@ -1052,20 +1056,44 @@ write.csv(summary, 'Results_summaries.csv')
 
 # Venn Diagram
 ```{r}
-CG = impCG %>%
+CG_pos = impCG %>%
+  filter(logFC >= 0) %>% 
   distinct(GeneID) %>% 
   pull(GeneID)
   
 
-PHY = impPHY %>%
+PHY_pos = impPHY %>%
+  filter(logFC >= 0) %>% 
   distinct(GeneID) %>% 
   pull(GeneID)
 
-NEM = impNEM %>%
+NEM_pos = impNEM %>%
+  filter(logFC >= 0) %>% 
   distinct(GeneID)  %>% 
   pull(GeneID)
 
-venn = list(CG = CG, PHY = PHY, NEM = NEM)
+venn_pos = list(CG_pos = CG_pos, PHY_pos = PHY_pos, NEM_pos = NEM_pos)
+
+```
+
+```{r}
+CG_neg = impCG %>%
+  filter(logFC <= 0) %>% 
+  distinct(GeneID) %>% 
+  pull(GeneID)
+  
+
+PHY_neg = impPHY %>%
+  filter(logFC <= 0) %>% 
+  distinct(GeneID) %>% 
+  pull(GeneID)
+
+NEM_neg = impNEM %>%
+  filter(logFC <= 0) %>% 
+  distinct(GeneID)  %>% 
+  pull(GeneID)
+
+venn_neg = list(CG_neg = CG_neg, PHY_neg = PHY_neg, NEM_neg = NEM_neg)
 
 ```
 
@@ -1074,10 +1102,12 @@ venn = list(CG = CG, PHY = PHY, NEM = NEM)
 library(ggVennDiagram)
 library(ggvenn)
 
-p = ggvenn(venn)
+a = ggvenn(venn_pos)
+
+b = ggvenn(venn_neg)
 
 
-save_plot('Venn_Up_Down.png', p, base_width = 6, base_height = 6)
+save_plot('Venn_Pos_Neg.png', ggarrange(a, b, labels = c('A', 'B'), label.y = 0.75), base_width = 11, base_height = 11)
 ```
 
 
