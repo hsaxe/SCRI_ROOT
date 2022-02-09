@@ -172,6 +172,14 @@ drop = which(apply(cpm(dds), 1, mean) < 20)
 d2 = dds[-drop,]
 
 dim(d2) # number of genes left
+
+fwrite(d2$counts, 'CPM_20_filtered.csv')
+
+## CPM normalized counts of all data
+cpm = cpm(d2, prior.count = 2, log = F) 
+
+## CPM normalized counts of filtered data
+cpmd20 = cpm[-drop,]
 ```
 
 # How many genes are being expressed from each haplotype?
@@ -426,9 +434,13 @@ head(impCG)
 length(unique(impCG$GeneID))
 
 fwrite(impCG, 'Limma_results_table_CG.csv')
+```
 
+# Read results in
+```{r}
 impCG = fread('Limma_results_table_CG.csv')
 ```
+
 
 ## Total CG DEGs by haplotype
 ```{r}

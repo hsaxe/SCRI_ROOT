@@ -1,0 +1,19 @@
+---
+title: "EBH_Plotting_Jm3101_v1.0_and_Walnut_2.0_ref_MS1s_only"
+author: "Houston Saxe"
+date: "2/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load neccessary libraries
+
+```{r message=FALSE, , results='hide', include=FALSE}
+pacman::p_load(data.table, ggplot2, ggfortify, stringr, rtracklayer, ape, GEOquery, Biobase, BiocManager, dplyr, statmod, tidytable, tibble, ggpubr, cowplot, tidyr, tidytext)
+
+## Helpful function for quick viewing of wide data
+left = function(x, n = 10){head(x[,1:n])}
+```
