@@ -1099,7 +1099,6 @@ venn_neg = list(CG_neg = CG_neg, PHY_neg = PHY_neg, NEM_neg = NEM_neg)
 
 # Plot and save venn diagram
 ```{r}
-library(ggVennDiagram)
 library(ggvenn)
 
 a = ggvenn(venn_pos)
