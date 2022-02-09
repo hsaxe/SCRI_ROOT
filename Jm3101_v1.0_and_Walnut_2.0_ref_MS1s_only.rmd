@@ -6,12 +6,12 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## Load neccessary libraries
 
-```{r , results='hide', message=FALSE}
+```{r message=FALSE, , results='hide', include=FALSE}
 pacman::p_load(data.table, ggplot2, ggfortify, stringr, rtracklayer, ape, GEOquery, Biobase, BiocManager, dplyr, statmod, tidytable, tibble, ggpubr, cowplot, tidyr, tidytext)
 
 ## Helpful function for quick viewing of wide data
@@ -56,6 +56,7 @@ head(metadata)
 ```{r}
 metaLong = metadata %>% 
   select(!Sample) %>% 
+  select(Hybrid, CG_Avg., Cinn.PRLR, TwoY_RLN) %>% 
   distinct() %>% 
   pivot_longer(where(is.numeric), names_to = 'Trait')
 
@@ -66,7 +67,7 @@ p =ggplot(metaLong, aes(reorder_within(Hybrid, value, Trait), value, fill = Hybr
   facet_wrap(~Trait, scales = 'free', ncol = 4)
 p
 
-save_plot('metadata_plot.png', p, base_height = 5, base_width = 10)
+save_plot('metadata_plot.png', p, base_height = 4, base_width = 8)
 ```
 
 # Center and scale predictors to make comparisons more interpretable in results
