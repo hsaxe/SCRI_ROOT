@@ -133,7 +133,7 @@ head(annotation_Jr)
 annotation_combined = annotation_Jm %>%
   rbind(annotation_Jr, fill = T)
 
-fwrite(annotation_combined, 'annotation_combined.csv')
+fwrite(annotation_combined, 'results/annotation_combined.csv')
 ```
 
 # Create DGEList object
@@ -175,7 +175,7 @@ d2 = dds[-drop,]
 
 dim(d2) # number of genes left
 
-fwrite(as.data.frame(d2$counts), 'CPM_20_filtered.csv', row.names = T)
+fwrite(as.data.frame(d2$counts), 'results/CPM_20_filtered.csv', row.names = T)
 
 ## CPM normalized counts of all data
 cpm = cpm(d2, prior.count = 2, log = F) 
@@ -415,12 +415,12 @@ head(impCG)
 
 length(unique(impCG$GeneID))
 
-fwrite(impCG, 'Limma_results_table_CG.csv')
+fwrite(impCG, 'results/Limma_results_table_CG.csv')
 ```
 
 # Read in CG results
 ```{r}
-impCG = fread('Limma_results_table_CG.csv')
+impCG = fread('results/Limma_results_table_CG.csv')
 ```
 
 # Positive CG DEGs for GO
@@ -447,7 +447,7 @@ length(unique(CG_GO_pos_both$GeneID))
 
 head(CG_GO_pos_both)
 
-fwrite(CG_GO_pos_both, "CG_DEGs_pos_GO.csv")
+fwrite(CG_GO_pos_both, "results/CG_DEGs_pos_GO.csv")
 
 ```
 
@@ -502,7 +502,7 @@ length(unique(CG_GO_neg_both$GeneID))
 
 head(CG_GO_neg_both)
 
-fwrite(CG_GO_neg_both, "CG_DEGs_neg_GO.csv")
+fwrite(CG_GO_neg_both, "results/CG_DEGs_neg_GO.csv")
 ```
 
 # Expression from alleles is causing duplication in GO results which means data loss as GO removes duplicates. However, these are not true duplicates.
@@ -619,14 +619,14 @@ impPHY = impPHY %>%
 
 head(impPHY)
 
-fwrite(impPHY, 'Limma_results_table_PHY.csv')
+fwrite(impPHY, 'results/Limma_results_table_PHY.csv')
 
-impPHY = fread('Limma_results_table_PHY.csv')
+impPHY = fread('results/Limma_results_table_PHY.csv')
 ```
 
 # Read in PHY results
 ```{r}
-impPHY = fread('Limma_results_table_PHY.csv')
+impPHY = fread('results/Limma_results_table_PHY.csv')
 ```
 
 # Positive PHY DEGs for GO
@@ -653,7 +653,7 @@ length(unique(PHY_GO_pos_both$GeneID))
 
 head(PHY_GO_pos_both)
 
-fwrite(PHY_GO_pos_both, "PHY_DEGs_pos_GO.csv")
+fwrite(PHY_GO_pos_both, "results/PHY_DEGs_pos_GO.csv")
 
 ```
 
@@ -681,7 +681,7 @@ length(unique(PHY_GO_neg_both$GeneID))
 
 head(PHY_GO_neg_both)
 
-fwrite(PHY_GO_neg_both, "PHY_DEGs_neg_GO.csv")
+fwrite(PHY_GO_neg_both, "results/PHY_DEGs_neg_GO.csv")
 ```
 
 
@@ -740,14 +740,14 @@ impNEM = impNEM %>%
 
 head(impNEM)
 
-fwrite(impNEM, 'Limma_results_table_NEM.csv')
+fwrite(impNEM, 'results/Limma_results_table_NEM.csv')
 
-impNEM = fread('Limma_results_table_NEM.csv')
+impNEM = fread('results/Limma_results_table_NEM.csv')
 ```
 
 # Read in NEM results
 ```{r}
-impNEM = fread('Limma_results_table_NEM.csv')
+impNEM = fread('results/Limma_results_table_NEM.csv')
 ```
 
 
@@ -775,7 +775,7 @@ length(unique(NEM_GO_pos_both$GeneID))
 
 head(NEM_GO_pos_both)
 
-fwrite(NEM_GO_pos_both, "NEM_DEGs_pos_GO.csv")
+fwrite(NEM_GO_pos_both, "results/NEM_DEGs_pos_GO.csv")
 
 ```
 
@@ -803,7 +803,7 @@ length(unique(NEM_GO_neg_both$GeneID))
 
 head(NEM_GO_neg_both)
 
-fwrite(NEM_GO_neg_both, "NEM_DEGs_neg_GO.csv")
+fwrite(NEM_GO_neg_both, "results/NEM_DEGs_neg_GO.csv")
 ```
 
 
@@ -851,7 +851,7 @@ length(unique(UNITY_GO_pos_both$GeneID))
 
 head(UNITY_GO_pos_both)
 
-fwrite(UNITY_GO_pos_both, "UNITY_DEGs_pos_GO.csv")
+fwrite(UNITY_GO_pos_both, "results/UNITY_DEGs_pos_GO.csv")
 
 ```
 
@@ -880,7 +880,7 @@ length(unique(UNITY_GO_neg_both$GeneID))
 
 head(UNITY_GO_neg_both)
 
-fwrite(UNITY_GO_neg_both, "UNITY_DEGs_neg_GO.csv")
+fwrite(UNITY_GO_neg_both, "results/UNITY_DEGs_neg_GO.csv")
 ```
 
 
