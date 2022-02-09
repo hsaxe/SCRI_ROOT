@@ -132,6 +132,8 @@ head(annotation_Jr)
 ```{r}
 annotation_combined = annotation_Jm %>%
   rbind(annotation_Jr, fill = T)
+
+fwrite(annotation_combined, 'annotation_combined.csv')
 ```
 
 # Create DGEList object
@@ -173,7 +175,7 @@ d2 = dds[-drop,]
 
 dim(d2) # number of genes left
 
-fwrite(d2$counts, 'CPM_20_filtered.csv')
+fwrite(as.data.frame(d2$counts), 'CPM_20_filtered.csv', row.names = T)
 
 ## CPM normalized counts of all data
 cpm = cpm(d2, prior.count = 2, log = F) 
@@ -181,26 +183,6 @@ cpm = cpm(d2, prior.count = 2, log = F)
 ## CPM normalized counts of filtered data
 cpmd20 = cpm[-drop,]
 ```
-
-# How many genes are being expressed from each haplotype?
-```{r}
-expressed = d2$counts %>% 
-  as.data.frame() %>% 
-  rownames_to_column(var = 'GeneID') %>% 
-  select(GeneID) %>% 
-  left_join(annotation_combined) %>%
-  distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
-
-p = ggplot(expressed, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  labs(y='Expressed genes')
-
-p
-
-save_plot('Expression_by_haplotype_CPM20.png', p)
-```
-
 
 ## Cluster visualization
 ```{r}

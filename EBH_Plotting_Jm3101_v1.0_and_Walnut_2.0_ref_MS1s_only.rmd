@@ -17,3 +17,31 @@ pacman::p_load(data.table, ggplot2, ggfortify, stringr, rtracklayer, ape, GEOque
 ## Helpful function for quick viewing of wide data
 left = function(x, n = 10){head(x[,1:n])}
 ```
+
+```{r}
+dat = fread('CPM_20_filtered.csv') %>% 
+  rename(GeneID = V1)
+
+head(dat)
+
+anno = fread('annotation_combined.csv')
+```
+
+# How many genes are being expressed from each haplotype?
+```{r}
+expressed = dat %>% 
+  as.data.frame() %>% 
+  mutate(GeneID = as.numeric(GeneID)) %>% 
+  select(GeneID) %>% 
+  left_join(anno) %>%
+  distinct(GeneID, Parent_haplotype) %>% 
+  count(Parent_haplotype)
+
+p = ggplot(expressed, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  labs(y='Expressed genes')
+
+p
+
+# save_plot('Expression_by_haplotype_CPM20.png', p)
+```
