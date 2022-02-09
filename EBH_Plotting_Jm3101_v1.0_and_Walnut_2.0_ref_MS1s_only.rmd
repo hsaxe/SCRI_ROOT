@@ -18,6 +18,7 @@ pacman::p_load(data.table, ggplot2, ggfortify, stringr, rtracklayer, ape, GEOque
 left = function(x, n = 10){head(x[,1:n])}
 ```
 
+# Load data and annotation
 ```{r}
 dat = fread('CPM_20_filtered.csv') %>% 
   rename(GeneID = V1)
@@ -44,4 +45,167 @@ p = ggplot(expressed, aes(Parent_haplotype, n, fill = Parent_haplotype))+
 p
 
 # save_plot('Expression_by_haplotype_CPM20.png', p)
+```
+
+# Read in CG results
+```{r}
+impCG = fread('Limma_results_table_CG.csv')
+```
+
+## Total CG DEGs by haplotype
+```{r}
+ASEsums = impCG %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
+
+p = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  labs(y='DEGs')+
+  ggtitle('Total CG DEGs')
+
+p
+
+# save_plot('impCG_both_EBH.png', p)
+```
+
+# CG positive genes EBH
+```{r}
+impCG_pos = impCG %>%
+  filter(logFC > 0) %>%
+  distinct(GeneID, Parent_haplotype) %>% 
+  count(Parent_haplotype)
+
+sum(impCG_pos$n)
+
+p = ggplot(impCG_pos, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  labs(y='DEGs')+
+  ggtitle('CG DEGs (+)')
+
+p
+
+# save_plot('impCG_pos_EBH.png', p)
+
+```
+
+# CG negative genes EBH
+```{r}
+impCG_neg = impCG %>%
+  filter(logFC < 0) %>%
+  distinct(GeneID, Parent_haplotype) %>% 
+  count(Parent_haplotype)
+
+p = ggplot(impCG_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  labs(y='DEGs')+
+  ggtitle('CG DEGs (-)')
+
+p
+
+# save_plot('impCG_neg_EBH.png', p)
+```
+
+# Read in PHY results
+```{r}
+impPHY = fread('Limma_results_table_PHY.csv')
+```
+
+## Total PHY DEGs by haplotype
+```{r}
+ASEsums = impPHY %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
+
+p = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  labs(y='DEGs')+
+  ggtitle('Total PHY DEGs')
+
+p
+
+# save_plot('impPHY_both_EBH.png', p)
+
+```
+
+# PHY positive genes EBH
+```{r}
+impPHY_pos = impPHY %>%
+  filter(logFC > 0) %>%
+  distinct(GeneID, Parent_haplotype) %>% 
+  count(Parent_haplotype)
+
+p = ggplot(impPHY_pos, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  labs(y='DEGs')+
+  ggtitle('PHY DEGs (+)')
+
+p
+
+# save_plot('impPHY_pos_EBH.png', p)
+```
+
+# PHY negative genes EBH
+```{r}
+impPHY_neg = impPHY %>%
+  filter(logFC < 0) %>%
+  distinct(GeneID, Parent_haplotype) %>% 
+  count(Parent_haplotype)
+
+p = ggplot(impPHY_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  labs(y='DEGs')+
+  ggtitle('PHY DEGs (-)')
+
+p
+
+# save_plot('impPHY_neg_EBH.png', p)
+```
+
+# Read in NEM results
+```{r}
+impNEM = fread('Limma_results_table_NEM.csv')
+```
+
+## Total NEM DEGs by haplotype
+```{r}
+ASEsums = impNEM %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
+
+p = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  labs(y='DEGs')+
+  ggtitle('Total NEM DEGs')
+
+p
+
+# save_plot('impNEM_both_EBH.png', p)
+```
+
+# NEM positive genes EBH
+```{r}
+impNEM_pos = impNEM %>%
+  filter(logFC > 0) %>%
+  distinct(GeneID, Parent_haplotype) %>% 
+  count(Parent_haplotype)
+
+p = ggplot(impNEM_pos, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  labs(y='DEGs')+
+  ggtitle('NEM DEGs (+)')
+
+p
+
+# save_plot('impNEM_pos_EBH.png', p)
+```
+
+# NEM negative genes EBH
+```{r}
+impNEM_neg = impNEM %>%
+  filter(logFC < 0) %>%
+  distinct(GeneID, Parent_haplotype) %>% 
+  count(Parent_haplotype)
+
+p = ggplot(impNEM_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  labs(y='DEGs')+
+  ggtitle('NEM DEGs (-)')
+
+p
+
+# save_plot('impNEM_neg_EBH.png', p)
 ```

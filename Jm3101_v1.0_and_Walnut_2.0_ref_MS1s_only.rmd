@@ -418,27 +418,10 @@ length(unique(impCG$GeneID))
 fwrite(impCG, 'Limma_results_table_CG.csv')
 ```
 
-# Read results in
+# Read in CG results
 ```{r}
 impCG = fread('Limma_results_table_CG.csv')
 ```
-
-
-## Total CG DEGs by haplotype
-```{r}
-ASEsums = impCG %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
-
-p = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  labs(y='DEGs')+
-  ggtitle('Total CG DEGs')
-
-p
-
-save_plot('impCG_both_EBH.png', p)
-```
-
-
 
 # Positive CG DEGs for GO
 ```{r}
@@ -467,6 +450,7 @@ head(CG_GO_pos_both)
 fwrite(CG_GO_pos_both, "CG_DEGs_pos_GO.csv")
 
 ```
+
 # Maybe analyze separately and try to recombine?
 ```{r}
 # CG_GO_pos_Jm = impCG %>%
@@ -567,42 +551,6 @@ fwrite(CG_GO_neg_both, "CG_DEGs_neg_GO.csv")
 ```
 
 
-# CG positive genes EBH
-```{r}
-impCG_pos = impCG %>%
-  filter(logFC > 0) %>%
-  distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
-
-sum(impCG_pos$n)
-
-p = ggplot(impCG_pos, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  labs(y='DEGs')+
-  ggtitle('CG DEGs (+)')
-
-p
-
-save_plot('impCG_pos_EBH.png', p)
-
-```
-# CG negative genes EBH
-```{r}
-impCG_neg = impCG %>%
-  filter(logFC < 0) %>%
-  distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
-
-p = ggplot(impCG_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  labs(y='DEGs')+
-  ggtitle('CG DEGs (-)')
-
-p
-
-save_plot('impCG_neg_EBH.png', p)
-```
-
 # CG Subcellular localization by logFC boxplot
 ```{r}
 subcell_CG = impCG %>% 
@@ -614,7 +562,6 @@ p = ggplot(subcell_CG, aes(reorder(Subcell_loc, logFC), logFC))+
 
 p
 ```
-
 
 
 # Fit model for genes associated with PHY score
@@ -677,23 +624,10 @@ fwrite(impPHY, 'Limma_results_table_PHY.csv')
 impPHY = fread('Limma_results_table_PHY.csv')
 ```
 
-
-## Total PHY DEGs by haplotype
+# Read in PHY results
 ```{r}
-ASEsums = impPHY %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
-
-p = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  labs(y='DEGs')+
-  ggtitle('Total PHY DEGs')
-
-p
-
-save_plot('impPHY_both_EBH.png', p)
-
+impPHY = fread('Limma_results_table_PHY.csv')
 ```
-
-
 
 # Positive PHY DEGs for GO
 ```{r}
@@ -749,41 +683,6 @@ head(PHY_GO_neg_both)
 
 fwrite(PHY_GO_neg_both, "PHY_DEGs_neg_GO.csv")
 ```
-
-# PHY positive genes EBH
-```{r}
-impPHY_pos = impPHY %>%
-  filter(logFC > 0) %>%
-  distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
-
-p = ggplot(impPHY_pos, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  labs(y='DEGs')+
-  ggtitle('PHY DEGs (+)')
-
-p
-
-save_plot('impPHY_pos_EBH.png', p)
-```
-# PHY negative genes EBH
-```{r}
-impPHY_neg = impPHY %>%
-  filter(logFC < 0) %>%
-  distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
-
-p = ggplot(impPHY_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  labs(y='DEGs')+
-  ggtitle('PHY DEGs (-)')
-
-p
-
-save_plot('impPHY_neg_EBH.png', p)
-```
-
-
 
 
 # Fit model for genes associated with NEM score
@@ -846,22 +745,10 @@ fwrite(impNEM, 'Limma_results_table_NEM.csv')
 impNEM = fread('Limma_results_table_NEM.csv')
 ```
 
-
-## Total NEM DEGs by haplotype
+# Read in NEM results
 ```{r}
-ASEsums = impNEM %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
-
-p = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  labs(y='DEGs')+
-  ggtitle('Total NEM DEGs')
-
-p
-
-save_plot('impNEM_both_EBH.png', p)
-
+impNEM = fread('Limma_results_table_NEM.csv')
 ```
-
 
 
 # Positive NEM DEGs for GO
@@ -918,41 +805,6 @@ head(NEM_GO_neg_both)
 
 fwrite(NEM_GO_neg_both, "NEM_DEGs_neg_GO.csv")
 ```
-
-# NEM positive genes EBH
-```{r}
-impNEM_pos = impNEM %>%
-  filter(logFC > 0) %>%
-  distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
-
-p = ggplot(impNEM_pos, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  labs(y='DEGs')+
-  ggtitle('NEM DEGs (+)')
-
-p
-
-save_plot('impNEM_pos_EBH.png', p)
-```
-
-# NEM negative genes EBH
-```{r}
-impNEM_neg = impNEM %>%
-  filter(logFC < 0) %>%
-  distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
-
-p = ggplot(impNEM_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  labs(y='DEGs')+
-  ggtitle('NEM DEGs (-)')
-
-p
-
-save_plot('impNEM_neg_EBH.png', p)
-```
-
 
 
 # Any common DEGs between all pathosystems?
