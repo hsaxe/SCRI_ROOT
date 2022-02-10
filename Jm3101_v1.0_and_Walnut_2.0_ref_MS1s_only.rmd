@@ -6,12 +6,12 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Load neccessary libraries
 
-```{r message=FALSE, , results='hide', include=FALSE}
+```{r echo=TRUE}
 pacman::p_load(data.table, ggplot2, ggfortify, stringr, rtracklayer, ape, GEOquery, Biobase, BiocManager, dplyr, statmod, tidytable, tibble, ggpubr, cowplot, tidyr, tidytext)
 
 ## Helpful function for quick viewing of wide data
@@ -29,20 +29,17 @@ dat = dat %>%
   select(contains(c('GeneID', 'MS1')))
 
 head(dat)
-# Data has unnecessary attributes. Also, samples need to be column names
 ```
 
 # Read in metadata
 ```{r}
-## Read in metadata
 metadata = fread("C:/Users/hsaxe/OneDrive/Documents/ALAB/Transcriptome_data/Root/R/Phenotyping/SCRI/LongList3_2Y.csv", stringsAsFactors = T)
 
 head(metadata)
 ```
 
-# Modify metadata for this experiment
+# Modify metadata for this analysis
 ```{r}
-#
 metadata = data.frame(Sample = colnames(dat)[colnames(dat) != 'GeneID']) %>%
   mutate(Hybrid = as.factor(gsub("\\-\\d$", "", Sample))) %>%
   left_join(metadata, by = c('Hybrid' = 'CAL:_Wip_ID...1'))
@@ -67,12 +64,11 @@ p =ggplot(metaLong, aes(reorder_within(Hybrid, value, Trait), value, fill = Hybr
   facet_wrap(~Trait, scales = 'free', ncol = 4)
 p
 
-save_plot('metadata_plot.png', p, base_height = 4, base_width = 8)
+save_plot('results/metadata_plot.png', p, base_height = 4, base_width = 8)
 ```
 
 # Center and scale predictors to make comparisons more interpretable in results
 ```{r}
-#
 metadata_S = metadata %>%
   mutate_if(is.numeric, scale)
 ```
@@ -273,20 +269,20 @@ plot_pca = function(dat, metadata, sample_colname = 'Group', sample_names_in = '
 
 # Plot PCA to look in R
 ```{r}
-plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'PC2', scale = T, center = T, color = 'TwoY_RLN', fill = 'TwoY_RLN', plot_type = '2D', group_by = 'Hybrid')
+plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'PC2', scale = T, center = T, color = 'Hybrid', fill = 'Hybrid', plot_type = '2D', group_by = 'Hybrid')
 
 ```
 
 # Plot PCA to save
 ```{r}
-a = plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'PC2', scale = T, center = T, color = 'CG_Avg.', fill = 'CG_Avg.', plot_type = '2D', group_by = 'Hybrid')
-
-b = plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'PC2', scale = T, center = T, color = 'Cinn.PRLR', fill = 'Cinn.PRLR', plot_type = '2D', group_by = 'Hybrid')
-          
-c = plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'PC2', scale = T, center = T, color = 'TwoY_RLN', fill = 'TwoY_RLN', plot_type = '2D', group_by = 'Hybrid')
-
-
-save_plot('PCA_Hybrids.png', ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 3), base_height = 3, base_width = 12)
+# a = plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'PC2', scale = T, center = T, color = 'CG_Avg.', fill = 'CG_Avg.', plot_type = '2D', group_by = 'Hybrid')
+# 
+# b = plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'PC2', scale = T, center = T, color = 'Cinn.PRLR', fill = 'Cinn.PRLR', plot_type = '2D', group_by = 'Hybrid')
+#           
+# c = plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'PC2', scale = T, center = T, color = 'TwoY_RLN', fill = 'TwoY_RLN', plot_type = '2D', group_by = 'Hybrid')
+# 
+# 
+# save_plot('PCA_Hybrids.png', ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 3), base_height = 3, base_width = 12)
 
 ```
 
@@ -297,7 +293,7 @@ save_plot('PCA_Hybrids.png', ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol 
 
 
 # PCA scatterplot with fitted line and correlation coefficient
-```{r}
+```{r fig.height=10, fig.width=7}
 ## Available plotting data: [1] "Hybrid"      "Sample"      "CG_Avg."     "CG_Dec."     "Cinn.PCLR"   "Cinn.PRLR"  
  # [7] "Pini.PCLR"   "Pini.PRLR"   "PHY_Dec."    "TwoY_length" "TwoY_RLN"    "NEM_Dec."   
 # [13] "Unity"
@@ -310,7 +306,9 @@ b = plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_n
 c = plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'TwoY_RLN', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', group_by = 'Hybrid', summarise_for_scatter = T)+
   ggtitle('Trait: Nematode Count')
 
-save_plot('Scatterplot_PC1_CG_PH_NEM.png', ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1), base_height = 10, base_width = 6)
+ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1)
+
+save_plot('results/Scatterplot_PC1_CG_PH_NEM.png', ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1), base_height = 10, base_width = 6)
 
 ```
 
@@ -334,13 +332,13 @@ head(mm)
 
 ## What is voom?
 
-# 1. Counts are transformed to log2 counts per million reads (CPM), where "per million reads" is defined based on the normalization factors we calculated earlier.
-# 2. A linear model is fitted to the log2 CPM for each gene, and the residuals are calculated.
-# 3. A smoothed curve is fitted to the sqrt(residual standard deviation) by average expression.
-# (see red line in plot above)
-# 4. The smoothed curve is used to obtain weights for each gene and sample that are passed into limma along with the log2 CPMs.
+## 1. Counts are transformed to log2 counts per million reads (CPM), where "per million reads" is defined based on the normalization factors we calculated earlier.
+## 2. A linear model is fitted to the log2 CPM for each gene, and the residuals are calculated.
+## 3. A smoothed curve is fitted to the sqrt(residual standard deviation) by average expression.
+## (see red line in plot below)
+## 4. The smoothed curve is used to obtain weights for each gene and sample that are passed into limma along with the log2 CPMs.
 
-# More details at "[voom: precision weights unlock linear model analysis tools for RNA-seq read counts](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29)"
+## More details at "[voom: precision weights unlock linear model analysis tools for RNA-seq read counts](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29)"
 
 # Filtered mean-variance trend
 ```{r}
@@ -352,7 +350,7 @@ y <- voom(d, mm, plot = T)
 # tmp <- voom(dds, mm, plot = T)
 ```
 
-## 5. Fitting linear models in limma with random effects
+# Fitting linear models in limma with random effects
 ```{r}
 ## Need to tell limma where the within class correlation is coming from
 dupcor_CG = duplicateCorrelation(y, mm, block = metadata$Hybrid)
@@ -366,9 +364,9 @@ consensus.corr.CG
 fit = lmFit(y, design = mm, block = metadata$Hybrid, correlation = consensus.corr.CG) 
 ```
 
-# The variance characteristics of low expressed genes are different from high expressed genes, if treated the same, the effect is to over represent low expressed genes in the DE list. This is corrected for by the log transformation and voom. However, some genes will have increased or decreased variance that is not a result of low expression, but due to other random factors. We are going to run empirical Bayes to adjust the variance of these genes.
+## The variance characteristics of low expressed genes are different from high expressed genes, if treated the same, the effect is to over represent low expressed genes in the DE list. This is corrected for by the log transformation and voom. However, some genes will have increased or decreased variance that is not a result of low expression, but due to other random factors. We are going to run empirical Bayes to adjust the variance of these genes.
 
-# Empirical Bayes smoothing of standard errors (shifts standard errors that are much larger or smaller than those from other genes towards the average standard error) (see "[Linear Models and Empirical Bayes Methods for Assessing Differential Expression in Microarray Experiments](https://www.degruyter.com/doi/10.2202/1544-6115.1027)"
+## Empirical Bayes smoothing of standard errors (shifts standard errors that are much larger or smaller than those from other genes towards the average standard error) (see "[Linear Models and Empirical Bayes Methods for Assessing Differential Expression in Microarray Experiments](https://www.degruyter.com/doi/10.2202/1544-6115.1027)"
 ```{r}
 BlockFit_CG = eBayes(fit)
 ```
@@ -450,6 +448,8 @@ head(CG_GO_pos_both)
 fwrite(CG_GO_pos_both, "results/CG_DEGs_pos_GO.csv")
 
 ```
+
+# Expression from alleles is causing duplication in GO results which means data loss as GO removes duplicates. However, these are not true duplicates.
 
 # Maybe analyze separately and try to recombine?
 ```{r}
@@ -556,11 +556,9 @@ fwrite(CG_GO_neg_both, "results/CG_DEGs_neg_GO.csv")
 subcell_CG = impCG %>% 
   distinct(GeneID, logFC, Subcell_loc, Parent_haplotype)
 
-p = ggplot(subcell_CG, aes(reorder(Subcell_loc, logFC), logFC))+
+ggplot(subcell_CG, aes(reorder(Subcell_loc, logFC), logFC))+
   geom_boxplot()+
   theme(axis.text.x = element_text(angle = 30))
-
-p
 ```
 
 
@@ -682,6 +680,16 @@ length(unique(PHY_GO_neg_both$GeneID))
 head(PHY_GO_neg_both)
 
 fwrite(PHY_GO_neg_both, "results/PHY_DEGs_neg_GO.csv")
+```
+
+# PHY Subcellular localization by logFC boxplot
+```{r}
+subcell_PHY = impPHY %>% 
+  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype)
+
+ggplot(subcell_PHY, aes(reorder(Subcell_loc, logFC), logFC))+
+  geom_boxplot()+
+  theme(axis.text.x = element_text(angle = 30))
 ```
 
 
@@ -806,6 +814,16 @@ head(NEM_GO_neg_both)
 fwrite(NEM_GO_neg_both, "results/NEM_DEGs_neg_GO.csv")
 ```
 
+# NEM Subcellular localization by logFC boxplot
+```{r}
+subcell_NEM = impNEM %>% 
+  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype)
+
+ggplot(subcell_NEM, aes(reorder(Subcell_loc, logFC), logFC))+
+  geom_boxplot()+
+  theme(axis.text.x = element_text(angle = 30))
+```
+
 
 # Any common DEGs between all pathosystems?
 ```{r}
@@ -898,7 +916,7 @@ summary = cbind(res_summaries_CG,res_summaries_PHY, res_summaries_NEM) %>%
 
 head(summary)
 
-write.csv(summary, 'Results_summaries.csv')
+write.csv(summary, 'results/Results_summaries.csv')
 ```
 
 # Venn Diagram
@@ -952,8 +970,10 @@ a = ggvenn(venn_pos)
 
 b = ggvenn(venn_neg)
 
+ggarrange(a, b, labels = c('A', 'B'), label.y = 0.75)
 
-save_plot('Venn_Pos_Neg.png', ggarrange(a, b, labels = c('A', 'B'), label.y = 0.75), base_width = 11, base_height = 11)
+
+save_plot('results/Venn_Pos_Neg.png', ggarrange(a, b, labels = c('A', 'B'), label.y = 0.75), base_width = 11, base_height = 11)
 ```
 
 
@@ -980,7 +1000,7 @@ p = ggcorrplot(cormat1, type = 'lower', hc.order = T, lab = T, p.mat = corpmat1)
 
 p
 
-save_plot('Pheno_corrplot.png', p)
+save_plot('results/Pheno_corrplot.png', p)
 ```
 
 
