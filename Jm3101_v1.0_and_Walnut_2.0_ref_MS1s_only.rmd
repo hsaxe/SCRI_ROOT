@@ -150,7 +150,7 @@ dds = calcNormFactors(dds)
 
 # Filter by max CPM of 75 (This is used for DGE analysis)
 ```{r}
-d = expression_filter(dds, DGElist = T, FilterFUN = max, FilterThreshold = 75)
+d = expression_filter(dds, DGEList = T, FilterFUN = max, FilterThreshold = 75)
 
 ## CPM normalized counts of all data
 cpm = cpm(dds, prior.count = 2, log = F) 
@@ -161,7 +161,7 @@ cpmd = cpm(d)
 
 # Less conservative threshold for looking at expressed genes
 ```{r}
-d2 = expression_filter(dds, DGElist = T, FilterFUN = mean, FilterThreshold = 20)
+d2 = expression_filter(dds, DGEList = T, FilterFUN = mean, FilterThreshold = 20)
 
 fwrite(as.data.frame(d2$counts), 'results/CPM_20_filtered.csv', row.names = T)
 ```
@@ -193,7 +193,7 @@ plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_nam
 
 # PCA boxplot
 ```{r}
-plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'PC2', scale = T, center = T, color = 'CG_Avg.', fill = 'CG_Avg.', plot_type = 'boxplot')
+plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'Hybrid', y = 'PC1', scale = T, center = T, fill = 'Cinn.PCLR', plot_type = 'boxplot')
 ```
 
 
