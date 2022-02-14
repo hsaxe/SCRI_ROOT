@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load neccessary libraries
 
 ```{r echo=TRUE}
-pacman::p_load(data.table, ggplot2, ggfortify, stringr, rtracklayer, ape, GEOquery, Biobase, BiocManager, dplyr, statmod, tidytable, tibble, ggpubr, cowplot, tidyr, tidytext)
+pacman::p_load(data.table, ggplot2, ggfortify, stringr, rtracklayer, ape, GEOquery, Biobase, BiocManager, dplyr, statmod, tidytable, tibble, ggpubr, cowplot, tidyr, tidytext, OmicsAnalyst)
 
 ## Helpful function for quick viewing of wide data
 left = function(x, n = 10){head(x[,1:n])}
@@ -147,37 +147,23 @@ dds = calcNormFactors(dds)
 # dds$samples
 ```
 
+
 # Filter by max CPM of 75 (This is used for DGE analysis)
 ```{r}
-drop = which(apply(cpm(dds), 1, max) < 75)
-
-d = dds[-drop,]
-
-dim(d) # number of genes left
+d = expression_filter(dds, DGElist = T, FilterFUN = max, FilterThreshold = 75)
 
 ## CPM normalized counts of all data
 cpm = cpm(dds, prior.count = 2, log = F) 
 
 ## CPM normalized counts of filtered data
-cpmd = cpm[-drop,]
-
+cpmd = cpm(d)
 ```
 
 # Less conservative threshold for looking at expressed genes
 ```{r}
-drop = which(apply(cpm(dds), 1, mean) < 20)
-
-d2 = dds[-drop,]
-
-dim(d2) # number of genes left
+d2 = expression_filter(dds, DGElist = T, FilterFUN = mean, FilterThreshold = 20)
 
 fwrite(as.data.frame(d2$counts), 'results/CPM_20_filtered.csv', row.names = T)
-
-## CPM normalized counts of all data
-cpm = cpm(d2, prior.count = 2, log = F) 
-
-## CPM normalized counts of filtered data
-cpmd20 = cpm[-drop,]
 ```
 
 ## Cluster visualization
@@ -186,90 +172,9 @@ cpmd20 = cpm[-drop,]
 # plotMDS(d, col = as.numeric(metadata$Hybrid), cex=1)
 ```
 
-
-# Make function for PCA analysis/plotting
-```{r}
-plot_pca = function(dat, metadata, sample_colname = 'Group', sample_names_in = 'row_names', x = 'PC1', y = 'PC2', scale = T, center = T, color = 'Group', fill = 'Group', plot_type = '2D', group_by = 'Group', summarise_for_scatter = T) {
-  
-  if(sample_names_in == 'col_names') {
-    dat = t(dat) %>%
-      as.data.frame() %>%
-    mutate(across(everything(), as.numeric)) %>%
-    scale(scale = scale, center = center) %>%
-    as.matrix()
-  } else {
-    dat = dat %>%
-    as.data.frame() %>% 
-    column_to_rownames(var = group) %>% 
-    select_if(is.character) %>%
-    mutate(across(everything(), as.numeric)) %>%
-    scale(scale = scale, center = center) %>%
-    as.matrix()
-  }
-  
-  dat = prcomp(dat, scale = F, center = F)
-  
-  scores = dat$x
-  
-  eigs = dat$sdev^2 
-  
-  var_exp = paste('(', formatC((eigs/sum(eigs))*100, format = 'f', digits = 2), '%', ')', sep = '')
-
-  names(var_exp) = colnames(scores)
-  
-  plot_dat = scores %>%
-  data.frame() %>%
-  rownames_to_column(var = sample_colname) %>%
-  left_join(metadata)
- 
-  if(plot_type == '2D') {
-  p = ggplot(plot_dat, aes(get(x), get(y), color = get(color), group = get(group_by), fill = get(fill)))+
-  geom_point()+
-  stat_ellipse(geom = 'polygon', alpha = 0.5, level = 0.65)+
-    # ggforce::geom_mark_ellipse(aes(fill = get(fill), label = get(group_by)))+
-  geom_text(aes(label = get(group_by)), color = 'black', size = 2.5)+
-  labs(x = paste(x, var_exp[x]), y = paste(y, var_exp[y]), fill = color, color = color)
-  return(p)
-  } 
-  
-  if(plot_type == 'boxplot') {
-    p = ggplot(plot_dat, aes(reorder(get(color), get(x)), get(x), fill = get(color)))+
-    geom_boxplot()+
-    labs(x = color, y = paste(x, var_exp[x]), fill = color)
-    return(p)
-  }
-  
-  if(plot_type == 'scatter') {
-    if(summarise_for_scatter == T) {
-      
-      plot_dat = plot_dat %>%
-      group_by(get(group_by)) %>%
-      summarise_if(is.numeric, mean)  
-  
-  colnames(plot_dat)[1] = group_by
-  
-  ggscatter(plot_dat, x = x, y = y, add = 'reg.line', color = color)+
-      stat_cor(label.x = 0, label.y = max(plot_dat[y])*1.1)+ 
-      stat_smooth(method = 'lm')+
-      labs(x = paste(x, var_exp[x]))
-      
-    } else {
-      ggscatter(plot_dat, x = x, y = y, add = 'reg.line', color = color)+
-      stat_cor(label.x = 0, label.y = max(plot_dat[y])*1.1)+ 
-      stat_smooth(method = 'lm')+
-      labs(x = paste(x, var_exp[x]))
-    }
-    
-  }
-  
-}
-```
-
-
-
 # Plot PCA to look in R
 ```{r}
-plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'PC2', scale = T, center = T, color = 'Hybrid', fill = 'Hybrid', plot_type = '2D', group_by = 'Hybrid')
+plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'PC2', scale = T, center = T, color = 'Hybrid', fill = 'Hybrid', plot_type = '2D')
 
 ```
 
@@ -288,7 +193,7 @@ plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names
 
 # PCA boxplot
 ```{r}
-# plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC2', y = 'PC2', scale = T, center = T, color = 'Cinn.PRLR', plot_type = 'boxplot')
+plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'PC2', scale = T, center = T, color = 'CG_Avg.', fill = 'CG_Avg.', plot_type = 'boxplot')
 ```
 
 
@@ -297,13 +202,13 @@ plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names
 ## Available plotting data: [1] "Hybrid"      "Sample"      "CG_Avg."     "CG_Dec."     "Cinn.PCLR"   "Cinn.PRLR"  
  # [7] "Pini.PCLR"   "Pini.PRLR"   "PHY_Dec."    "TwoY_length" "TwoY_RLN"    "NEM_Dec."   
 # [13] "Unity"
-a = plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'CG_Avg.', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', group_by = 'Hybrid', summarise_for_scatter = T)+
+a = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'CG_Avg.', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', summarise_for_scatter = T)+
   ggtitle('Trait: Crown Gall Disease')
 
-b = plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'Cinn.PRLR', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', group_by = 'Hybrid', summarise_for_scatter = T)+
+b = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'Cinn.PRLR', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', summarise_for_scatter = T)+
   ggtitle('Trait: Phytophthora Root Rot')
 
-c = plot_pca(cpmd, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'TwoY_RLN', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', group_by = 'Hybrid', summarise_for_scatter = T)+
+c = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'TwoY_RLN', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', summarise_for_scatter = T)+
   ggtitle('Trait: Nematode Count')
 
 ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1)
