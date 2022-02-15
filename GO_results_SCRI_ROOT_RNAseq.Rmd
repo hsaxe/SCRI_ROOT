@@ -15,219 +15,260 @@ knitr::opts_chunk$set(echo = TRUE)
 pacman::p_load(dplyr, tibble, readr, stringr, data.table, ggplot2, cowplot, tidyr)
 ```
 
-
+# Process analysis files downloaded from http://pantherdb.org/tools/compareToRefList.jsp
 ```{r}
-dat = as.data.frame(read_tsv("C:/Users/hsaxe/Downloads/analysis (21).txt", skip = 11))
+files = list.files('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT/GOresults/raw/')
 
-colnames(dat) = str_extract(colnames(dat), 'biological process|cellular component|(?<=\\().*?(?=\\))')
+parse_GO = function(x) {
+  
+  dat = as.data.frame(read_tsv(paste0('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT/GOresults/raw/', x), skip = 11))
 
-# `cellular component`
-# biological process
+filename =  colnames(dat)[1:2] %>% 
+  str_extract('CG|PHY|NEM|Biological Process|Cellular Component') %>% 
+  paste0(collapse = '_') %>% 
+  gsub(' ', '_', .)
+  
 
-dat = dat %>%
-  mutate(GO_term = str_extract(`biological process`, '(?<=:).*?(?=\\))'), `fold Enrichment` = gsub('< 0.01', '0.01', `fold Enrichment`)) %>%
-  mutate(GO_term = as.numeric(GO_term), log2FC = log2(as.numeric(`fold Enrichment`)))
+colnames(dat) = str_extract(colnames(dat), 'Biological Process|Cellular Component|(?<=\\().*?(?=\\))')
 
-head(dat)
+write_csv(dat, paste0('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT/GOresults/', filename, '_parsed.csv'))
+  
+}
 
-# fwrite(dat, 'test_GO_BP_Jr_parsed_CG.csv')
+lapply(files, parse_GO)
 ```
 
-# GO biological process plotting CG
+# GO Biological Process plotting CG
 ```{r}
-dat = fread('GO_BP_parsed_CG.csv')
+dat = fread('GOresults/Biological_Process_CG_parsed.csv')
 
 dat = dat %>%
-  mutate(GO_term = str_extract(`biological process`, '(?<=:).*?(?=\\))'), `fold Enrichment` = gsub('< 0.01', '0.01', `fold Enrichment`)) %>%
-  mutate(GO_term = as.numeric(GO_term), log2FC = log2(as.numeric(`fold Enrichment`)))
+  mutate(GO_term = str_extract(`Biological Process`, '\\(.*\\)'),
+         `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
+  mutate(`Biological Process` = gsub('\\(.*\\)', '', `Biological Process`),
+    log2FC = log2(as.numeric(`fold Enrichment`)),
+         `-log10 FDR` = log10(FDR)*-1)
 
 labs = dat %>%
-  filter(`biological process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
+  filter(`Biological Process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
 
-p = ggplot(dat, aes(FDR, log2FC))+
+p = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   geom_point(aes(size = log2FC^2, color = log2FC))+
   geom_point(aes(size = log2FC^2), shape = 1, color = 'black')+
-  # geom_text(aes(label = `GO biological process complete`), angle = 45)+
+  # geom_text(aes(label = `GO Biological Process complete`), angle = 45)+
   theme(legend.position = 'none')+
   guides(color = 'none', size = 'none', fill = 'none')+
-  scale_x_log10()+
+  # scale_x_log10()+
+  scale_y_log10()+
   coord_cartesian(clip = "off") +
-  # geom_text(data = labs, aes(label = `biological process`), angle = 45)+
-  ggrepel::geom_label_repel(data = labs, aes(label = `biological process`), size = 1, box.padding = 0.4, max.overlaps = 30)+
-  ggtitle(paste0('Crown Gall GO Biological Process Results (', length(unique(dat$`biological process`)), ' terms)'))+
-  scale_color_gradient(low = 'blue', high = 'red')
+  # geom_text(data = labs, aes(label = `Biological Process`), angle = 45)+
+  ggrepel::geom_label_repel(data = labs, aes(label = `Biological Process`, size = log2FC^2*0.01), box.padding = 0.4, label.padding = 0.1, max.overlaps = 30)+
+  ggtitle(paste0('Crown Gall GO Biological Process Results (', length(unique(dat$`Biological Process`)), ' terms)'))+
+  scale_color_gradient2(low = 'blue', high = 'red')
 
 p
 
-save_plot('GO_BP_CG_plot.png', p)
+save_plot('GOresults/GO_BP_CG_plot.png', p)
+
+
+# words = dat %>% 
+#   pull(`Biological Process`) %>% 
+#   paste(collapse = ' ') %>% 
+#   str_split(., ' ') %>% 
+#   unlist() %>%
+#   gsub('metabolic|process|of|cellular|regulation', NA, .) %>% 
+#   data.frame(x = .) %>% 
+#   drop_na() %>%
+#   count(x)
+# 
+# wordcloud::wordcloud(words = words$x, freq = words$n)
 ```
 
-# GO cellular component plotting CG
+
+# GO Cellular Component plotting CG
 ```{r}
-dat = fread('GO_CC_parsed_CG.csv')
+dat = fread('GOresults/Cellular_Component_CG_parsed.csv')
 
 dat = dat %>%
-  mutate(GO_term = str_extract(`cellular component`, '(?<=:).*?(?=\\))'), `fold Enrichment` = gsub('< 0.01', '0.01', `fold Enrichment`)) %>%
-  mutate(GO_term = as.numeric(GO_term), log2FC = log2(as.numeric(`fold Enrichment`)))
+  mutate(GO_term = str_extract(`Cellular Component`, '\\(.*\\)'),
+         `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
+  mutate(`Cellular Component` = gsub('\\(.*\\)', '', `Cellular Component`),
+    log2FC = log2(as.numeric(`fold Enrichment`)),
+         `-log10 FDR` = log10(FDR)*-1)
 
-labs = dat %>%
-  filter(log2FC^2 >=1, FDR <= 0.01)
-
-p = ggplot(dat, aes(FDR, log2FC))+
+p = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   geom_point(aes(size = log2FC^2, color = log2FC))+
   geom_point(aes(size = log2FC^2), shape = 1, color = 'black')+
-  # geom_text(aes(label = `GO biological process complete`), angle = 45)+
   theme(legend.position = 'none')+
   guides(color = 'none', size = 'none', fill = 'none')+
-  scale_x_log10()+
-  coord_cartesian(clip = "off") +
-  # geom_text(data = labs, aes(label = `biological process`), angle = 45)+
-  ggrepel::geom_label_repel(data = labs, aes(label = `cellular component`), size = 1, box.padding = 0.4, max.overlaps = 30)+
-  ggtitle(paste0('Crown Gall GO Cellular Component Results (', length(unique(dat$`cellular component`)), ' terms)'))+
-  scale_color_gradient(low = 'blue', high = 'red')
+  # scale_x_log10()+
+  scale_y_log10()+
+  coord_cartesian(clip = "off")+
+  # geom_text(data = labs, aes(label = `Cellular Component`), angle = 45)+
+  ggrepel::geom_label_repel( aes(label = `Cellular Component`, size = log2FC^2*0.01), box.padding = 0.4, label.padding = 0.1, max.overlaps = 60)+
+  ggtitle(paste0('Crown Gall GO Cellular Component Results (', length(unique(dat$`Cellular Component`)), ' terms)'))+
+  scale_color_gradient2(low = 'blue', high = 'red', midpoint = -1)+
+  lims(x = c(-4.5, 5), y = c(-2.5, 11.5))
 
 p
 
-save_plot('GO_CC_CG_plot.png', p)
+
+save_plot('GOresults/GO_CC_CG_plot.png', p)
 ```
 
 
-# GO biological process plotting PHY
+# GO Biological Process plotting PHY
 ```{r}
-dat = fread('GO_BP_parsed_PHY.csv')
+dat = fread('GOresults/Biological_Process_PHY_parsed.csv')
 
 dat = dat %>%
-  mutate(GO_term = str_extract(`biological process`, '(?<=:).*?(?=\\))'), `fold Enrichment` = gsub('< 0.01', '0.01', `fold Enrichment`)) %>%
-  mutate(GO_term = as.numeric(GO_term), log2FC = log2(as.numeric(`fold Enrichment`)))
+  mutate(GO_term = str_extract(`Biological Process`, '\\(.*\\)'),
+         `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
+  mutate(`Biological Process` = gsub('\\(.*\\)', '', `Biological Process`),
+    log2FC = log2(as.numeric(`fold Enrichment`)),
+         `-log10 FDR` = log10(FDR)*-1)
 
-labs = dat %>%
-  filter(`biological process` %like% 'wall|poly|glucan|cellulose|ATP|RNA')
-   # filter(log2FC^2 >=4, FDR <= 0.01)
+# labs = dat %>%
+#   filter(`Biological Process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
 
-p = ggplot(dat, aes(FDR, log2FC))+
+p = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   geom_point(aes(size = log2FC^2, color = log2FC))+
   geom_point(aes(size = log2FC^2), shape = 1, color = 'black')+
-  # geom_text(aes(label = `GO biological process complete`), angle = 45)+
+  # geom_text(aes(label = `GO Biological Process complete`), angle = 45)+
   theme(legend.position = 'none')+
   guides(color = 'none', size = 'none', fill = 'none')+
-  scale_x_log10()+
+  # scale_x_log10()+
+  scale_y_log10()+
   coord_cartesian(clip = "off") +
-  # geom_text(data = labs, aes(label = `biological process`), angle = 45)+
-  ggrepel::geom_label_repel(data = labs, aes(label = `biological process`), size = 1, box.padding = 0.4, max.overlaps = 30)+
-  ggtitle(paste0('P. Cinn GO Biological Process Results (', length(unique(dat$`biological process`)), ' terms)'))+
-  scale_color_gradient(low = 'blue', high = 'red')
+  # geom_text(data = labs, aes(label = `Biological Process`), angle = 45)+
+  ggrepel::geom_label_repel(aes(label = `Biological Process`, size = log2FC^2*0.01), box.padding = 0.4, label.padding = 0.1, max.overlaps = 30)+
+  ggtitle(paste0('P. Cinn GO Biological Process Results (', length(unique(dat$`Biological Process`)), ' terms)'))+
+  scale_color_gradient2(low = 'blue', high = 'red')
 
 p
 
-save_plot('GO_BP_PHY_plot.png', p)
+save_plot('GOresults/GO_BP_PHY_plot.png', p)
 ```
 
 
-# GO cellular component plotting PHY
+# GO Cellular Component plotting PHY
 ```{r}
-dat = fread('GO_CC_parsed_PHY.csv')
+dat = fread('GOresults/Cellular_Component_PHY_parsed.csv')
 
 dat = dat %>%
-  mutate(GO_term = str_extract(`cellular component`, '(?<=:).*?(?=\\))'), `fold Enrichment` = gsub('< 0.01', '0.01', `fold Enrichment`)) %>%
-  mutate(GO_term = as.numeric(GO_term), log2FC = log2(as.numeric(`fold Enrichment`)))
+  mutate(GO_term = str_extract(`Cellular Component`, '\\(.*\\)'),
+         `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
+  mutate(`Cellular Component` = gsub('\\(.*\\)', '', `Cellular Component`),
+    log2FC = log2(as.numeric(`fold Enrichment`)),
+         `-log10 FDR` = log10(FDR)*-1)
 
-labs = dat 
-  # filter(log2FC^2 >=1, FDR <= 0.01)
-
-p = ggplot(dat, aes(FDR, log2FC))+
+p = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   geom_point(aes(size = log2FC^2, color = log2FC))+
   geom_point(aes(size = log2FC^2), shape = 1, color = 'black')+
-  # geom_text(aes(label = `GO biological process complete`), angle = 45)+
+  # geom_text(aes(label = `GO Cellular Component complete`), angle = 45)+
   theme(legend.position = 'none')+
   guides(color = 'none', size = 'none', fill = 'none')+
-  scale_x_log10()+
+  # scale_x_log10()+
+  scale_y_log10()+
   coord_cartesian(clip = "off") +
-  # geom_text(data = labs, aes(label = `biological process`), angle = 45)+
-  ggrepel::geom_label_repel(data = labs, aes(label = `cellular component`), size = 1, box.padding = 0.4, max.overlaps = 30)+
-  ggtitle(paste0('P. Cinn GO Cellular Component Results (', length(unique(dat$`cellular component`)), ' terms)'))+
-  scale_color_gradient(low = 'blue', high = 'red')
+  # geom_text(data = labs, aes(label = `Cellular Component`), angle = 45)+
+  ggrepel::geom_label_repel(aes(label = `Cellular Component`, size = log2FC^2*0.01), box.padding = 0.4, label.padding = 0.1, max.overlaps = 30)+
+  ggtitle(paste0('P. Cinn GO Cellular Component Results (', length(unique(dat$`Cellular Component`)), ' terms)'))+
+  scale_color_gradient2(low = 'blue', high = 'red')
 
 p
 
-save_plot('GO_CC_PHY_plot.png', p)
+save_plot('GOresults/GO_CC_PHY_plot.png', p)
 ```
 
 
-# GO biological process plotting NEM
+# GO Biological Process plotting NEM
 ```{r}
-dat = fread('GO_BP_parsed_NEM.csv')
+dat = fread('GOresults/Biological_Process_NEM_parsed.csv')
+
+dat = dat %>%
+  mutate(GO_term = str_extract(`Biological Process`, '\\(.*\\)'),
+         `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
+  mutate(`Biological Process` = gsub('\\(.*\\)', '', `Biological Process`),
+    log2FC = log2(as.numeric(`fold Enrichment`)),
+         `-log10 FDR` = log10(FDR)*-1)
 
 labs = dat %>%
-  filter(`biological process` %like% 'wall|poly|glucan|cellulose|ATP|RNA')
-   # filter(log2FC^2 >=4, FDR <= 0.01)
+  filter(`Biological Process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
 
-p = ggplot(dat, aes(FDR, log2FC))+
+p = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   geom_point(aes(size = log2FC^2, color = log2FC))+
   geom_point(aes(size = log2FC^2), shape = 1, color = 'black')+
-  # geom_text(aes(label = `GO biological process complete`), angle = 45)+
+  # geom_text(aes(label = `GO Biological Process complete`), angle = 45)+
   theme(legend.position = 'none')+
   guides(color = 'none', size = 'none', fill = 'none')+
-  scale_x_log10()+
+  # scale_x_log10()+
+  scale_y_log10()+
   coord_cartesian(clip = "off") +
-  # geom_text(data = labs, aes(label = `biological process`), angle = 45)+
-  ggrepel::geom_label_repel(data = labs, aes(label = `biological process`), size = 1, box.padding = 0.4, max.overlaps = 30)+
-  ggtitle(paste0('Nematode GO Biological Process Results (', length(unique(dat$`biological process`)), ' terms)'))+
-  scale_color_gradient(low = 'blue', high = 'red')
+  # geom_text(data = labs, aes(label = `Biological Process`), angle = 45)+
+  ggrepel::geom_label_repel(data = labs, aes(label = `Biological Process`, size = log2FC^2*0.01), box.padding = 0.4, label.padding = 0.1, max.overlaps = 30)+
+  ggtitle(paste0('Nematode GO Biological Process Results (', length(unique(dat$`Biological Process`)), ' terms)'))+
+  scale_color_gradient2(low = 'blue', high = 'red')
 
 p
 
-save_plot('GO_BP_NEM_plot.png', p)
+save_plot('GOresults/GO_BP_NEM_plot.png', p)
 ```
 
 
-# GO cellular component plotting NEM
+# GO Cellular Component plotting NEM
 ```{r}
-dat = fread('GO_CC_parsed_NEM.csv')
+dat = fread('GOresults/Cellular_Component_NEM_parsed.csv')
 
-labs = dat 
-  # filter(log2FC^2 >=1, FDR <= 0.01)
+dat = dat %>%
+  mutate(GO_term = str_extract(`Cellular Component`, '\\(.*\\)'),
+         `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
+  mutate(`Cellular Component` = gsub('\\(.*\\)', '', `Cellular Component`),
+    log2FC = log2(as.numeric(`fold Enrichment`)),
+         `-log10 FDR` = log10(FDR)*-1)
 
-p = ggplot(dat, aes(FDR, log2FC))+
+p = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   geom_point(aes(size = log2FC^2, color = log2FC))+
   geom_point(aes(size = log2FC^2), shape = 1, color = 'black')+
-  # geom_text(aes(label = `GO biological process complete`), angle = 45)+
+  # geom_text(aes(label = `GO Cellular Component complete`), angle = 45)+
   theme(legend.position = 'none')+
   guides(color = 'none', size = 'none', fill = 'none')+
-  scale_x_log10()+
+  # scale_x_log10()+
+  scale_y_log10()+
   coord_cartesian(clip = "off") +
-  # geom_text(data = labs, aes(label = `biological process`), angle = 45)+
-  ggrepel::geom_label_repel(data = labs, aes(label = `cellular component`), size = 1, box.padding = 0.4, max.overlaps = 30)+
-  ggtitle(paste0('Nematode GO Cellular Component Results (', length(unique(dat$`cellular component`)), ' terms)'))+
-  scale_color_gradient(low = 'blue', high = 'red')
+  # geom_text(data = labs, aes(label = `Cellular Component`), angle = 45)+
+  ggrepel::geom_label_repel(aes(label = `Cellular Component`, size = log2FC^2*0.01), box.padding = 0.4, label.padding = 0.1, max.overlaps = 30)+
+  ggtitle(paste0('Nematode GO Cellular Component Results (', length(unique(dat$`Cellular Component`)), ' terms)'))+
+  scale_color_gradient2(low = 'blue', high = 'red')
 
 p
 
-save_plot('GO_CC_NEM_plot.png', p)
+save_plot('GOresults/GO_CC_NEM_plot.png', p)
 ```
 
 
-# Test GO biological process plotting CG Jr
+# Test GO Biological Process plotting CG Jr
 ```{r}
 dat = fread('test_GO_BP_Jr_parsed_CG.csv')
 
 dat = dat %>%
-  mutate(GO_term = str_extract(`biological process`, '(?<=:).*?(?=\\))'), `fold Enrichment` = gsub('< 0.01', '0.01', `fold Enrichment`)) %>%
+  mutate(GO_term = str_extract(`Biological Process`, '(?<=:).*?(?=\\))'), `fold Enrichment` = gsub('< 0.01', '0.01', `fold Enrichment`)) %>%
   mutate(GO_term = as.numeric(GO_term), log2FC = log2(as.numeric(`fold Enrichment`)))
 
 labs = dat %>%
-  filter(`biological process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
+  filter(`Biological Process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
 
 p = ggplot(dat, aes(FDR, log2FC))+
   geom_point(aes(size = log2FC^2, color = log2FC))+
   geom_point(aes(size = log2FC^2), shape = 1, color = 'black')+
-  # geom_text(aes(label = `GO biological process complete`), angle = 45)+
+  # geom_text(aes(label = `GO Biological Process complete`), angle = 45)+
   theme(legend.position = 'none')+
   guides(color = 'none', size = 'none', fill = 'none')+
   scale_x_log10()+
   coord_cartesian(clip = "off") +
-  # geom_text(data = labs, aes(label = `biological process`), angle = 45)+
-  ggrepel::geom_label_repel(data = labs, aes(label = `biological process`), size = 1, box.padding = 0.4, max.overlaps = 30)+
-  ggtitle(paste0('test Jr Crown Gall GO Biological Process Results (', length(unique(dat$`biological process`)), ' terms)'))+
+  # geom_text(data = labs, aes(label = `Biological Process`), angle = 45)+
+  ggrepel::geom_label_repel(data = labs, aes(label = `Biological Process`), size = 1, box.padding = 0.4, max.overlaps = 30)+
+  ggtitle(paste0('test Jr Crown Gall GO Biological Process Results (', length(unique(dat$`Biological Process`)), ' terms)'))+
   scale_color_gradient(low = 'blue', high = 'red')
 
 p
@@ -236,31 +277,3 @@ save_plot('test_GO_BP_Jr_CG_plot.png', p)
 ```
 
 
-# Test GO biological process plotting CG Jm
-```{r}
-dat = fread('test_GO_BP_Jm_parsed_CG.csv')
-
-dat = dat %>%
-  mutate(GO_term = str_extract(`biological process`, '(?<=:).*?(?=\\))'), `fold Enrichment` = gsub('< 0.01', '0.01', `fold Enrichment`)) %>%
-  mutate(GO_term = as.numeric(GO_term), log2FC = log2(as.numeric(`fold Enrichment`)))
-
-labs = dat %>%
-  filter(`biological process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
-
-p = ggplot(dat, aes(FDR, log2FC))+
-  geom_point(aes(size = log2FC^2, color = log2FC))+
-  geom_point(aes(size = log2FC^2), shape = 1, color = 'black')+
-  # geom_text(aes(label = `GO biological process complete`), angle = 45)+
-  theme(legend.position = 'none')+
-  guides(color = 'none', size = 'none', fill = 'none')+
-  scale_x_log10()+
-  coord_cartesian(clip = "off") +
-  # geom_text(data = labs, aes(label = `biological process`), angle = 45)+
-  ggrepel::geom_label_repel(data = labs, aes(label = `biological process`), size = 1, box.padding = 0.4, max.overlaps = 30)+
-  ggtitle(paste0('test Jm Crown Gall GO Biological Process Results (', length(unique(dat$`biological process`)), ' terms)'))+
-  scale_color_gradient(low = 'blue', high = 'red')
-
-p
-
-save_plot('test_GO_BP_Jm_CG_plot.png', p)
-```
