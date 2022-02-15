@@ -48,7 +48,7 @@ p
 
 # Read in CG results
 ```{r}
-impCG = fread('results/Limma_results_table_CG.csv')
+impCG = fread('DGEresults/Limma_results_table_CG.csv')
 ```
 
 ## Total CG DEGs by haplotype
@@ -104,7 +104,7 @@ a
 
 # Read in PHY results
 ```{r}
-impPHY = fread('results/Limma_results_table_PHY.csv')
+impPHY = fread('DGEresults/Limma_results_table_PHY.csv')
 ```
 
 ## Total PHY DEGs by haplotype
@@ -158,7 +158,7 @@ b
 
 # Read in NEM results
 ```{r}
-impNEM = fread('results/Limma_results_table_NEM.csv')
+impNEM = fread('DGEresults/Limma_results_table_NEM.csv')
 ```
 
 ## Total NEM DEGs by haplotype
@@ -215,6 +215,6 @@ f = ggarrange(a, b, c, labels = c('A', 'B', 'C'), nrow = 1)
 
 f
 
-save_plot('results/CG_PHY_NEM_EBH.png', f, base_height = 7, base_width = 8)
+save_plot('DGEresults/CG_PHY_NEM_EBH.png', f, base_height = 7, base_width = 8)
 ```
 

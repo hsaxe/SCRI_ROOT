@@ -64,7 +64,7 @@ p =ggplot(metaLong, aes(reorder_within(Hybrid, value, Trait), value, fill = Hybr
   facet_wrap(~Trait, scales = 'free', ncol = 4)
 p
 
-save_plot('results/metadata_plot.png', p, base_height = 4, base_width = 8)
+save_plot('DGEresults/metadata_plot.png', p, base_height = 4, base_width = 8)
 ```
 
 # Center and scale predictors to make comparisons more interpretable in results
@@ -129,7 +129,7 @@ head(annotation_Jr)
 annotation_combined = annotation_Jm %>%
   rbind(annotation_Jr, fill = T)
 
-fwrite(annotation_combined, 'results/annotation_combined.csv')
+fwrite(annotation_combined, 'DGEresults/annotation_combined.csv')
 ```
 
 # Create DGEList object
@@ -163,7 +163,7 @@ cpmd = cpm(d)
 ```{r}
 d2 = expression_filter(dds, DGEList = T, FilterFUN = mean, FilterThreshold = 20)
 
-fwrite(as.data.frame(d2$counts), 'results/CPM_20_filtered.csv', row.names = T)
+fwrite(as.data.frame(d2$counts), 'DGEresults/CPM_20_filtered.csv', row.names = T)
 ```
 
 ## Cluster visualization
@@ -213,7 +213,7 @@ c = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col
 
 ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1)
 
-save_plot('results/Scatterplot_PC1_CG_PH_NEM.png', ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1), base_height = 10, base_width = 6)
+save_plot('DGEresults/Scatterplot_PC1_CG_PH_NEM.png', ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1), base_height = 10, base_width = 6)
 
 ```
 
@@ -318,12 +318,12 @@ head(impCG)
 
 length(unique(impCG$GeneID))
 
-fwrite(impCG, 'results/Limma_results_table_CG.csv')
+fwrite(impCG, 'DGEresults/Limma_results_table_CG.csv')
 ```
 
 # Read in CG results
 ```{r}
-impCG = fread('results/Limma_results_table_CG.csv')
+impCG = fread('DGEresults/Limma_results_table_CG.csv')
 ```
 
 # Positive CG DEGs for GO
@@ -522,14 +522,14 @@ impPHY = impPHY %>%
 
 head(impPHY)
 
-fwrite(impPHY, 'results/Limma_results_table_PHY.csv')
+fwrite(impPHY, 'DGEresults/Limma_results_table_PHY.csv')
 
-impPHY = fread('results/Limma_results_table_PHY.csv')
+impPHY = fread('DGEresults/Limma_results_table_PHY.csv')
 ```
 
 # Read in PHY results
 ```{r}
-impPHY = fread('results/Limma_results_table_PHY.csv')
+impPHY = fread('DGEresults/Limma_results_table_PHY.csv')
 ```
 
 # Positive PHY DEGs for GO
@@ -653,14 +653,14 @@ impNEM = impNEM %>%
 
 head(impNEM)
 
-fwrite(impNEM, 'results/Limma_results_table_NEM.csv')
+fwrite(impNEM, 'DGEresults/Limma_results_table_NEM.csv')
 
-impNEM = fread('results/Limma_results_table_NEM.csv')
+impNEM = fread('DGEresults/Limma_results_table_NEM.csv')
 ```
 
 # Read in NEM results
 ```{r}
-impNEM = fread('results/Limma_results_table_NEM.csv')
+impNEM = fread('DGEresults/Limma_results_table_NEM.csv')
 ```
 
 
@@ -821,7 +821,7 @@ summary = cbind(res_summaries_CG,res_summaries_PHY, res_summaries_NEM) %>%
 
 head(summary)
 
-write.csv(summary, 'results/Results_summaries.csv')
+write.csv(summary, 'DGEresults/Results_summaries.csv')
 ```
 
 # Venn Diagram
@@ -878,7 +878,7 @@ b = ggvenn(venn_neg)
 ggarrange(a, b, labels = c('A', 'B'), label.y = 0.75)
 
 
-save_plot('results/Venn_Pos_Neg.png', ggarrange(a, b, labels = c('A', 'B'), label.y = 0.75), base_width = 11, base_height = 11)
+save_plot('DGEresults/Venn_Pos_Neg.png', ggarrange(a, b, labels = c('A', 'B'), label.y = 0.75), base_width = 11, base_height = 11)
 ```
 
 
@@ -905,7 +905,7 @@ p = ggcorrplot(cormat1, type = 'lower', hc.order = T, lab = T, p.mat = corpmat1)
 
 p
 
-save_plot('results/Pheno_corrplot.png', p)
+save_plot('DGEresults/Pheno_corrplot.png', p)
 ```
 
 
