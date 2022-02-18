@@ -47,7 +47,12 @@ dat = dat %>%
          `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
   mutate(`Biological Process` = gsub('\\(.*\\)', '', `Biological Process`),
     log2FC = log2(as.numeric(`fold Enrichment`)),
-         `-log10 FDR` = log10(FDR)*-1)
+         `-log10 FDR` = log10(FDR)*-1,
+    Direction = ifelse(
+      log2FC >= 0, 'Pos', 'Neg'
+    ))
+
+res_list = list(CG_BP = count(dat, Direction))
 
 labs = dat %>%
   filter(`Biological Process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
@@ -94,7 +99,12 @@ dat = dat %>%
          `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
   mutate(`Cellular Component` = gsub('\\(.*\\)', '', `Cellular Component`),
     log2FC = log2(as.numeric(`fold Enrichment`)),
-         `-log10 FDR` = log10(FDR)*-1)
+         `-log10 FDR` = log10(FDR)*-1,
+    Direction = ifelse(
+      log2FC >= 0, 'Pos', 'Neg'
+    ))
+
+res_list$CG_CC = count(dat, Direction)
 
 p = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   geom_point(aes(size = log2FC^2, color = log2FC))+
@@ -126,7 +136,12 @@ dat = dat %>%
          `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
   mutate(`Biological Process` = gsub('\\(.*\\)', '', `Biological Process`),
     log2FC = log2(as.numeric(`fold Enrichment`)),
-         `-log10 FDR` = log10(FDR)*-1)
+         `-log10 FDR` = log10(FDR)*-1,
+    Direction = ifelse(
+      log2FC >= 0, 'Pos', 'Neg'
+    ))
+
+res_list$PHY_BP = count(dat, Direction)
 
 # labs = dat %>%
 #   filter(`Biological Process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
@@ -160,7 +175,12 @@ dat = dat %>%
          `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
   mutate(`Cellular Component` = gsub('\\(.*\\)', '', `Cellular Component`),
     log2FC = log2(as.numeric(`fold Enrichment`)),
-         `-log10 FDR` = log10(FDR)*-1)
+         `-log10 FDR` = log10(FDR)*-1,
+    Direction = ifelse(
+      log2FC >= 0, 'Pos', 'Neg'
+    ))
+
+res_list$PHY_CC = count(dat, Direction)
 
 p = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   geom_point(aes(size = log2FC^2, color = log2FC))+
@@ -191,7 +211,12 @@ dat = dat %>%
          `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
   mutate(`Biological Process` = gsub('\\(.*\\)', '', `Biological Process`),
     log2FC = log2(as.numeric(`fold Enrichment`)),
-         `-log10 FDR` = log10(FDR)*-1)
+         `-log10 FDR` = log10(FDR)*-1,
+    Direction = ifelse(
+      log2FC >= 0, 'Pos', 'Neg'
+    ))
+
+res_list$NEM_BP = count(dat, Direction)
 
 labs = dat %>%
   filter(`Biological Process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
@@ -225,7 +250,12 @@ dat = dat %>%
          `fold Enrichment` = as.numeric(ifelse(`fold Enrichment` == '< 0.01', min(`fold Enrichment`), `fold Enrichment`))) %>%
   mutate(`Cellular Component` = gsub('\\(.*\\)', '', `Cellular Component`),
     log2FC = log2(as.numeric(`fold Enrichment`)),
-         `-log10 FDR` = log10(FDR)*-1)
+         `-log10 FDR` = log10(FDR)*-1,
+    Direction = ifelse(
+      log2FC >= 0, 'Pos', 'Neg'
+    ))
+
+res_list$NEM_CC = count(dat, Direction)
 
 p = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   geom_point(aes(size = log2FC^2, color = log2FC))+
@@ -246,34 +276,39 @@ p
 save_plot('GOresults/GO_CC_NEM_plot.png', p)
 ```
 
+```{r}
+write.csv(res_list, 'C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT/GOresults/res_summaries.csv')
+```
+
+
 
 # Test GO Biological Process plotting CG Jr
 ```{r}
-dat = fread('test_GO_BP_Jr_parsed_CG.csv')
+# dat = fread('test_GO_BP_Jr_parsed_CG.csv')
+# 
+# dat = dat %>%
+#   mutate(GO_term = str_extract(`Biological Process`, '(?<=:).*?(?=\\))'), `fold Enrichment` = gsub('< 0.01', '0.01', `fold Enrichment`)) %>%
+#   mutate(GO_term = as.numeric(GO_term), log2FC = log2(as.numeric(`fold Enrichment`)))
+# 
+# labs = dat %>%
+#   filter(`Biological Process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
+# 
+# p = ggplot(dat, aes(FDR, log2FC))+
+#   geom_point(aes(size = log2FC^2, color = log2FC))+
+#   geom_point(aes(size = log2FC^2), shape = 1, color = 'black')+
+#   # geom_text(aes(label = `GO Biological Process complete`), angle = 45)+
+#   theme(legend.position = 'none')+
+#   guides(color = 'none', size = 'none', fill = 'none')+
+#   scale_x_log10()+
+#   coord_cartesian(clip = "off") +
+#   # geom_text(data = labs, aes(label = `Biological Process`), angle = 45)+
+#   ggrepel::geom_label_repel(data = labs, aes(label = `Biological Process`), size = 1, box.padding = 0.4, max.overlaps = 30)+
+#   ggtitle(paste0('test Jr Crown Gall GO Biological Process Results (', length(unique(dat$`Biological Process`)), ' terms)'))+
+#   scale_color_gradient(low = 'blue', high = 'red')
 
-dat = dat %>%
-  mutate(GO_term = str_extract(`Biological Process`, '(?<=:).*?(?=\\))'), `fold Enrichment` = gsub('< 0.01', '0.01', `fold Enrichment`)) %>%
-  mutate(GO_term = as.numeric(GO_term), log2FC = log2(as.numeric(`fold Enrichment`)))
-
-labs = dat %>%
-  filter(`Biological Process` %like% 'wall|poly|glucan|cellulose|ATP|RNA') 
-
-p = ggplot(dat, aes(FDR, log2FC))+
-  geom_point(aes(size = log2FC^2, color = log2FC))+
-  geom_point(aes(size = log2FC^2), shape = 1, color = 'black')+
-  # geom_text(aes(label = `GO Biological Process complete`), angle = 45)+
-  theme(legend.position = 'none')+
-  guides(color = 'none', size = 'none', fill = 'none')+
-  scale_x_log10()+
-  coord_cartesian(clip = "off") +
-  # geom_text(data = labs, aes(label = `Biological Process`), angle = 45)+
-  ggrepel::geom_label_repel(data = labs, aes(label = `Biological Process`), size = 1, box.padding = 0.4, max.overlaps = 30)+
-  ggtitle(paste0('test Jr Crown Gall GO Biological Process Results (', length(unique(dat$`Biological Process`)), ' terms)'))+
-  scale_color_gradient(low = 'blue', high = 'red')
-
-p
-
-save_plot('test_GO_BP_Jr_CG_plot.png', p)
+# p
+# 
+# save_plot('test_GO_BP_Jr_CG_plot.png', p)
 ```
 
 
