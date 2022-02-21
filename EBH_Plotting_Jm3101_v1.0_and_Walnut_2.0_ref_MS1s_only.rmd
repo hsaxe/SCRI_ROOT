@@ -20,12 +20,12 @@ left = function(x, n = 10){head(x[,1:n])}
 
 # Load data and annotation
 ```{r}
-dat = fread('CPM_20_filtered.csv') %>% 
+dat = fread('DGEresults/CPM_20_filtered.csv') %>% 
   rename(GeneID = V1)
 
 head(dat)
 
-anno = fread('annotation_combined.csv')
+anno = fread('DGEresults/annotation_combined.csv')
 ```
 
 # How many genes are being expressed from each haplotype?
