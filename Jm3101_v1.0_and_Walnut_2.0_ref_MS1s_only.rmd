@@ -216,7 +216,7 @@ c = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col
 
 ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1)
 
-save_plot('DGEresults/Scatterplot_PC1_CG_PH_NEM.png', ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1), base_height = 10, base_width = 6)
+save_plot('DGEresults/PCA_scatter_CG_PH_NEM.png', ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1), base_height = 10, base_width = 6)
 
 ```
 
