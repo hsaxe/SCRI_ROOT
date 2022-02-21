@@ -44,6 +44,9 @@ metadata = data.frame(Sample = colnames(dat)[colnames(dat) != 'GeneID']) %>%
   
 row.names(metadata) = metadata$Sample
 
+metadata = metadata %>% 
+  mutate(PHY_Avg = rowMeans(select(., matches('PCLR|PRLR'))))
+
 head(metadata)
 ```
 
@@ -51,7 +54,7 @@ head(metadata)
 ```{r}
 metaLong = metadata %>% 
   select(!Sample) %>% 
-  select(Hybrid, CG_Avg., Cinn.PRLR, TwoY_RLN) %>% 
+  select(Hybrid, CG_Avg., PHY_Avg, TwoY_RLN) %>% 
   distinct() %>% 
   pivot_longer(where(is.numeric), names_to = 'Trait')
 
@@ -302,7 +305,7 @@ PCA_CG = cpmd %>%
   right_join(ids) %>% 
   column_to_rownames(var = 'GeneID')
 
-plot_pca(PCA_CG, metadata, sample_colname = 'Sample', sample_names_in = 'col_names', x = 'PC1', y = 'PC2', scale = T, center = T, color = 'CG_Avg.', fill = 'CG_Avg.', plot_type = '2D', group_by = 'Hybrid')
+plot_pca(PCA_CG, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'PC2', scale = T, center = T, color = 'CG_Avg.', fill = 'CG_Avg.', plot_type = '2D')
 ```
 
 
@@ -348,7 +351,7 @@ length(unique(CG_GO_pos_both$GeneID))
 
 head(CG_GO_pos_both)
 
-fwrite(CG_GO_pos_both, "results/CG_DEGs_pos_GO.csv")
+fwrite(CG_GO_pos_both, "DGEresults/CG_DEGs_pos_GO.csv")
 
 ```
 
@@ -405,7 +408,7 @@ length(unique(CG_GO_neg_both$GeneID))
 
 head(CG_GO_neg_both)
 
-fwrite(CG_GO_neg_both, "results/CG_DEGs_neg_GO.csv")
+fwrite(CG_GO_neg_both, "DGEresults/CG_DEGs_neg_GO.csv")
 ```
 
 # Expression from alleles is causing duplication in GO results which means data loss as GO removes duplicates. However, these are not true duplicates.
@@ -467,7 +470,7 @@ ggplot(subcell_CG, aes(reorder(Subcell_loc, logFC), logFC))+
 
 # Fit model for genes associated with PHY score
 ```{r}
-mm = model.matrix(~Cinn.PRLR, data = metadata_S)
+mm = model.matrix(~PHY_Avg, data = metadata_S)
 
 head(mm)
 ```
@@ -554,7 +557,7 @@ length(unique(PHY_GO_pos_both$GeneID))
 
 head(PHY_GO_pos_both)
 
-fwrite(PHY_GO_pos_both, "results/PHY_DEGs_pos_GO.csv")
+fwrite(PHY_GO_pos_both, "DGEresults/PHY_DEGs_pos_GO.csv")
 
 ```
 
@@ -582,7 +585,7 @@ length(unique(PHY_GO_neg_both$GeneID))
 
 head(PHY_GO_neg_both)
 
-fwrite(PHY_GO_neg_both, "results/PHY_DEGs_neg_GO.csv")
+fwrite(PHY_GO_neg_both, "DGEresults/PHY_DEGs_neg_GO.csv")
 ```
 
 # PHY Subcellular localization by logFC boxplot
@@ -686,7 +689,7 @@ length(unique(NEM_GO_pos_both$GeneID))
 
 head(NEM_GO_pos_both)
 
-fwrite(NEM_GO_pos_both, "results/NEM_DEGs_pos_GO.csv")
+fwrite(NEM_GO_pos_both, "DGEresults/NEM_DEGs_pos_GO.csv")
 
 ```
 
@@ -714,7 +717,7 @@ length(unique(NEM_GO_neg_both$GeneID))
 
 head(NEM_GO_neg_both)
 
-fwrite(NEM_GO_neg_both, "results/NEM_DEGs_neg_GO.csv")
+fwrite(NEM_GO_neg_both, "DGEresults/NEM_DEGs_neg_GO.csv")
 ```
 
 # NEM Subcellular localization by logFC boxplot
@@ -772,7 +775,7 @@ length(unique(UNITY_GO_pos_both$GeneID))
 
 head(UNITY_GO_pos_both)
 
-fwrite(UNITY_GO_pos_both, "results/UNITY_DEGs_pos_GO.csv")
+fwrite(UNITY_GO_pos_both, "DGEresults/UNITY_DEGs_pos_GO.csv")
 
 ```
 
@@ -801,7 +804,7 @@ length(unique(UNITY_GO_neg_both$GeneID))
 
 head(UNITY_GO_neg_both)
 
-fwrite(UNITY_GO_neg_both, "results/UNITY_DEGs_neg_GO.csv")
+fwrite(UNITY_GO_neg_both, "DGEresults/UNITY_DEGs_neg_GO.csv")
 ```
 
 
