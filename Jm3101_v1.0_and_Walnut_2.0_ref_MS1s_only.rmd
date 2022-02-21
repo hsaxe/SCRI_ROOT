@@ -200,13 +200,15 @@ plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_nam
 
 # PCA scatterplot with fitted line and correlation coefficient
 ```{r fig.height=10, fig.width=7}
-## Available plotting data: [1] "Hybrid"      "Sample"      "CG_Avg."     "CG_Dec."     "Cinn.PCLR"   "Cinn.PRLR"  
- # [7] "Pini.PCLR"   "Pini.PRLR"   "PHY_Dec."    "TwoY_length" "TwoY_RLN"    "NEM_Dec."   
-# [13] "Unity"
-a = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'CG_Avg.', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', summarise_for_scatter = T)+
+## Available plotting data: 
+# [1] "Sample"      "Hybrid"      "CG_Avg."     "CG_Dec."     "Cinn.PCLR"   "Cinn.PRLR"  
+#  [7] "Pini.PCLR"   "Pini.PRLR"   "PHY_Dec."    "TwoY_length" "TwoY_RLN"    "NEM_Dec."   
+# [13] "Unity"       "PHY_Avg" 
+
+a = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC2', y = 'CG_Avg.', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', summarise_for_scatter = T)+
   ggtitle('Trait: Crown Gall Disease')
 
-b = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'Cinn.PRLR', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', summarise_for_scatter = T)+
+b = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC5', y = 'PHY_Avg', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', summarise_for_scatter = T)+
   ggtitle('Trait: Phytophthora Root Rot')
 
 c = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'TwoY_RLN', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', summarise_for_scatter = T)+
