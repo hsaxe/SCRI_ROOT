@@ -17,11 +17,11 @@ pacman::p_load(dplyr, tibble, readr, stringr, data.table, ggplot2, cowplot, tidy
 
 # Process analysis files downloaded from http://pantherdb.org/tools/compareToRefList.jsp
 ```{r}
-files = list.files('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT/GOresults/raw/')
+files = list.files('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/')
 
 parse_GO = function(x) {
   
-  dat = as.data.frame(read_tsv(paste0('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT/GOresults/raw/', x), skip = 11))
+  dat = as.data.frame(read_tsv(paste0('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/', x), skip = 11))
 
 filename =  colnames(dat)[1:2] %>% 
   str_extract('CG|PHY|NEM|Biological Process|Cellular Component') %>% 
@@ -31,7 +31,7 @@ filename =  colnames(dat)[1:2] %>%
 
 colnames(dat) = str_extract(colnames(dat), 'Biological Process|Cellular Component|(?<=\\().*?(?=\\))')
 
-write_csv(dat, paste0('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT/GOresults/', filename, '_parsed.csv'))
+write_csv(dat, paste0('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/', filename, '_parsed.csv'))
   
 }
 
@@ -157,7 +157,7 @@ p = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   coord_cartesian(clip = "off") +
   # geom_text(data = labs, aes(label = `Biological Process`), angle = 45)+
   ggrepel::geom_label_repel(aes(label = `Biological Process`, size = log2FC^2*0.01), box.padding = 0.4, label.padding = 0.1, max.overlaps = 30)+
-  ggtitle(paste0('P. Cinn GO Biological Process Results (', length(unique(dat$`Biological Process`)), ' terms)'))+
+  ggtitle(paste0('Phytophthora Root Rot GO Biological Process Results (', length(unique(dat$`Biological Process`)), ' terms)'))+
   scale_color_gradient2(low = 'blue', high = 'red')
 
 p
@@ -193,7 +193,7 @@ p = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   coord_cartesian(clip = "off") +
   # geom_text(data = labs, aes(label = `Cellular Component`), angle = 45)+
   ggrepel::geom_label_repel(aes(label = `Cellular Component`, size = log2FC^2*0.01), box.padding = 0.4, label.padding = 0.1, max.overlaps = 30)+
-  ggtitle(paste0('P. Cinn GO Cellular Component Results (', length(unique(dat$`Cellular Component`)), ' terms)'))+
+  ggtitle(paste0('Phytophthora Root Rot GO Cellular Component Results (', length(unique(dat$`Cellular Component`)), ' terms)'))+
   scale_color_gradient2(low = 'blue', high = 'red')
 
 p
