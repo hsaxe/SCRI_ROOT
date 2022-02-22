@@ -131,6 +131,14 @@ annotation_combined = annotation_Jm %>%
   rbind(annotation_Jr, fill = T)
 
 fwrite(annotation_combined, 'DGEresults/annotation_combined.csv')
+
+BP_anno = annotation_Jm %>% 
+  distinct(`Jr-GeneID`) %>% 
+  rbind(distinct(annotation_Jr, GeneID), use.names = F) %>% 
+  distinct(`Jr-GeneID`) %>% 
+  mutate(`Jr-GeneID` = paste0('LOC', `Jr-GeneID`))
+
+fwrite(BP_anno, 'GeneIDs_for_annotation_with_GO.csv')
 ```
 
 # Create DGEList object
