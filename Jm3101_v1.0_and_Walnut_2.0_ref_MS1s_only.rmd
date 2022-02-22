@@ -462,11 +462,18 @@ fwrite(CG_GO_neg_both, "DGEresults/CG_DEGs_neg_GO.csv")
 # CG Subcellular localization by logFC boxplot
 ```{r}
 subcell_CG = impCG %>% 
-  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype)
+  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype) %>% 
+  group_by(Subcell_loc) %>% 
+  mutate(mean = mean(logFC))
 
-ggplot(subcell_CG, aes(reorder(Subcell_loc, logFC), logFC))+
+p = ggplot(subcell_CG, aes(reorder(Subcell_loc, logFC), logFC, fill = mean))+
   geom_boxplot()+
-  theme(axis.text.x = element_text(angle = 30))
+  theme(axis.text.x = element_text(angle = 30))+
+  scale_fill_gradient2(low = 'blue', high = 'red')
+
+p
+
+save_plot('DGEresults/Subcell_boxplot_CG.png', p)
 ```
 
 
@@ -593,11 +600,18 @@ fwrite(PHY_GO_neg_both, "DGEresults/PHY_DEGs_neg_GO.csv")
 # PHY Subcellular localization by logFC boxplot
 ```{r}
 subcell_PHY = impPHY %>% 
-  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype)
+  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype) %>% 
+  group_by(Subcell_loc) %>% 
+  mutate(mean = mean(logFC))
 
-ggplot(subcell_PHY, aes(reorder(Subcell_loc, logFC), logFC))+
+p = ggplot(subcell_PHY, aes(reorder(Subcell_loc, logFC), logFC, fill = mean))+
   geom_boxplot()+
-  theme(axis.text.x = element_text(angle = 30))
+  theme(axis.text.x = element_text(angle = 30))+
+  scale_fill_gradient2(low = 'blue', high = 'red')
+
+p
+
+save_plot('DGEresults/Subcell_boxplot_PHY.png', p)
 ```
 
 
@@ -725,11 +739,18 @@ fwrite(NEM_GO_neg_both, "DGEresults/NEM_DEGs_neg_GO.csv")
 # NEM Subcellular localization by logFC boxplot
 ```{r}
 subcell_NEM = impNEM %>% 
-  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype)
+  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype) %>% 
+  group_by(Subcell_loc) %>% 
+  mutate(mean = mean(logFC))
 
-ggplot(subcell_NEM, aes(reorder(Subcell_loc, logFC), logFC))+
+p = ggplot(subcell_NEM, aes(reorder(Subcell_loc, logFC), logFC, fill = mean))+
   geom_boxplot()+
-  theme(axis.text.x = element_text(angle = 30))
+  theme(axis.text.x = element_text(angle = 30))+
+  scale_fill_gradient2(low = 'blue', high = 'red')
+
+p
+
+save_plot('DGEresults/Subcell_boxplot_NEM.png', p)
 ```
 
 
