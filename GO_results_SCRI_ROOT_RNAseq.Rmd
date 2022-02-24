@@ -17,25 +17,25 @@ pacman::p_load(dplyr, tibble, readr, stringr, data.table, ggplot2, cowplot, tidy
 
 # Process analysis files downloaded from http://pantherdb.org/tools/compareToRefList.jsp
 ```{r}
-files = list.files('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/')
-
-parse_GO = function(x) {
-  
-  dat = as.data.frame(read_tsv(paste0('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/', x), skip = 11))
-
-filename =  colnames(dat)[1:2] %>% 
-  str_extract('CG|PHY|NEM|Biological Process|Cellular Component') %>% 
-  paste0(collapse = '_') %>% 
-  gsub(' ', '_', .)
-  
-
-colnames(dat) = str_extract(colnames(dat), 'Biological Process|Cellular Component|(?<=\\().*?(?=\\))')
-
-write_csv(dat, paste0('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/', filename, '_parsed.csv'))
-  
-}
-
-lapply(files, parse_GO)
+# files = list.files('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/')
+# 
+# parse_GO = function(x) {
+#   
+#   dat = as.data.frame(read_tsv(paste0('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/', x), skip = 11))
+# 
+# filename =  colnames(dat)[1:2] %>% 
+#   str_extract('CG|PHY|NEM|Biological Process|Cellular Component') %>% 
+#   paste0(collapse = '_') %>% 
+#   gsub(' ', '_', .)
+#   
+# 
+# colnames(dat) = str_extract(colnames(dat), 'Biological Process|Cellular Component|(?<=\\().*?(?=\\))')
+# 
+# write_csv(dat, paste0('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/', filename, '_parsed.csv'))
+#   
+# }
+# 
+# lapply(files, parse_GO)
 ```
 
 # GO Biological Process plotting CG
