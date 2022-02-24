@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load neccessary libraries
 
 ```{r echo=TRUE}
-pacman::p_load(data.table, ggplot2, ggfortify, stringr, rtracklayer, ape, GEOquery, Biobase, BiocManager, dplyr, statmod, tidytable, tibble, ggpubr, cowplot, tidyr, tidytext, OmicsAnalyst)
+pacman::p_load(rlang, data.table, ggplot2, ggfortify, stringr, dplyr, statmod, tibble, ggpubr, cowplot, tidyr, tidytext, OmicsAnalyst, tidytable)
 
 ## Helpful function for quick viewing of wide data
 left = function(x, n = 10){head(x[,1:n])}
@@ -48,6 +48,8 @@ metadata = metadata %>%
   mutate(PHY_Avg = rowMeans(select(., matches('PCLR|PRLR'))))
 
 head(metadata)
+
+fwrite(metadata, 'SCRI_ROOT_RNAseq_metadata.csv')
 ```
 
 # Plotting metadata
@@ -99,7 +101,7 @@ all(colnames(dat1) == rownames(metadata_S))
 
 # Microcarpa annotation
 ```{r}
-annotation_Jm = fread("C:/Users/hsaxe/OneDrive/Documents/ALAB/Genome_info/Genomic_Annotation_2/Jm_x_Jr/Jm_x_Jr_Genomic_annotation_12_16_2021.csv")
+annotation_Jm = fread("C:/Users/hsaxe/OneDrive/Documents/ALAB/Genome_info/Genomic_Annotation_2/Jm_x_Jr/Jm_x_Jr_Genomic_annotation.csv")
 
 ## Extract everything but class mRNA and other isoforms. This reduces duplication in the data
 annotation_Jm = annotation_Jm %>%
@@ -113,7 +115,7 @@ head(annotation_Jm)
 
 # Regia annotation
 ```{r}
-annotation_Jr = fread("C:/Users/hsaxe/OneDrive/Documents/ALAB/Genome_info/Genomic_Annotation_2/Jr/Jr_Genomic_annotation_1_21_2022.csv")
+annotation_Jr = fread("C:/Users/hsaxe/OneDrive/Documents/ALAB/Genome_info/Genomic_Annotation_2/Jr/Jr_Genomic_annotation.csv")
 
 ## Extract everything but class mRNA and other isoforms. This reduces duplication in the data
 annotation_Jr = annotation_Jr %>%
@@ -477,11 +479,32 @@ subcell_CG = impCG %>%
 p = ggplot(subcell_CG, aes(reorder(Subcell_loc, logFC), logFC, fill = mean))+
   geom_boxplot()+
   theme(axis.text.x = element_text(angle = 30))+
+  xlab(NULL)+
+  ggtitle('Crown Gall Subcellular Localization')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red')+
   scale_fill_gradient2(low = 'blue', high = 'red')
 
 p
 
 save_plot('DGEresults/Subcell_boxplot_CG.png', p)
+```
+
+# CG Biological Process by logFC boxplot
+```{r}
+BP_CG = impCG %>% 
+  filter(Category == 'biological_process' & logFC^2 >= 0.25) %>% 
+  distinct(GeneID, logFC, Name, Parent_haplotype) %>% 
+  group_by(Name) %>% 
+  mutate(mean = mean(logFC))
+
+p = ggplot(BP_CG, aes(reorder(Name, logFC), logFC, fill = mean))+
+  geom_boxplot()+
+  theme(axis.text.x = element_text(angle = 30))+
+  scale_fill_gradient2(low = 'blue', high = 'red')
+
+p
+
+save_plot('DGEresults/BP_boxplot_CG.png', p, base_height = 20, base_width = 20)
 ```
 
 
@@ -615,6 +638,9 @@ subcell_PHY = impPHY %>%
 p = ggplot(subcell_PHY, aes(reorder(Subcell_loc, logFC), logFC, fill = mean))+
   geom_boxplot()+
   theme(axis.text.x = element_text(angle = 30))+
+  xlab(NULL)+
+  ggtitle('Phytophthora Root Rot Subcellular Localization')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red')+
   scale_fill_gradient2(low = 'blue', high = 'red')
 
 p
@@ -754,6 +780,9 @@ subcell_NEM = impNEM %>%
 p = ggplot(subcell_NEM, aes(reorder(Subcell_loc, logFC), logFC, fill = mean))+
   geom_boxplot()+
   theme(axis.text.x = element_text(angle = 30))+
+  xlab(NULL)+
+  ggtitle('Nematode Count Subcellular Localization')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red')+
   scale_fill_gradient2(low = 'blue', high = 'red')
 
 p
