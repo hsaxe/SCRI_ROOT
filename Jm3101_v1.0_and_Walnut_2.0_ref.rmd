@@ -1,5 +1,5 @@
 ---
-title: "Jm3101_v1.0_and_Walnut_2.0_ref_MS1s_only"
+title: "Jm3101_v1.0_and_Walnut_2.0"
 author: "Houston Saxe"
 date: "1/28/2022"
 output: github_document
@@ -166,15 +166,22 @@ d = expression_filter(dds, DGEList = T, FilterFUN = max, FilterThreshold = 75)
 ## CPM normalized counts of all data
 cpm = cpm(dds, prior.count = 2, log = F) 
 
+cpm = cpm %>% 
+  data.frame() %>% 
+  rownames_to_column(var = 'GeneID') %>%  
+  rename_with(~ gsub('X', '', gsub('\\.', '-', .x)))
+
+fwrite(cpm, 'DGEresults/cpm_plotting_data.csv')
+
 ## CPM normalized counts of filtered data
 cpmd = cpm(d)
 ```
 
 # Less conservative threshold for looking at expressed genes
 ```{r}
-d2 = expression_filter(dds, DGEList = T, FilterFUN = mean, FilterThreshold = 20)
-
-fwrite(as.data.frame(d2$counts), 'DGEresults/CPM_20_filtered.csv', row.names = T)
+# d2 = expression_filter(dds, DGEList = T, FilterFUN = mean, FilterThreshold = 20)
+# 
+# fwrite(as.data.frame(d2$counts), 'DGEresults/CPM_20_filtered.csv', row.names = T)
 ```
 
 ## Cluster visualization
@@ -185,7 +192,9 @@ fwrite(as.data.frame(d2$counts), 'DGEresults/CPM_20_filtered.csv', row.names = T
 
 # Plot PCA to look in R
 ```{r}
-plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'PC2', scale = T, center = T, color = 'Hybrid', fill = 'Hybrid', plot_type = '2D')
+pca = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'PC1', y = 'PC2', scale = T, center = T, color = 'Hybrid', fill = 'Hybrid', plot_type = '2D')
+
+pca$plot
 
 ```
 
@@ -204,7 +213,9 @@ plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_nam
 
 # PCA boxplot
 ```{r}
-plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'Hybrid', y = 'PC1', scale = T, center = T, fill = 'Cinn.PCLR', plot_type = 'boxplot')
+pca = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'Hybrid', y = 'PC1', scale = T, center = T, color = 'Hybrid', fill = 'PHY_Avg', plot_type = 'boxplot')
+
+pca
 ```
 
 
@@ -215,13 +226,15 @@ plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_nam
 #  [7] "Pini.PCLR"   "Pini.PRLR"   "PHY_Dec."    "TwoY_length" "TwoY_RLN"    "NEM_Dec."   
 # [13] "Unity"       "PHY_Avg" 
 
-a = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC2', y = 'CG_Avg.', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', summarise_for_scatter = T)+
+
+
+a = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'PC2', y = 'CG_Avg.', scale = T, center = T, plot_type = 'scatter', summarise_for_scatter = T)+
   ggtitle('Trait: Crown Gall Disease')
 
-b = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC5', y = 'PHY_Avg', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', summarise_for_scatter = T)+
+b = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'PC5', y = 'PHY_Avg', scale = T, center = T, plot_type = 'scatter', summarise_for_scatter = T)+
   ggtitle('Trait: Phytophthora Root Rot')
 
-c = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'TwoY_RLN', scale = T, center = T, color = 'Hybrid', plot_type = 'scatter', summarise_for_scatter = T)+
+c = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'PC1', y = 'TwoY_RLN', scale = T, center = T, plot_type = 'scatter', summarise_for_scatter = T)+
   ggtitle('Trait: Nematode Count')
 
 ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1)
@@ -317,7 +330,10 @@ PCA_CG = cpmd %>%
   right_join(ids) %>% 
   column_to_rownames(var = 'GeneID')
 
-plot_pca(PCA_CG, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Hybrid, x = 'PC1', y = 'PC2', scale = T, center = T, color = 'CG_Avg.', fill = 'CG_Avg.', plot_type = '2D')
+pca = plot_pca(PCA_CG, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'PC1', y = 'PC2', scale = T, center = T, color = 'CG_Avg.', fill = 'CG_Avg.', plot_type = '2D')
+
+pca$plot
+
 ```
 
 
@@ -491,20 +507,20 @@ save_plot('DGEresults/Subcell_boxplot_CG.png', p)
 
 # CG Biological Process by logFC boxplot
 ```{r}
-BP_CG = impCG %>% 
-  filter(Category == 'biological_process' & logFC^2 >= 0.25) %>% 
-  distinct(GeneID, logFC, Name, Parent_haplotype) %>% 
-  group_by(Name) %>% 
-  mutate(mean = mean(logFC))
-
-p = ggplot(BP_CG, aes(reorder(Name, logFC), logFC, fill = mean))+
-  geom_boxplot()+
-  theme(axis.text.x = element_text(angle = 30))+
-  scale_fill_gradient2(low = 'blue', high = 'red')
-
-p
-
-save_plot('DGEresults/BP_boxplot_CG.png', p, base_height = 20, base_width = 20)
+# BP_CG = impCG %>% 
+#   filter(Category == 'biological_process' & logFC^2 >= 0.25) %>% 
+#   distinct(GeneID, logFC, Name, Parent_haplotype) %>% 
+#   group_by(Name) %>% 
+#   mutate(mean = mean(logFC))
+# 
+# p = ggplot(BP_CG, aes(reorder(Name, logFC), logFC, fill = mean))+
+#   geom_boxplot()+
+#   theme(axis.text.x = element_text(angle = 30))+
+#   scale_fill_gradient2(low = 'blue', high = 'red')
+# 
+# p
+# 
+# save_plot('DGEresults/BP_boxplot_CG.png', p, base_height = 20, base_width = 20)
 ```
 
 
