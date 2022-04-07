@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load neccessary libraries
 
 ```{r echo=TRUE}
-pacman::p_load(rlang, data.table, ggplot2, ggfortify, stringr, dplyr, statmod, tibble, ggpubr, cowplot, tidyr, tidytext, OmicsAnalyst, tidytable)
+pacman::p_load(rlang, data.table, ggplot2, ggfortify, stringr, dplyr, statmod, tibble, ggpubr, cowplot, tidyr, tidytext, OmicsAnalyst, tidytable, gridExtra)
 ```
 
 # Read in results
