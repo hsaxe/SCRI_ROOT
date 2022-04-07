@@ -63,7 +63,7 @@ p =ggplot(metaLong, aes(reorder_within(Hybrid, value, Trait), value, fill = Hybr
 p
 ```
 ```{r}
-save_plot('DGEresults/metadata_plot.png', p, height = 10, width = 17)
+# save_plot('DGEresults/metadata_plot.png', p, height = 10, width = 17)
 ```
 
 
