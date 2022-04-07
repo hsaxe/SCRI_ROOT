@@ -9,18 +9,13 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Load neccessary libraries
-
+# Load neccessary libraries
 ```{r echo=TRUE}
-pacman::p_load(rlang, data.table, ggplot2, ggfortify, stringr, dplyr, statmod, tibble, ggpubr, cowplot, tidyr, tidytext, OmicsAnalyst, tidytable)
-
-## Helpful function for quick viewing of wide data
-left = function(x, n = 10){head(x[,1:n])}
+pacman::p_load(rlang, data.table, ggplot2, ggfortify, stringr, dplyr, statmod, tibble, ggpubr, sjPlot, tidyr, tidytext, OmicsAnalyst, tidytable)
 ```
 
-# Prepare expression data
+# Read in and prepare expression data
 ```{r}
-## Read in data
 dat = fread("C:/Users/hsaxe/OneDrive/Documents/ALAB/Transcriptome_data/Root/SCRI_ROOT_RNAseq_counts_combined_genomes.txt")
 
 dat$GeneID = gsub("LOC", "", dat$GeneID)
@@ -67,7 +62,7 @@ p =ggplot(metaLong, aes(reorder_within(Hybrid, value, Trait), value, fill = Hybr
   facet_wrap(~Trait, scales = 'free', ncol = 4)
 p
 
-save_plot('DGEresults/metadata_plot.png', p, base_height = 4, base_width = 8)
+save_plot('DGEresults/metadata_plot.png', p, height = 10, width = 17)
 ```
 
 # Center and scale predictors to make comparisons more interpretable in results
@@ -192,7 +187,17 @@ cpmd = cpm(d)
 
 # Plot PCA to look in R
 ```{r}
-pca = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'PC1', y = 'PC2', scale = T, center = T, color = 'Hybrid', fill = 'Hybrid', plot_type = '2D')
+pca = plot_pca(cpmd, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               plotting_factors_name = Hybrid, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'Hybrid',
+               fill = 'Hybrid',
+               plot_type = '2D')
 
 pca$plot
 
@@ -213,9 +218,19 @@ pca$plot
 
 # PCA boxplot
 ```{r}
-pca = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'Hybrid', y = 'PC1', scale = T, center = T, color = 'Hybrid', fill = 'PHY_Avg', plot_type = 'boxplot')
+pca = plot_pca(cpmd, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               plotting_factors_name = Hybrid, 
+               x = 'Hybrid',
+               y = 'PC1',
+               scale = T, 
+               center = T, 
+               color = 'Hybrid',
+               fill = 'PHY_Avg',
+               plot_type = 'boxplot')
 
-pca
+pca$plot_dat
 ```
 
 
@@ -223,23 +238,51 @@ pca
 ```{r fig.height=10, fig.width=7}
 ## Available plotting data: 
 # [1] "Sample"      "Hybrid"      "CG_Avg."     "CG_Dec."     "Cinn.PCLR"   "Cinn.PRLR"  
-#  [7] "Pini.PCLR"   "Pini.PRLR"   "PHY_Dec."    "TwoY_length" "TwoY_RLN"    "NEM_Dec."   
-# [13] "Unity"       "PHY_Avg" 
+#  [7] "Pini.PCLR"   "Pini.PRLR"   "PHY_Dec."    "TwoY_length" "TwoY_RLN"    "NEM_Dec."   # [13] "Unity"       "PHY_Avg" 
 
+a = plot_pca(cpmd, metadata,
+             join_by_name = 'Sample',
+             plotting_factors_in = 'col_names',
+             plotting_factors_name = Hybrid,
+             x = 'PC2', y = 'CG_Avg.',
+             scale = T,
+             center = T,
+             color = 'Hybrid',
+             plot_type = 'scatter',
+             summarise_for_scatter = T)
 
+b = plot_pca(cpmd, metadata,
+             join_by_name = 'Sample',
+             plotting_factors_in = 'col_names',
+             plotting_factors_name = Hybrid,
+             x = 'PC5',
+             y = 'PHY_Avg',
+             scale = T,
+             center = T,
+             color = 'Hybrid',
+             plot_type = 'scatter',
+             summarise_for_scatter = T)
 
-a = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'PC2', y = 'CG_Avg.', scale = T, center = T, plot_type = 'scatter', summarise_for_scatter = T)+
-  ggtitle('Trait: Crown Gall Disease')
+c = plot_pca(cpmd, metadata,
+             join_by_name = 'Sample',
+             plotting_factors_in = 'col_names',
+             plotting_factors_name = Hybrid, 
+             x = 'PC1',
+             y = 'TwoY_RLN',
+             scale = T, 
+             center = T, 
+             color = 'Hybrid',
+             plot_type = 'scatter',
+             summarise_for_scatter = T)
 
-b = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'PC5', y = 'PHY_Avg', scale = T, center = T, plot_type = 'scatter', summarise_for_scatter = T)+
-  ggtitle('Trait: Phytophthora Root Rot')
+arr = ggarrange(a$plot + ggtitle('Trait: Crown Gall Disease'),
+                b$plot + ggtitle('Trait: Phytophthora Root Rot'),
+                c$plot + ggtitle('Trait: Nematode Count'), 
+                labels = c('A)', 'B)', 'C)'), ncol = 1)
 
-c = plot_pca(cpmd, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'PC1', y = 'TwoY_RLN', scale = T, center = T, plot_type = 'scatter', summarise_for_scatter = T)+
-  ggtitle('Trait: Nematode Count')
+sjPlot::save_plot('DGEresults/PCA_scatter_CG_PH_NEM.png', arr, height = 35, width = 18)
 
-ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1)
-
-save_plot('DGEresults/PCA_scatter_CG_PH_NEM.png', ggarrange(a, b, c, labels = c('A', 'B', 'C'), ncol = 1), base_height = 10, base_width = 6)
+# save_plot('DGEresults/PCA_scatter_CG_PH_NEM.png', , base_height = 10, base_width = 6)
 
 ```
 
@@ -253,6 +296,7 @@ save_plot('DGEresults/PCA_scatter_CG_PH_NEM.png', ggarrange(a, b, c, labels = c(
 # pheatmap(cor, annotation = select(metadata,Hybrid))
 ```
 
+## Modeling against CG score
 
 # Create design matrix for CG score
 ```{r}
@@ -271,17 +315,17 @@ head(mm)
 
 ## More details at "[voom: precision weights unlock linear model analysis tools for RNA-seq read counts](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29)"
 
-# Filtered mean-variance trend
+# Filtered mean-variance trend CG
 ```{r}
 y <- voom(d, mm, plot = T)
 ```
 
-# Vs Unfiltered mean-variance trend
+# Vs Unfiltered mean-variance trend CG
 ```{r}
 # tmp <- voom(dds, mm, plot = T)
 ```
 
-# Fitting linear models in limma with random effects
+# Fitting linear models in limma with random effects CG
 ```{r}
 ## Need to tell limma where the within class correlation is coming from
 dupcor_CG = duplicateCorrelation(y, mm, block = metadata$Hybrid)
@@ -302,14 +346,14 @@ fit = lmFit(y, design = mm, block = metadata$Hybrid, correlation = consensus.cor
 BlockFit_CG = eBayes(fit)
 ```
 
-# Limma results
+# Limma results CG
 ```{r}
 res_summaries_CG = BlockFit_CG %>% decideTests() %>% summary()
 
 res_summaries_CG
 ```
 
-# Table of results
+# Table of results CG
 ```{r}
 impCG = topTable(BlockFit_CG, sort.by = "logFC", p.value = 0.05, adjust.method = "BH", number = Inf) %>%
   mutate(R = sqrt(t^2/(t^2 + 40)), AveExpr = 2^AveExpr)
@@ -330,14 +374,24 @@ PCA_CG = cpmd %>%
   right_join(ids) %>% 
   column_to_rownames(var = 'GeneID')
 
-pca = plot_pca(PCA_CG, metadata, join_by_name = 'Sample', plotting_factors_in = 'col_names', plotting_factors_name = Group, x = 'PC1', y = 'PC2', scale = T, center = T, color = 'CG_Avg.', fill = 'CG_Avg.', plot_type = '2D')
+pca = plot_pca(PCA_CG, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               plotting_factors_name = Group, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'CG_Avg.',
+               fill = 'CG_Avg.',
+               plot_type = '2D')
 
 pca$plot
 
 ```
 
 
-# Merge annotation with results
+# Merge annotation with results CG
 ```{r}
 impCG = impCG %>%
   rownames_to_column(var = "GeneID") %>%
@@ -485,45 +539,6 @@ fwrite(CG_GO_neg_both, "DGEresults/CG_DEGs_neg_GO.csv")
 ```
 
 
-# CG Subcellular localization by logFC boxplot
-```{r}
-subcell_CG = impCG %>% 
-  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype) %>% 
-  group_by(Subcell_loc) %>% 
-  mutate(mean = mean(logFC))
-
-p = ggplot(subcell_CG, aes(reorder(Subcell_loc, logFC), logFC, fill = mean))+
-  geom_boxplot()+
-  theme(axis.text.x = element_text(angle = 30))+
-  xlab(NULL)+
-  ggtitle('Crown Gall Subcellular Localization')+
-  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red')+
-  scale_fill_gradient2(low = 'blue', high = 'red')
-
-p
-
-save_plot('DGEresults/Subcell_boxplot_CG.png', p)
-```
-
-# CG Biological Process by logFC boxplot
-```{r}
-# BP_CG = impCG %>% 
-#   filter(Category == 'biological_process' & logFC^2 >= 0.25) %>% 
-#   distinct(GeneID, logFC, Name, Parent_haplotype) %>% 
-#   group_by(Name) %>% 
-#   mutate(mean = mean(logFC))
-# 
-# p = ggplot(BP_CG, aes(reorder(Name, logFC), logFC, fill = mean))+
-#   geom_boxplot()+
-#   theme(axis.text.x = element_text(angle = 30))+
-#   scale_fill_gradient2(low = 'blue', high = 'red')
-# 
-# p
-# 
-# save_plot('DGEresults/BP_boxplot_CG.png', p, base_height = 20, base_width = 20)
-```
-
-
 # Fit model for genes associated with PHY score
 ```{r}
 mm = model.matrix(~PHY_Avg, data = metadata_S)
@@ -531,12 +546,12 @@ mm = model.matrix(~PHY_Avg, data = metadata_S)
 head(mm)
 ```
 
-# Filtered mean-variance trend
+# Filtered mean-variance trend PHY
 ```{r}
 y <- voom(d, mm, plot = T)
 ```
 
-# Fitting linear models in limma with random effects
+# Fitting linear models in limma with random effects PHY
 ```{r}
 ## Need to tell limma where the within class correlation is coming from
 dupcor_PHY = duplicateCorrelation(y, mm, block = metadata$Hybrid)
@@ -553,14 +568,14 @@ fit = lmFit(y, design = mm, block = metadata$Hybrid, correlation = consensus.cor
 BlockFit_PHY = eBayes(fit)
 ```
 
-# Limma results
+# Limma results PHY
 ```{r}
 res_summaries_PHY = BlockFit_PHY %>% decideTests() %>% summary()
 
 res_summaries_PHY
 ```
 
-# Table of results
+# Table of results PHY
 ```{r}
 impPHY = topTable(BlockFit_PHY, sort.by = "logFC", p.value = 0.05, adjust.method = "BH", number = Inf) %>%
   mutate(R = sqrt(t^2/(t^2 + 40)), AveExpr = 2^AveExpr)
@@ -571,7 +586,7 @@ dim(impPHY)
 head(impPHY)
 ```
 
-# Merge annotation with results
+# Merge annotation with results PHY
 ```{r}
 impPHY = impPHY %>%
   rownames_to_column(var = "GeneID") %>%
@@ -644,26 +659,6 @@ head(PHY_GO_neg_both)
 fwrite(PHY_GO_neg_both, "DGEresults/PHY_DEGs_neg_GO.csv")
 ```
 
-# PHY Subcellular localization by logFC boxplot
-```{r}
-subcell_PHY = impPHY %>% 
-  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype) %>% 
-  group_by(Subcell_loc) %>% 
-  mutate(mean = mean(logFC))
-
-p = ggplot(subcell_PHY, aes(reorder(Subcell_loc, logFC), logFC, fill = mean))+
-  geom_boxplot()+
-  theme(axis.text.x = element_text(angle = 30))+
-  xlab(NULL)+
-  ggtitle('Phytophthora Root Rot Subcellular Localization')+
-  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red')+
-  scale_fill_gradient2(low = 'blue', high = 'red')
-
-p
-
-save_plot('DGEresults/Subcell_boxplot_PHY.png', p)
-```
-
 
 # Fit model for genes associated with NEM score
 ```{r}
@@ -672,12 +667,12 @@ mm = model.matrix(~TwoY_RLN, data = metadata_S)
 head(mm)
 ```
 
-# Filtered mean-variance trend
+# Filtered mean-variance trend NEM
 ```{r}
 y <- voom(d, mm, plot = T)
 ```
 
-# Fitting linear models in limma with random effects
+# Fitting linear models in limma with random effects NEM
 ```{r}
 ## Need to tell limma where the within class correlation is coming from
 dupcor_NEM = duplicateCorrelation(y, mm, block = metadata$Hybrid)
@@ -694,14 +689,14 @@ fit = lmFit(y, design = mm, block = metadata$Hybrid, correlation = consensus.cor
 BlockFit_NEM = eBayes(fit)
 ```
 
-## Limma results
+## Limma results NEM
 ```{r}
 res_summaries_NEM = BlockFit_NEM %>% decideTests() %>% summary()
 
 res_summaries_NEM
 ```
 
-## Table of results
+## Table of results NEM
 ```{r}
 impNEM = topTable(BlockFit_NEM, sort.by = "logFC", p.value = 0.05, adjust.method = "BH", number = Inf) %>%
   mutate(R = sqrt(t^2/(t^2 + 40)), AveExpr = 2^AveExpr)
@@ -712,7 +707,7 @@ dim(impNEM)
 head(impNEM)
 ```
 
-## Merge annotation with results
+## Merge annotation with results NEM
 ```{r}
 impNEM = impNEM %>%
   rownames_to_column(var = "GeneID") %>%
@@ -784,26 +779,6 @@ length(unique(NEM_GO_neg_both$GeneID))
 head(NEM_GO_neg_both)
 
 fwrite(NEM_GO_neg_both, "DGEresults/NEM_DEGs_neg_GO.csv")
-```
-
-# NEM Subcellular localization by logFC boxplot
-```{r}
-subcell_NEM = impNEM %>% 
-  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype) %>% 
-  group_by(Subcell_loc) %>% 
-  mutate(mean = mean(logFC))
-
-p = ggplot(subcell_NEM, aes(reorder(Subcell_loc, logFC), logFC, fill = mean))+
-  geom_boxplot()+
-  theme(axis.text.x = element_text(angle = 30))+
-  xlab(NULL)+
-  ggtitle('Nematode Count Subcellular Localization')+
-  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red')+
-  scale_fill_gradient2(low = 'blue', high = 'red')
-
-p
-
-save_plot('DGEresults/Subcell_boxplot_NEM.png', p)
 ```
 
 
@@ -894,14 +869,20 @@ c(length(unique(UNITY_GO_pos_both)), length(unique(UNITY_GO_neg_both$Gen)))
 ```{r}
 summary = cbind(res_summaries_CG,res_summaries_PHY, res_summaries_NEM) %>% 
   as.data.frame() %>% 
-  select(!`(Intercept)`)
+  select(!`(Intercept)`) %>% 
+  rename(PHY_Avg. = PHY_Avg) %>% 
+  rownames_to_column(var = 'Association') %>% 
+  mutate(Association = gsub('Down', 'Negative', gsub('Up', 'Positive', Association))) %>% 
+  rename_with(~ str_extract(.x, 'Association|CG|PHY|RLN')) %>% 
+  rename_with(~ gsub('RLN', 'NEM', .x))
 
 head(summary)
 
 write.csv(summary, 'DGEresults/Results_summaries.csv')
 ```
 
-# Venn Diagram
+
+# Venn Diagram positive genes
 ```{r}
 CG_pos = impCG %>%
   filter(logFC >= 0) %>% 
@@ -923,6 +904,7 @@ venn_pos = list(CG_pos = CG_pos, PHY_pos = PHY_pos, NEM_pos = NEM_pos)
 
 ```
 
+# Venn Diagram negative genes
 ```{r}
 CG_neg = impCG %>%
   filter(logFC <= 0) %>% 
@@ -944,7 +926,7 @@ venn_neg = list(CG_neg = CG_neg, PHY_neg = PHY_neg, NEM_neg = NEM_neg)
 
 ```
 
-# Plot and save venn diagram
+# Plot and save venn diagram figure with results summaries
 ```{r}
 library(ggvenn)
 
@@ -952,10 +934,16 @@ a = ggvenn(venn_pos)
 
 b = ggvenn(venn_neg)
 
-ggarrange(a, b, labels = c('A', 'B'), label.y = 0.75)
+p = tableGrob(summary)
+
+c = grid.arrange(p)
+
+ggarrange(a, b, c,  labels = c('A)', 'B)', 'C)'), label.y = 0.75)
 
 
-save_plot('DGEresults/Venn_Pos_Neg.png', ggarrange(a, b, labels = c('A', 'B'), label.y = 0.75), base_width = 11, base_height = 11)
+save_plot('DGEresults/Venn_Pos_Neg.png',
+          ggarrange(a, b, c,  labels = c('A)', 'B)', 'C)'), label.y = 0.75, heights = c(4,1)),
+          width = 25, height = 23)
 ```
 
 
@@ -985,71 +973,4 @@ p
 save_plot('DGEresults/Pheno_corrplot.png', p)
 ```
 
-
-# Troubleshooting space for pca function
-```{r}
-# dat = cpmd
-# scale = T
-# center = T
-# metadata = metadata
-# sample_colname = 'Sample'
-# group_by = 'Hybrid'
-# color = 'Hybrid'
-# x = 'PC2'
-# y = 'Cinn.PRLR'
-# 
-# dat = t(dat) %>%
-#       as.data.frame() %>%
-#     mutate(across(everything(), as.numeric)) %>%
-#     scale(scale = scale, center = center) %>%
-#     as.matrix()
-# 
-# dat = prcomp(dat, scale = F, center = F)
-#   
-#   scores = dat$x
-#   
-#   eigs = dat$sdev^2 
-#   
-#   var_exp = paste('(', formatC((eigs/sum(eigs))*100, format = 'f', digits = 2), '%', ')', sep = '')
-# 
-#   names(var_exp) = colnames(scores)
-#   
-#   plot_dat = scores %>%
-#   data.frame() %>%
-#   rownames_to_column(var = sample_colname) %>%
-#   left_join(metadata)
-#   
-#   plot_dat = plot_dat %>%
-#       group_by(get(group_by)) %>%
-#       summarise_if(is.numeric, mean)  
-#   
-#   colnames(plot_dat)[1] = group_by
-  
-  # ggscatter(plot_dat, x = x, y = y, add = 'reg.line', color = color)+
-  #     stat_cor()+ 
-  #     stat_smooth(method = 'lm')
-    
-```
-
-
-```{r}
-# Get matrix for correlation
-# cordat =  plot_dat %>%
-#   select(CG_Avg., Cinn.PRLR, TwoY_RLN, PC1, PC2) %>%
-#   scale() %>%
-#   as.matrix()
-# 
-# # Calculate p-values
-# corpmat = cor_pmat(cordat)
-# 
-# # Calculate correlation coefficients
-# cormat =cor(cordat)
-# 
-# # Plot. All relationships are significant
-# p = ggcorrplot(cormat, type = 'lower', hc.order = T, lab = T, p.mat = corpmat)
-# 
-# p
-
-# save_plot('Pheno_Geno_corrplot.png', p)
-```
 
