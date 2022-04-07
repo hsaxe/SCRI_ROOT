@@ -1,0 +1,101 @@
+---
+title: "Subcellular_Localization_Analysis"
+author: "Houston Saxe"
+date: "4/4/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load neccessary libraries
+
+```{r echo=TRUE}
+pacman::p_load(rlang, data.table, ggplot2, ggfortify, stringr, dplyr, statmod, tibble, ggpubr, cowplot, tidyr, tidytext, OmicsAnalyst, tidytable)
+```
+
+# Read in results
+```{r}
+impCG = fread('DGEresults/Limma_results_table_CG.csv')
+
+impPHY = fread('DGEresults/Limma_results_table_PHY.csv')
+
+impNEM = fread('DGEresults/Limma_results_table_NEM.csv')
+```
+
+
+# CG Subcellular localization by logFC boxplot
+```{r}
+subcell_CG = impCG %>% 
+  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype) %>% 
+  group_by(Subcell_loc) %>% 
+  mutate(Susceptibility = mean(logFC))
+
+p1 = ggplot(subcell_CG, aes(reorder(Subcell_loc, logFC), logFC, fill = Susceptibility))+
+  geom_boxplot()+
+  theme(axis.text.x = element_text(angle = 30))+
+  xlab(NULL)+
+  ggtitle('Crown Gall Subcellular Localization')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red')+
+  scale_fill_gradient2(low = 'blue', high = 'red')+
+  theme(legend.position = 'bottom', legend.margin = margin(t = -50), plot.margin = margin(0.5, 2, 0.5, 0.5, "cm"))
+
+p1
+
+save_plot('Subcell_results//Subcell_boxplot_CG.png', p1)
+```
+
+# PHY Subcellular localization by logFC boxplot
+```{r}
+subcell_PHY = impPHY %>% 
+  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype) %>% 
+  group_by(Subcell_loc) %>% 
+  mutate(Susceptibility = mean(logFC))
+
+p2 = ggplot(subcell_PHY, aes(reorder(Subcell_loc, logFC), logFC, fill = Susceptibility))+
+  geom_boxplot()+
+  theme(axis.text.x = element_text(angle = 30))+
+  xlab(NULL)+
+  ggtitle('Phytophthora Root Rot Subcellular Localization')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red')+
+  scale_fill_gradient2(low = 'blue', high = 'red')+
+  theme(legend.position = 'bottom', legend.margin = margin(t = -50), plot.margin = margin(0.5, 2, 0.5, 0.5, "cm"))
+
+p2
+
+save_plot('Subcell_results//Subcell_boxplot_PHY.png', p2)
+```
+
+# NEM Subcellular localization by logFC boxplot
+```{r}
+subcell_NEM = impNEM %>% 
+  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype) %>% 
+  group_by(Subcell_loc) %>% 
+  mutate(Susceptibility = mean(logFC))
+
+p3 = ggplot(subcell_NEM, aes(reorder(Subcell_loc, logFC), logFC, fill = Susceptibility))+
+  geom_boxplot()+
+  theme(axis.text.x = element_text(angle = 30))+
+  xlab(NULL)+
+  ggtitle('Nematode Count Subcellular Localization')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red')+
+  scale_fill_gradient2(low = 'blue', high = 'red')+
+  theme(legend.position = 'bottom', legend.margin = margin(t = -50), plot.margin = margin(0.5, 2, 0.5, 0.5, "cm"))
+
+p3
+
+save_plot('Subcell_results/Subcell_boxplot_NEM.png', p3)
+```
+
+# Arrange plots
+```{r}
+arr = ggarrange(p1, p2, p3, labels = c('A)', 'B)', 'C)'), ncol = 1)
+
+arr
+
+sjPlot::save_plot('Subcell_results/Subcell_aranged.png', arr, height = 22, width = 17)
+
+# save_plot('Subcell_results/Subcell_aranged.png', arr, base_height = 10, base_width = 8)
+```
+
