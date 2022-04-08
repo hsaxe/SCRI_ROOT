@@ -1,21 +1,17 @@
----
-title: "GO_results_SCRI_ROOT_RNAseq"
-author: "Houston Saxe"
-date: "1/24/2022"
-output: github_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+GO\_results\_SCRI\_ROOT\_RNAseq
+================
+Houston Saxe
+1/24/2022
 
 # Load libraries
-```{r}
+
+``` r
 pacman::p_load(dplyr, tibble, readr, stringr, data.table, ggplot2, sjPlot, ggpubr, tidyr)
 ```
 
-# Process analysis files downloaded from http://pantherdb.org/tools/compareToRefList.jsp
-```{r}
+# Process analysis files downloaded from <http://pantherdb.org/tools/compareToRefList.jsp>
+
+``` r
 # files = list.files('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/')
 # 
 # parse_GO = function(x) {
@@ -41,9 +37,9 @@ pacman::p_load(dplyr, tibble, readr, stringr, data.table, ggplot2, sjPlot, ggpub
 # lapply(files, parse_GO)
 ```
 
-
 # GO Biological Process plotting CG
-```{r}
+
+``` r
 dat = fread('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/biological_process_CG_parsed.csv')
 
 dat = dat %>%
@@ -73,12 +69,20 @@ p1 = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   guides(size = 'none')
 
 p1
+```
 
+![](GO_results_SCRI_ROOT_RNAseq_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+``` r
 save_plot('GOresults/GO_BP_CG_plot.png', p1)
 ```
 
+    ## png 
+    ##   2
+
 # GO Biological Process plotting PHY
-```{r}
+
+``` r
 dat = fread('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/biological_process_PHY_parsed.csv')
 
 dat = dat %>%
@@ -108,13 +112,20 @@ p2 = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   guides(size = 'none')
 
 p2
+```
 
+![](GO_results_SCRI_ROOT_RNAseq_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
 save_plot('GOresults/GO_BP_PHY_plot.png', p2)
 ```
 
+    ## png 
+    ##   2
 
 # GO Biological Process plotting NEM
-```{r}
+
+``` r
 dat = fread('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/biological_process_NEM_parsed.csv')
 
 dat = dat %>%
@@ -144,29 +155,45 @@ p3 = ggplot(dat, aes(log2FC, `-log10 FDR`))+
   guides(size = 'none')
 
 p3
+```
 
+![](GO_results_SCRI_ROOT_RNAseq_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
 save_plot('GOresults/GO_BP_NEM_plot.png', p3)
 ```
 
+    ## png 
+    ##   2
+
 # Arrange all plots to one
-```{r}
+
+``` r
 arr = ggarrange(p1, p2, p3, labels = c('A)', 'B)', 'C)'), ncol = 1)
 
 arr
+```
 
+![](GO_results_SCRI_ROOT_RNAseq_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
 sjPlot::save_plot('GOresults/GO_arranged_BP.png', arr, height = 25, width = 20)
+```
 
+    ## png 
+    ##   2
+
+``` r
 # save_plot('GOresults/GO_arranged_BP.png', arr, base_height = 9, base_width = 7)
 ```
 
-
-
-```{r}
+``` r
 write.csv(res_list, 'C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/res_summaries.csv')
 ```
 
 # Unified GO BP plot
-```{r}
+
+``` r
 dat = fread('C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/biological_process_NA_parsed.csv')
 
 dat = dat %>%
@@ -196,9 +223,15 @@ p3 = ggplot(dat, aes(log2FC, `-log10 P-value`))+
   guides(size = 'none')
 
 p3
+```
 
+![](GO_results_SCRI_ROOT_RNAseq_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
+``` r
 save_plot('GOresults/GO_BP_UNITY_plot.png', p3)
 ```
-```
 
+    ## png 
+    ##   2
+
+\`\`\`
