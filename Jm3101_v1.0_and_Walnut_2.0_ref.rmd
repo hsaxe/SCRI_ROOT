@@ -231,7 +231,7 @@ pca = plot_pca(cpmd, metadata,
                fill = 'PHY_Avg',
                plot_type = 'boxplot')
 
-pca$plot_dat
+pca$plot
 ```
 
 
@@ -281,10 +281,9 @@ arr = ggarrange(a$plot + ggtitle('Trait: Crown Gall Disease'),
                 c$plot + ggtitle('Trait: Nematode Count'), 
                 labels = c('A)', 'B)', 'C)'), ncol = 1)
 
+arr
+
 sjPlot::save_plot('DGEresults/PCA_scatter_CG_PH_NEM.png', arr, height = 35, width = 18)
-
-# save_plot('DGEresults/PCA_scatter_CG_PH_NEM.png', , base_height = 10, base_width = 6)
-
 ```
 
 
@@ -297,9 +296,9 @@ sjPlot::save_plot('DGEresults/PCA_scatter_CG_PH_NEM.png', arr, height = 35, widt
 # pheatmap(cor, annotation = select(metadata,Hybrid))
 ```
 
-## Modeling against CG score
+## Differential expression analysis
 
-# Create design matrix for CG score
+# Fit model for genes associated with CG score
 ```{r}
 mm = model.matrix(~CG_Avg., data = metadata_S)
 
