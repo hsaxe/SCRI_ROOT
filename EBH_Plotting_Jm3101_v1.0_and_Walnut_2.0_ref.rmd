@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load neccessary libraries
 
 ```{r message=FALSE, , results='hide', include=FALSE}
-pacman::p_load(dplyr, tibble, readr, stringr, data.table, ggplot2, sjplot, tidyr)
+pacman::p_load(dplyr, tibble, readr, stringr, data.table, ggplot2, sjPlot, tidyr)
 
 ## Helpful function for quick viewing of wide data
 left = function(x, n = 10){head(x[,1:n])}
@@ -53,13 +53,13 @@ impCG = fread('DGEresults/Limma_results_table_CG.csv')
 
 ## Total CG DEGs by haplotype
 ```{r}
-ASEsums = impCG %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
-
-p1 = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  theme(legend.position = 'none')+
-  labs(y='DEGs')+
-  ggtitle('Total CG DEGs')
+# ASEsums = impCG %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
+# 
+# p1 = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+#   geom_col(color = 'black')+
+#   theme(legend.position = 'none')+
+#   labs(y='DEGs')+
+#   ggtitle('Total CG DEGs')
 
 ```
 
@@ -96,7 +96,7 @@ p3 = ggplot(impCG_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
 ```
 # Put three CG plots together
 ```{r}
-a = ggarrange(p1, p2, p3, nrow = 3)
+a = ggarrange(p2, p3, nrow = 2)
 
 a
 ```
@@ -109,13 +109,13 @@ impPHY = fread('DGEresults/Limma_results_table_PHY.csv')
 
 ## Total PHY DEGs by haplotype
 ```{r}
-ASEsums = impPHY %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
-
-p1 = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  theme(legend.position = 'none')+
-  labs(y='DEGs')+
-  ggtitle('Total PHY DEGs')
+# ASEsums = impPHY %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
+# 
+# p1 = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+#   geom_col(color = 'black')+
+#   theme(legend.position = 'none')+
+#   labs(y='DEGs')+
+#   ggtitle('Total PHY DEGs')
 
 ```
 
@@ -151,7 +151,7 @@ p3 = ggplot(impPHY_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
 
 # Put three PHY plots together
 ```{r}
-b = ggarrange(p1, p2, p3, nrow = 3)
+b = ggarrange(p2, p3, nrow = 2)
 
 b
 ```
@@ -163,13 +163,13 @@ impNEM = fread('DGEresults/Limma_results_table_NEM.csv')
 
 ## Total NEM DEGs by haplotype
 ```{r}
-ASEsums = impNEM %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
-
-p1 = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-  geom_col(color = 'black')+
-  theme(legend.position = 'none')+
-  labs(y='DEGs')+
-  ggtitle('Total NEM DEGs')
+# ASEsums = impNEM %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
+# 
+# p1 = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+#   geom_col(color = 'black')+
+#   theme(legend.position = 'none')+
+#   labs(y='DEGs')+
+#   ggtitle('Total NEM DEGs')
 
 ```
 
@@ -205,16 +205,73 @@ p3 = ggplot(impNEM_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
 
 # Put three NEM plots together
 ```{r}
-c = ggarrange(p1, p2, p3, nrow = 3)
+c = ggarrange(p2, p3, nrow = 2)
 
 c
 ```
+
 # Put CG, PHY, and NEM figs into one fig
 ```{r}
 f = ggarrange(a, b, c, labels = c('A)', 'B)', 'C)'), nrow = 1)
 
 f
 
-sjPlot::save_plot('DGEresults/CG_PHY_NEM_EBH.png', f, height = 17, width = 20)
+sjPlot::save_plot('DGEresults/CG_PHY_NEM_EBH.png', f, height = 14, width = 16)
 ```
+
+# Read in Length results
+```{r}
+impLength = fread('DGEresults/Limma_results_table_Length.csv')
+```
+
+## Total Length DEGs by haplotype
+```{r}
+ASEsums = impLength %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
+
+p1 = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  theme(legend.position = 'none')+
+  labs(y='DEGs')+
+  ggtitle('Total Length DEGs')
+
+```
+
+# Length positive genes EBH
+```{r}
+impLength_pos = impLength %>%
+  filter(logFC > 0) %>%
+  distinct(GeneID, Parent_haplotype) %>% 
+  count(Parent_haplotype)
+
+p2 = ggplot(impLength_pos, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  theme(legend.position = 'none')+
+  labs(y='DEGs')+
+  ggtitle('Length DEGs (+)')
+
+```
+
+# Length negative genes EBH
+```{r}
+impLength_neg = impLength %>%
+  filter(logFC < 0) %>%
+  distinct(GeneID, Parent_haplotype) %>% 
+  count(Parent_haplotype)
+
+p3 = ggplot(impLength_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  theme(legend.position = 'none')+
+  labs(y='DEGs')+
+  ggtitle('Length DEGs (-)')
+
+```
+
+
+# Put three Length plots together
+```{r}
+d = ggarrange(p1, p2, p3, nrow = 3)
+
+d
+```
+
 
