@@ -1,0 +1,141 @@
+---
+title: "Make_GO_and_Subcell_Results_Workbook"
+author: "Houston Saxe"
+date: "8/15/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load neccessary libraries
+
+```{r echo=TRUE}
+pacman::p_load(rlang, 
+               data.table, 
+               ggplot2,
+               ggfortify, 
+               stringr, 
+               dplyr, 
+               statmod, 
+               tibble,
+               ggpubr, 
+               sjPlot, 
+               tidyr,
+               tidytext, 
+               OmicsAnalyst,
+               tidytable, 
+               gridExtra,
+               openxlsx)
+```
+
+# Read in results
+```{r}
+subcell_CG = fread('Subcell_results/Subcell_Results_Table_CG.csv')
+
+BP_CG = fread('GOresults/BP_Results_Table_CG.csv')
+
+
+subcell_PHY = fread('Subcell_results/Subcell_Results_Table_PHY.csv')
+
+BP_PHY = fread('GOresults/BP_Results_Table_PHY.csv')
+
+
+subcell_NEM = fread('Subcell_results/Subcell_Results_Table_NEM.csv')
+
+BP_NEM = fread('GOresults/BP_Results_Table_NEM.csv')
+```
+
+
+# CG make results worksheet
+```{r}
+full_results = subcell_CG %>% 
+  left_join(BP_CG, by = c('Subcell_GeneID' = 'BP_mapped_id.y'))
+
+wb = createWorkbook()
+
+addWorksheet(wb, sheetName = 'Crown Gall', gridLines = F)
+
+writeDataTable(wb, sheet = 1, x = full_results)
+```
+
+# CG make results worksheet
+```{r}
+quick_results = subcell_CG %>% 
+  select(Subcell_Subcell_loc, Subcell_FDR, Subcell_fold_enrichment, Subcell_GeneID, Subcell_name, Subcell_logFC, Subcell_Term_logFC) %>% 
+  left_join(BP_CG %>% select(BP_log_FE_Mod, BP_fdr, BP_term.label.y, BP_mapped_id.y, BP_Term_label_logFC), 
+            by = c('Subcell_GeneID' = 'BP_mapped_id.y')) %>% 
+  rename(Gene_name = Subcell_name, logFC = Subcell_logFC, Biological_process = BP_term.label.y)
+
+wb2 = createWorkbook()
+
+addWorksheet(wb2, sheetName = 'Crown Gall', gridLines = F)
+
+writeDataTable(wb2, sheet = 1, x = quick_results)
+```
+
+# PHY make results worksheet
+```{r}
+full_results = subcell_PHY %>% 
+  left_join(BP_PHY, by = c('Subcell_GeneID' = 'BP_mapped_id.y'))
+
+addWorksheet(wb, sheetName = 'Phytophthora', gridLines = F)
+
+writeDataTable(wb, sheet = 2, x = full_results)
+```
+
+# PHY make results worksheet
+```{r}
+quick_results = subcell_PHY %>% 
+  select(Subcell_Subcell_loc, Subcell_FDR, Subcell_fold_enrichment, Subcell_GeneID, Subcell_name, Subcell_logFC, Subcell_Term_logFC) %>% 
+  left_join(BP_PHY %>% select(BP_log_FE_Mod, BP_fdr, BP_term.label.y, BP_mapped_id.y, BP_Term_label_logFC), 
+            by = c('Subcell_GeneID' = 'BP_mapped_id.y')) %>% 
+  rename(Gene_name = Subcell_name, logFC = Subcell_logFC, Biological_process = BP_term.label.y)
+
+addWorksheet(wb2, sheetName = 'Phytophthora', gridLines = F)
+
+writeDataTable(wb2, sheet = 2, x = quick_results)
+```
+
+# NEM make results worksheet
+```{r}
+full_results = subcell_NEM %>% 
+  left_join(BP_NEM, by = c('Subcell_GeneID' = 'BP_mapped_id.y'))
+
+addWorksheet(wb, sheetName = 'Nematodes', gridLines = F)
+
+writeDataTable(wb, sheet = 3, x = full_results)
+```
+
+# NEM make results worksheet
+```{r}
+quick_results = subcell_NEM %>% 
+  select(Subcell_Subcell_loc, Subcell_FDR, Subcell_fold_enrichment, Subcell_GeneID, Subcell_name, Subcell_logFC, Subcell_Term_logFC) %>% 
+  left_join(BP_NEM %>% select(BP_log_FE_Mod, BP_fdr, BP_term.label.y, BP_mapped_id.y, BP_Term_label_logFC), 
+            by = c('Subcell_GeneID' = 'BP_mapped_id.y')) %>% 
+  rename(Gene_name = Subcell_name, logFC = Subcell_logFC, Biological_process = BP_term.label.y)
+
+
+addWorksheet(wb2, sheetName = 'Nematodes', gridLines = F)
+
+writeDataTable(wb2, sheet = 3, x = quick_results)
+```
+
+# Write workbook of results
+```{r}
+saveWorkbook(wb, 'File_S1_GO_BP_Subcell_full_results.xlsx', overwrite = T)
+
+saveWorkbook(wb2, 'File_S1_GO_BP_Subcell_quick_results.xlsx', overwrite = T)
+```
+
+
+```{r, fig.width=10}
+dat = quick_results %>% 
+  filter(BP_term.label.y %like% 'cell wall' & BP_fdr <= 0.05 & Subcell_FDR <= 0.05) %>% 
+  select(!c(Subcell_GeneID, Subcell_name, BP_name)) %>% 
+  distinct()
+
+ggplot(dat, aes(reorder(Subcell_Subcell_loc, Subcell_fold_enrichment), Subcell_fold_enrichment, fill = Subcell_fold_enrichment))+
+  geom_col()
+```
