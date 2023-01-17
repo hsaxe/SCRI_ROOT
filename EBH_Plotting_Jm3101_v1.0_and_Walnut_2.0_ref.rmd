@@ -10,20 +10,27 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Load neccessary libraries
-
 ```{r message=FALSE, , results='hide', include=FALSE}
-pacman::p_load(dplyr, tibble, readr, stringr, data.table, ggplot2, sjPlot, tidyr)
+pacman::p_load(dplyr,
+               tibble,
+               readr,
+               stringr,
+               data.table,
+               ggplot2,
+               sjPlot, 
+               tidyr,
+               ggpubr,
+               ggmosaic)
 
-## Helpful function for quick viewing of wide data
-left = function(x, n = 10){head(x[,1:n])}
 ```
 
 # Load data and annotation
 ```{r}
-dat = fread('DGEresults/CPM_20_filtered.csv') %>% 
-  rename(GeneID = V1)
+dat = fread('DGEresults/DGE_CPM_data.csv')
 
 head(dat)
+
+dat$GeneID %>% unique() %>% length()
 
 anno = fread('DGEresults/annotation_combined.csv')
 ```
@@ -36,187 +43,603 @@ expressed = dat %>%
   select(GeneID) %>% 
   left_join(anno) %>%
   distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
+  count(Parent_haplotype, name = 'Expressed_gene_count')
 
-p = ggplot(expressed, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+p = ggplot(expressed, aes(Parent_haplotype, Expressed_gene_count, fill = Parent_haplotype))+
   geom_col(color = 'black')+
   labs(y='Expressed genes')
 
 p
 
 ```
-
-# Read in CG results
+### View table
 ```{r}
-impCG = fread('DGEresults/Limma_results_table_CG.csv')
+expressed
 ```
 
-## Total CG DEGs by haplotype
+# CG Read in results
 ```{r}
-# ASEsums = impCG %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
-# 
-# p1 = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-#   geom_col(color = 'black')+
-#   theme(legend.position = 'none')+
-#   labs(y='DEGs')+
-#   ggtitle('Total CG DEGs')
-
+impCG = fread('DGEresults/Limma_results_table_CG.csv') %>% 
+  mutate(Gene_type = ifelse(logFC > 0, 'Susceptiblity', 'Resistance'),
+         Parent_haplotype = factor(Parent_haplotype, levels = c('J.regia', 'J.microcarpa')))
 ```
 
-# CG positive genes EBH
+### Total CG DEGs by haplotype
+```{r}
+ASEsums = impCG %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype, name = 'DEG_gene_count')
+
+p1 = ggplot(ASEsums, aes(Parent_haplotype, DEG_gene_count, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  theme(legend.position = 'none')+
+  labs(y='DEGs')+
+  ggtitle('Total CG DEGs')
+
+p1
+
+```
+### Sum of the DEGs
+```{r}
+sum(ASEsums$DEG_gene_count)
+```
+
+### CG positive genes EBH
 ```{r}
 impCG_pos = impCG %>%
   filter(logFC > 0) %>%
   distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
+  count(Parent_haplotype, name = 'Susceptibility_genes')
 
 sum(impCG_pos$n)
 
-p2 = ggplot(impCG_pos, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+p2 = ggplot(impCG_pos, aes(Parent_haplotype, Susceptibility_genes, fill = Parent_haplotype))+
   geom_col(color = 'black')+
   theme(legend.position = 'none')+
   labs(y='DEGs')+
   ggtitle('CG DEGs (+)')
 
+p2
 ```
 
-# CG negative genes EBH
+### Adding binomial test
+```{r}
+binom.test.v = Vectorize(binom.test)
+
+impCG_pos_test = impCG_pos %>% 
+  mutate(observed_sum = sum(Susceptibility_genes)) %>% 
+  rename(observed = Susceptibility_genes) %>% 
+  left_join(expressed, by = 'Parent_haplotype') %>% 
+  left_join(ASEsums, by = 'Parent_haplotype') %>% 
+  mutate(Analysis = 'CG_pos',
+         Expressed_gene_count_sum = sum(Expressed_gene_count),
+         DEG_gene_count_sum = sum(DEG_gene_count),
+         Background_prob = DEG_gene_count/DEG_gene_count_sum,
+         expected_observed = Background_prob*observed_sum,
+         log_FE = log2(observed/expected_observed)) %>% 
+  group_by(Parent_haplotype) %>% 
+  mutate(Binom_p_val = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[3]],
+         Binom_estimate = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[5]][[1]]) %>% 
+  relocate(Analysis)
+
+```
+
+### CG negative genes EBH
 ```{r}
 impCG_neg = impCG %>%
   filter(logFC < 0) %>%
   distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
+  count(Parent_haplotype, name = 'Resistance_genes')
 
-p3 = ggplot(impCG_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+p3 = ggplot(impCG_neg, aes(Parent_haplotype, Resistance_genes, fill = Parent_haplotype))+
   geom_col(color = 'black')+
   theme(legend.position = 'none')+
   labs(y='DEGs')+
   ggtitle('CG DEGs (-)')
 
+p3
 ```
-# Put three CG plots together
+
+### Adding binomial test
+```{r}
+impCG_neg_test = impCG_neg %>% 
+  mutate(observed_sum = sum(Resistance_genes)) %>% 
+  rename(observed = Resistance_genes) %>% 
+  left_join(expressed, by = 'Parent_haplotype') %>% 
+  left_join(ASEsums, by = 'Parent_haplotype') %>% 
+  mutate(Analysis = 'CG_neg',
+         Expressed_gene_count_sum = sum(Expressed_gene_count),
+         DEG_gene_count_sum = sum(DEG_gene_count),
+         Background_prob = DEG_gene_count/DEG_gene_count_sum,
+         expected_observed = Background_prob*observed_sum,
+         log_FE = log2(observed/expected_observed)) %>% 
+  group_by(Parent_haplotype) %>% 
+  mutate(Binom_p_val = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[3]],
+         Binom_estimate = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[5]][[1]]) %>% 
+  relocate(Analysis)
+
+
+View(impCG_neg_test)
+```
+
+# Contingency table for Fisher's exact test
+###Tests H1 that the odds of expressing susceptibility genes are higher in J. regia than J. microcarpa
+```{r}
+t = impCG_pos %>% 
+  left_join(impCG_neg) %>% 
+  arrange(desc(Susceptibility_genes)) %>% 
+  column_to_rownames(var = 'Parent_haplotype') %>% 
+  t()
+
+t
+```
+
+# Do results change if you reorder Contingency table to test H1 that the odds of expressing resistance genes are higher in J. microcarpa than J. regia? It appears not
+```{r}
+t = impCG_pos %>% 
+  left_join(impCG_neg) %>%
+  arrange(desc(Parent_haplotype)) %>% 
+  relocate(Resistance_genes, .before = Susceptibility_genes) %>% 
+  column_to_rownames(var = 'Parent_haplotype') %>% 
+
+  t()
+
+t
+```
+
+### Check to see if sum is correct
+```{r}
+sum(t)
+```
+
+### Mosaic plot
+```{r}
+mosaicplot(t,
+           color = T)
+```
+
+### Fisher's exact test, new structure
+```{r}
+fisher_res = fisher.test(t)
+
+fisher_res
+
+```
+
+# Do results change if you reorder Contingency table to test H1 that the odds of expressing resistance genes are higher in J. microcarpa than J. regia? It appears not
+```{r}
+t = impCG_pos %>% 
+  left_join(impCG_neg) %>%
+  arrange(desc(Parent_haplotype)) %>% 
+  relocate(Resistance_genes, .before = Susceptibility_genes) %>% 
+  column_to_rownames(var = 'Parent_haplotype') %>% 
+  t()
+
+t
+```
+
+### Check to see if sum is correct
+```{r}
+sum(t)
+```
+
+### Mosaic plot
+```{r}
+mosaicplot(t,
+           color = T)
+```
+
+### Fisher's exact test, new structure
+```{r}
+fisher_res = fisher.test(t)
+
+fisher_res
+
+```
+
+### New mosaic plot
+```{r}
+uniq_impCG = impCG %>% 
+  distinct(GeneID, Parent_haplotype, Gene_type) %>% 
+  mutate(Pathogen = 'A. tumefaciens',
+         Stats = paste('Fisher p-value: ',
+                     round(fisher_res$p.val, 4),
+                     '\n', 'Odds ratio: ',
+                     round(fisher_res$estimate, 3), sep = ''))
+
+A = ggplot(uniq_impCG)+
+  geom_mosaic(aes(x = product(Gene_type, Parent_haplotype), fill = Parent_haplotype), color = 'black')+
+  theme_grey(base_size = 14)+
+    theme(legend.position = 'none',
+          strip.text = element_text(face = 'italic'))+
+  facet_wrap(~Pathogen+Stats)
+
+A
+```
+
+### Put three CG plots together
 ```{r}
 a = ggarrange(p2, p3, nrow = 2)
 
 a
 ```
 
-
-# Read in PHY results
+# PHY Read in results
 ```{r}
-impPHY = fread('DGEresults/Limma_results_table_PHY.csv')
+impPHY = fread('DGEresults/Limma_results_table_PHY.csv') %>% 
+ mutate(Gene_type = ifelse(logFC > 0, 'Susceptiblity', 'Resistance'),
+         Parent_haplotype = factor(Parent_haplotype, levels = c('J.regia', 'J.microcarpa')))
 ```
 
-## Total PHY DEGs by haplotype
+### Total PHY DEGs by haplotype
 ```{r}
-# ASEsums = impPHY %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
-# 
-# p1 = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-#   geom_col(color = 'black')+
-#   theme(legend.position = 'none')+
-#   labs(y='DEGs')+
-#   ggtitle('Total PHY DEGs')
+ASEsums = impPHY %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype, name = 'DEG_gene_count')
+
+p1 = ggplot(ASEsums, aes(Parent_haplotype, DEG_gene_count, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  theme(legend.position = 'none')+
+  labs(y='DEGs')+
+  ggtitle('Total PHY DEGs')
+
+p1
 
 ```
 
-# PHY positive genes EBH
+### Sum of the DEGs
+```{r}
+sum(ASEsums$DEG_gene_count)
+```
+
+### PHY positive genes EBH
 ```{r}
 impPHY_pos = impPHY %>%
   filter(logFC > 0) %>%
   distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
+  count(Parent_haplotype, name = 'Susceptibility_genes')
 
-p2 = ggplot(impPHY_pos, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+sum(impPHY_pos$n)
+
+p2 = ggplot(impPHY_pos, aes(Parent_haplotype, Susceptibility_genes, fill = Parent_haplotype))+
   geom_col(color = 'black')+
   theme(legend.position = 'none')+
   labs(y='DEGs')+
   ggtitle('PHY DEGs (+)')
 
+p2
 ```
 
-# PHY negative genes EBH
+### Adding binomial test
+```{r}
+binom.test.v = Vectorize(binom.test)
+
+impPHY_pos_test = impPHY_pos %>% 
+  mutate(observed_sum = sum(Susceptibility_genes)) %>% 
+  rename(observed = Susceptibility_genes) %>% 
+  left_join(expressed, by = 'Parent_haplotype') %>% 
+  left_join(ASEsums, by = 'Parent_haplotype') %>% 
+  mutate(Analysis = 'PHY_pos',
+         Expressed_gene_count_sum = sum(Expressed_gene_count),
+         DEG_gene_count_sum = sum(DEG_gene_count),
+         Background_prob = DEG_gene_count/DEG_gene_count_sum,
+         expected_observed = Background_prob*observed_sum,
+         log_FE = log2(observed/expected_observed)) %>% 
+  group_by(Parent_haplotype) %>% 
+  mutate(Binom_p_val = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[3]],
+         Binom_estimate = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[5]][[1]]) %>% 
+  relocate(Analysis)
+
+```
+
+### PHY negative genes EBH
 ```{r}
 impPHY_neg = impPHY %>%
   filter(logFC < 0) %>%
   distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
+  count(Parent_haplotype, name = 'Resistance_genes')
 
-p3 = ggplot(impPHY_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+p3 = ggplot(impPHY_neg, aes(Parent_haplotype, Resistance_genes, fill = Parent_haplotype))+
   geom_col(color = 'black')+
   theme(legend.position = 'none')+
   labs(y='DEGs')+
   ggtitle('PHY DEGs (-)')
 
+p3
 ```
 
-# Put three PHY plots together
+### Adding binomial test
 ```{r}
-b = ggarrange(p2, p3, nrow = 2)
+impPHY_neg_test = impPHY_neg %>% 
+  mutate(observed_sum = sum(Resistance_genes)) %>% 
+  rename(observed = Resistance_genes) %>% 
+  left_join(expressed, by = 'Parent_haplotype') %>% 
+  left_join(ASEsums, by = 'Parent_haplotype') %>% 
+  mutate(Analysis = 'PHY_neg',
+         Expressed_gene_count_sum = sum(Expressed_gene_count),
+         DEG_gene_count_sum = sum(DEG_gene_count),
+         Background_prob = DEG_gene_count/DEG_gene_count_sum,
+         expected_observed = Background_prob*observed_sum,
+         log_FE = log2(observed/expected_observed)) %>% 
+  group_by(Parent_haplotype) %>% 
+  mutate(Binom_p_val = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[3]],
+         Binom_estimate = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[5]][[1]]) %>% 
+  relocate(Analysis)
 
-b
+
+View(impPHY_neg_test)
 ```
 
-# Read in NEM results
+# Contingency table for Fisher's exact test
 ```{r}
-impNEM = fread('DGEresults/Limma_results_table_NEM.csv')
+t = impPHY_pos %>% 
+  left_join(impPHY_neg) %>% 
+  arrange(desc(Susceptibility_genes)) %>%
+  column_to_rownames(var = 'Parent_haplotype') %>% 
+  t()
+
+t
 ```
 
-## Total NEM DEGs by haplotype
+### Check to see if sum is correct
 ```{r}
-# ASEsums = impNEM %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype)
-# 
-# p1 = ggplot(ASEsums, aes(Parent_haplotype, n, fill = Parent_haplotype))+
-#   geom_col(color = 'black')+
-#   theme(legend.position = 'none')+
-#   labs(y='DEGs')+
-#   ggtitle('Total NEM DEGs')
+sum(t)
+```
+
+### Mosaic plot
+```{r}
+mosaicplot(t,
+           color = T)
+```
+
+### Fisher's exact test, new structure
+```{r}
+fisher_res = fisher.test(t)
+
+fisher_res
 
 ```
 
-# NEM positive genes EBH
+### New mosaic plot
+```{r}
+uniq_impPHY = impPHY %>% 
+  distinct(GeneID, Parent_haplotype, Gene_type) %>% 
+  mutate(Pathogen = 'Phytophthora .spp',
+         Stats = paste('Fisher p-value: ',
+                     round(fisher_res$p.val, 3),
+                     '\n', 'Odds ratio: ',
+                     round(fisher_res$estimate, 3), sep = ''))
+
+B = ggplot(uniq_impPHY)+
+  geom_mosaic(aes(x = product(Gene_type, Parent_haplotype), fill = Parent_haplotype), color = 'black')+
+  labs(title = substitute(paste(italic('Phytophthora'))),
+       tag = paste('.spp ',
+                   'Fisher p-value: ',
+                     round(fisher_res$p.val, 3),
+                     ', ', 'Odds ratio: ',
+                     round(fisher_res$estimate, 3), sep = ''))+
+  theme(legend.position = 'none', plot.tag.position = c(0.56, 0.98))
+
+B
+```
+
+### Put three PHY plots together
+```{r}
+a = ggarrange(p2, p3, nrow = 2)
+
+a
+```
+
+# NEM Read in results
+```{r}
+impNEM = fread('DGEresults/Limma_results_table_NEM.csv') %>% 
+ mutate(Gene_type = ifelse(logFC > 0, 'Susceptiblity', 'Resistance'),
+         Parent_haplotype = factor(Parent_haplotype, levels = c('J.regia', 'J.microcarpa')))
+```
+
+### Total NEM DEGs by haplotype
+```{r}
+ASEsums = impNEM %>% distinct(GeneID, Parent_haplotype) %>% count(Parent_haplotype, name = 'DEG_gene_count')
+
+p1 = ggplot(ASEsums, aes(Parent_haplotype, DEG_gene_count, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  theme(legend.position = 'none')+
+  labs(y='DEGs')+
+  ggtitle('Total NEM DEGs')
+
+p1
+
+```
+
+### Sum of the DEGs
+```{r}
+sum(ASEsums$DEG_gene_count)
+```
+
+### NEM positive genes EBH
 ```{r}
 impNEM_pos = impNEM %>%
   filter(logFC > 0) %>%
   distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
+  count(Parent_haplotype, name = 'Susceptibility_genes')
 
-p2 = ggplot(impNEM_pos, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+sum(impNEM_pos$n)
+
+p2 = ggplot(impNEM_pos, aes(Parent_haplotype, Susceptibility_genes, fill = Parent_haplotype))+
   geom_col(color = 'black')+
   theme(legend.position = 'none')+
   labs(y='DEGs')+
   ggtitle('NEM DEGs (+)')
 
+p2
 ```
 
-# NEM negative genes EBH
+### Adding binomial test
+```{r}
+binom.test.v = Vectorize(binom.test)
+
+impNEM_pos_test = impNEM_pos %>% 
+  mutate(observed_sum = sum(Susceptibility_genes)) %>% 
+  rename(observed = Susceptibility_genes) %>% 
+  left_join(expressed, by = 'Parent_haplotype') %>% 
+  left_join(ASEsums, by = 'Parent_haplotype') %>% 
+  mutate(Analysis = 'NEM_pos',
+         Expressed_gene_count_sum = sum(Expressed_gene_count),
+         DEG_gene_count_sum = sum(DEG_gene_count),
+         Background_prob = DEG_gene_count/DEG_gene_count_sum,
+         expected_observed = Background_prob*observed_sum,
+         log_FE = log2(observed/expected_observed)) %>% 
+  group_by(Parent_haplotype) %>% 
+  mutate(Binom_p_val = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[3]],
+         Binom_estimate = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[5]][[1]]) %>% 
+  relocate(Analysis)
+
+```
+
+### NEM negative genes EBH
 ```{r}
 impNEM_neg = impNEM %>%
   filter(logFC < 0) %>%
   distinct(GeneID, Parent_haplotype) %>% 
-  count(Parent_haplotype)
+  count(Parent_haplotype, name = 'Resistance_genes')
 
-p3 = ggplot(impNEM_neg, aes(Parent_haplotype, n, fill = Parent_haplotype))+
+p3 = ggplot(impNEM_neg, aes(Parent_haplotype, Resistance_genes, fill = Parent_haplotype))+
   geom_col(color = 'black')+
   theme(legend.position = 'none')+
   labs(y='DEGs')+
   ggtitle('NEM DEGs (-)')
 
+p3
 ```
 
-# Put three NEM plots together
+### Adding binomial test
 ```{r}
-c = ggarrange(p2, p3, nrow = 2)
+impNEM_neg_test = impNEM_neg %>% 
+  mutate(observed_sum = sum(Resistance_genes)) %>% 
+  rename(observed = Resistance_genes) %>% 
+  left_join(expressed, by = 'Parent_haplotype') %>% 
+  left_join(ASEsums, by = 'Parent_haplotype') %>% 
+  mutate(Analysis = 'NEM_neg',
+         Expressed_gene_count_sum = sum(Expressed_gene_count),
+         DEG_gene_count_sum = sum(DEG_gene_count),
+         Background_prob = DEG_gene_count/DEG_gene_count_sum,
+         expected_observed = Background_prob*observed_sum,
+         log_FE = log2(observed/expected_observed)) %>% 
+  group_by(Parent_haplotype) %>% 
+  mutate(Binom_p_val = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[3]],
+         Binom_estimate = binom.test.v(x = observed,
+                                n = observed_sum,
+                                p = Background_prob)[[5]][[1]]) %>% 
+  relocate(Analysis)
 
-c
+
+View(impNEM_neg_test)
 ```
+
+# Contingency table for Fisher's exact test
+```{r}
+t = impNEM_pos %>% 
+  left_join(impNEM_neg) %>%
+  arrange(desc(Susceptibility_genes)) %>%
+  column_to_rownames(var = 'Parent_haplotype') %>% 
+  t()
+
+t
+```
+
+### Check to see if sum is correct
+```{r}
+sum(t)
+```
+
+### Mosaic plot
+```{r}
+mosaicplot(t,
+           color = T)
+```
+
+### Fisher's exact test, new structure
+```{r}
+fisher_res = fisher.test(t)
+
+fisher_res
+
+```
+
+### New mosaic plot
+```{r}
+uniq_impNEM = impNEM %>% 
+  distinct(GeneID, Parent_haplotype, Gene_type) %>% 
+  mutate(Pathogen = 'P. vulnus',
+         Stats = paste('Fisher p-value: ',
+                     round(fisher_res$p.val, 3),
+                     '\n', 'Odds ratio: ',
+                     round(fisher_res$estimate, 3), sep = ''))
+
+C = ggplot(uniq_impNEM)+
+  geom_mosaic(aes(x = product(Gene_type, Parent_haplotype), fill = Parent_haplotype), color = 'black')+
+  labs(title = substitute(paste(italic('P. vulnus'))),
+       tag = paste('Fisher p-value: ',
+                     round(fisher_res$p.val, 3),
+                     ', ', 'Odds ratio: ',
+                     round(fisher_res$estimate, 3), sep = ''))+
+  theme(legend.position = 'none', plot.tag.position = c(0.5,0.98))
+
+C
+```
+
+### Put three NEM plots together
+```{r}
+a = ggarrange(p2, p3, nrow = 2)
+
+a
+```
+# Final fig for paper
+```{r}
+all = list(uniq_impCG, uniq_impPHY, uniq_impNEM) %>% 
+  bind_rows()
+
+D = ggplot(all)+
+  geom_mosaic(aes(x = product(Gene_type, Parent_haplotype),
+                  fill = Parent_haplotype),
+              offset = 0.03,
+              color = 'black')+
+  theme_grey(base_size = 11)+
+    theme(legend.position = 'none',
+          strip.text = element_text(face = 'italic'))+
+  facet_wrap(~Pathogen+Stats)
+
+D
+
+sjPlot::save_plot('DGEresults/CG_PHY_NEM_EBH_3.png', D, height = 12, width = 16)
+```
+
 
 # Put CG, PHY, and NEM figs into one fig
 ```{r}
-f = ggarrange(a, b, c, labels = c('A)', 'B)', 'C)'), nrow = 1)
+f = ggarrange(A, B, C, labels = c('A)', 'B)', 'C)'), nrow = 3)
 
 f
 
-sjPlot::save_plot('DGEresults/CG_PHY_NEM_EBH.png', f, height = 14, width = 16)
+sjPlot::save_plot('DGEresults/CG_PHY_NEM_EBH_3.png', f, height = 15, width = 16)
 ```
 
 # Read in Length results
