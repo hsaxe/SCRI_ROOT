@@ -65,33 +65,33 @@ save_plot('Subcell_results//Subcell_boxplot_CG.png', p1)
 
 # Fisher's Exact for Subcellular Localization: CG
 ```{r}
-fisher.test.p = function(x){
-  f = fisher.test(x, workspace = 2000000, simulate.p.value = T)
-  return(f$p.value)
-}
-
 test = impCG %>%
   mutate(sign = ifelse(logFC >= 0, '+', '-')) %>%
   distinct(GeneID, Subcell_loc, sign) %>% 
-  group_by(Subcell_loc) %>% 
-  count(sign) %>% 
+  # group_by(Subcell_loc) %>% 
+  count(Subcell_loc, sign) %>% 
   pivot_wider(names_from = sign, values_from = n) %>% 
   replace(is.na(.), 0) %>% 
   ungroup() %>% 
   mutate(expected = (`-`/sum(`-`, na.rm = T)*sum(`+`, na.rm = T)),
          sum_neg = sum(`-`),
          sum_pos = sum(`+`),
+         neg_not_in_BP = sum_neg - `-`,
+         pos_not_in_BP = sum_pos - `+`,
          `+mod` =  ifelse(`+` == 0, min(expected)-0.1, `+`),
          num_genes = `+`+`-`,
          fold_enrichment = log2(`+mod`/expected)
          ) %>% 
   rowwise() %>%
   mutate(
-  fisher = fisher.test.p(x = matrix(c(sum_neg, `-`,  sum_pos, `+`), nrow = 2))
+  fisher.p = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[1]],
+  fisher.odds = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[3]][1]
   ) %>% 
   ungroup() %>% 
-  mutate(FDR = p.adjust(fisher, method = 'BH'))  %>% 
+  mutate(FDR = p.adjust(fisher.p, method = 'BH'))  %>% 
   left_join(subcell_CG, by = 'Subcell_loc')
+
+View(test %>% select(!c(GeneID, logFC)) %>% distinct())
 
 plot_dat = test %>% 
   select(!c(GeneID, logFC)) %>% 
@@ -105,7 +105,7 @@ fwrite(results, 'Subcell_results/Subcell_Results_Table_CG.csv')
 
 ```
 
-
+### Bar plot of results
 ```{r}
 ggplot(filter(plot_dat, FDR <= 0.05), aes(reorder(Subcell_loc, fold_enrichment), fold_enrichment, fill = fold_enrichment))+
   geom_col(color = 'black')+
@@ -118,10 +118,7 @@ ggplot(filter(plot_dat, FDR <= 0.05), aes(reorder(Subcell_loc, fold_enrichment),
   scale_fill_gradient2(low = 'blue', high = 'red')
 ```
 
-
-
-
-
+### Custom plot of results
 ```{r fig.height=6, fig.width=9, warning=FALSE, message=FALSE}
 CG = ggplot(plot_dat, aes(x = Term_logFC, y = log2(FDR)*-1, color = fold_enrichment))+
   geom_point(aes(size = num_genes, color = fold_enrichment))+
@@ -181,33 +178,33 @@ save_plot('Subcell_results//Subcell_boxplot_PHY.png', p1)
 
 # Fisher's Exact for Subcellular Localization: PHY
 ```{r}
-fisher.test.p = function(x){
-  f = fisher.test(x, workspace = 2000000, simulate.p.value = T)
-  return(f$p.value)
-}
-
 test = impPHY %>%
   mutate(sign = ifelse(logFC >= 0, '+', '-')) %>%
   distinct(GeneID, Subcell_loc, sign) %>% 
-  group_by(Subcell_loc) %>% 
-  count(sign) %>% 
+  # group_by(Subcell_loc) %>% 
+  count(Subcell_loc, sign) %>% 
   pivot_wider(names_from = sign, values_from = n) %>% 
   replace(is.na(.), 0) %>% 
   ungroup() %>% 
   mutate(expected = (`-`/sum(`-`, na.rm = T)*sum(`+`, na.rm = T)),
          sum_neg = sum(`-`),
          sum_pos = sum(`+`),
+         neg_not_in_BP = sum_neg - `-`,
+         pos_not_in_BP = sum_pos - `+`,
          `+mod` =  ifelse(`+` == 0, min(expected)-0.1, `+`),
          num_genes = `+`+`-`,
          fold_enrichment = log2(`+mod`/expected)
          ) %>% 
   rowwise() %>%
   mutate(
-  fisher = fisher.test.p(x = matrix(c(sum_neg, `-`,  sum_pos, `+`), nrow = 2))
+  fisher.p = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[1]],
+  fisher.odds = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[3]][1]
   ) %>% 
   ungroup() %>% 
-  mutate(FDR = p.adjust(fisher, method = 'BH'))  %>% 
-  left_join(subcell_PHY, by = 'Subcell_loc')
+  mutate(FDR = p.adjust(fisher.p, method = 'BH'))  %>% 
+  left_join(subcell_CG, by = 'Subcell_loc')
+
+View(test %>% select(!c(GeneID, logFC)) %>% distinct())
 
 plot_dat = test %>% 
   select(!c(GeneID, logFC)) %>% 
@@ -221,6 +218,7 @@ fwrite(results, 'Subcell_results/Subcell_Results_Table_PHY.csv')
 
 ```
 
+### Bar plot of results
 ```{r}
 ggplot(filter(plot_dat, FDR <= 0.05), aes(reorder(Subcell_loc, fold_enrichment), fold_enrichment, fill = fold_enrichment))+
   geom_col(color = 'black')+
@@ -233,10 +231,7 @@ ggplot(filter(plot_dat, FDR <= 0.05), aes(reorder(Subcell_loc, fold_enrichment),
   scale_fill_gradient2(low = 'blue', high = 'red')
 ```
 
-
-
-
-
+### Custom plot of results
 ```{r fig.height=6, fig.width=9, warning=FALSE, message=FALSE}
 PHY = ggplot(plot_dat, aes(x = Term_logFC, y = log2(FDR)*-1, color = fold_enrichment))+
   geom_point(aes(size = num_genes, color = fold_enrichment))+
@@ -296,33 +291,33 @@ save_plot('Subcell_results//Subcell_boxplot_NEM.png', p1)
 
 # Fisher's Exact for Subcellular Localization: NEM
 ```{r}
-fisher.test.p = function(x){
-  f = fisher.test(x, workspace = 2000000, simulate.p.value = T)
-  return(f$p.value)
-}
-
 test = impNEM %>%
   mutate(sign = ifelse(logFC >= 0, '+', '-')) %>%
   distinct(GeneID, Subcell_loc, sign) %>% 
-  group_by(Subcell_loc) %>% 
-  count(sign) %>% 
+  # group_by(Subcell_loc) %>% 
+  count(Subcell_loc, sign) %>% 
   pivot_wider(names_from = sign, values_from = n) %>% 
   replace(is.na(.), 0) %>% 
   ungroup() %>% 
   mutate(expected = (`-`/sum(`-`, na.rm = T)*sum(`+`, na.rm = T)),
          sum_neg = sum(`-`),
          sum_pos = sum(`+`),
+         neg_not_in_BP = sum_neg - `-`,
+         pos_not_in_BP = sum_pos - `+`,
          `+mod` =  ifelse(`+` == 0, min(expected)-0.1, `+`),
          num_genes = `+`+`-`,
          fold_enrichment = log2(`+mod`/expected)
          ) %>% 
   rowwise() %>%
   mutate(
-  fisher = fisher.test.p(x = matrix(c(sum_neg, `-`,  sum_pos, `+`), nrow = 2))
+  fisher.p = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[1]],
+  fisher.odds = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[3]][1]
   ) %>% 
   ungroup() %>% 
-  mutate(FDR = p.adjust(fisher, method = 'BH'))  %>% 
-  left_join(subcell_NEM, by = 'Subcell_loc')
+  mutate(FDR = p.adjust(fisher.p, method = 'BH'))  %>% 
+  left_join(subcell_CG, by = 'Subcell_loc')
+
+View(test %>% select(!c(GeneID, logFC)) %>% distinct())
 
 plot_dat = test %>% 
   select(!c(GeneID, logFC)) %>% 
@@ -336,6 +331,7 @@ fwrite(results, 'Subcell_results/Subcell_Results_Table_NEM.csv')
 
 ```
 
+### Bar plot of results
 ```{r}
 ggplot(filter(plot_dat, FDR <= 0.05), aes(reorder(Subcell_loc, fold_enrichment), fold_enrichment, fill = fold_enrichment))+
   geom_col(color = 'black')+
@@ -348,10 +344,7 @@ ggplot(filter(plot_dat, FDR <= 0.05), aes(reorder(Subcell_loc, fold_enrichment),
   scale_fill_gradient2(low = 'blue', high = 'red')
 ```
 
-
-
-
-
+### Custom plot of results
 ```{r fig.height=6, fig.width=9, warning=FALSE, message=FALSE}
 NEM = ggplot(plot_dat, aes(x = Term_logFC, y = log2(FDR)*-1, color = fold_enrichment))+
   geom_point(aes(size = num_genes, color = fold_enrichment))+
@@ -387,82 +380,3 @@ NEM
 
 save_plot('Subcell_results/Subcell_NEM.png', width = 26, height = 15)
 ```
-
-# Length Subcellular localization by logFC boxplot
-```{r}
-subcell_Length = impLength %>% 
-  distinct(GeneID, logFC, Subcell_loc, Parent_haplotype) %>% 
-  group_by(Subcell_loc) %>% 
-  mutate(Term_logFC = mean(logFC)) %>% 
-  filter(Term_logFC^2 >=  0.0625)
-
-p3 = ggplot(subcell_Length, aes(reorder(Subcell_loc, logFC), logFC, fill = Term_logFC))+
-  geom_boxplot()+
-  theme(axis.text.x = element_text(angle = 30, size = 10))+
-  xlab(NULL)+
-  ggtitle('Length Subcellular Localization')+
-  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red')+
-  scale_fill_gradient2(low = 'blue', high = 'red')+
-  theme(legend.position = 'bottom', legend.margin = margin(t = -50), plot.margin = margin(0.5, 2, 0.5, 0.5, "cm"))
-
-p3
-
-save_plot('Subcell_results/Subcell_boxplot_Length.png', p3)
-```
-
-# Fisher's Exact for Subcellular Localization: Length
-```{r}
-fisher.test.p = function(x){
-  f = fisher.test(x, workspace = 2000000, simulate.p.value = T)
-  return(f$p.value)
-}
-
-test = impLength %>%
-  mutate(sign = ifelse(logFC >= 0, '+', '-')) %>% 
-  group_by(Subcell_loc) %>% 
-  count(sign) %>% 
-  pivot_wider(names_from = sign, values_from = n) %>% 
-  replace(is.na(.), 0) %>% 
-  # column_to_rownames(var = 'Biological_Process') %>%
-  # relocate(`+`) %>% 
-  ungroup() %>% 
-  mutate(expected = (`-`/sum(`-`, na.rm = T)*sum(`+`, na.rm = T)),
-         sum_neg = sum(`-`),
-         sum_pos = sum(`+`),
-         fold_change = log2(`+`/expected)
-         ) %>% 
-  rowwise() %>%
-  mutate(
-  fisher = fisher.test.p(x = matrix(c(sum_neg, `-`,  sum_pos, `+`), nrow = 2))
-  ) %>% 
-  ungroup() %>% 
-  mutate(FDR = p.adjust(fisher, method = 'BH'),
-         INF = ifelse(!is.finite(fold_change), 'Infinite', NA),
-         FIN = ifelse(is.finite(fold_change), fold_change, 0),
-         FC_Mod = ifelse(!is.finite(fold_change) & fold_change >= 0, max(FIN)*1.1,
-                      ifelse(!is.finite(fold_change) & fold_change <= 0, min(FIN)*1.1, fold_change)))
-
-
-ggplot(filter(test, FDR <= 0.05), aes(reorder(Subcell_loc, FC_Mod), FC_Mod, fill = FC_Mod))+
-  geom_col(color = 'black')+
-  theme(axis.text.x = element_text(angle = 30, size = 10))+
-  geom_label(aes(label = INF))+
-  xlab(NULL)+
-  # expand_limits(y = c(-2.5, 10))+
-  ggtitle('Subcellular Localization Fisher\'s Exact Test Length')+
-  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red')+
-  scale_fill_gradient2(low = 'blue', high = 'red')
-
-```
-
-# Arrange plots
-```{r}
-arr = ggarrange(p1, p2, p3, labels = c('A)', 'B)', 'C)'), ncol = 1)
-
-arr
-
-sjPlot::save_plot('Subcell_results/Subcell_aranged.png', arr, height = 22, width = 17)
-
-# save_plot('Subcell_results/Subcell_aranged.png', arr, base_height = 10, base_width = 8)
-```
-
