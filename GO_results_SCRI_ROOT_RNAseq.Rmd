@@ -151,6 +151,9 @@ labs_normal = plot_dat %>%
   select( term.label.y, term.label.mod, fdr,  log_FE_Mod, Term_label_logFC, `Number_of_Genes`) %>% 
   distinct()
 
+counts = labs_normal %>% 
+  count(term.label.mod)
+
 # Labels for top 5 terms by fdr
 top = plot_dat %>% 
   select(term.label.y, term.label.mod, fdr,  log_FE_Mod, Term_label_logFC, `Number_of_Genes`) %>% 
