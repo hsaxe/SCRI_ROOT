@@ -49,7 +49,7 @@ head(metadata)
 ```{r}
 metadata = data.frame(Sample = colnames(dat)[colnames(dat) != 'GeneID']) %>%
   mutate(Hybrid = as.factor(gsub("\\-\\d$", "", Sample))) %>%
-  left_join(metadata, by = c('Hybrid' = 'CAL:_Wip_ID...1'))
+  left_join(metadata, by = c('Hybrid' = 'CAL:_Wip_ID'))
   
 row.names(metadata) = metadata$Sample
 
@@ -191,6 +191,8 @@ fwrite(cpm, 'DGEresults/cpm_plotting_data.csv')
 
 ## CPM normalized counts of filtered data
 cpmd = cpm(d)
+
+fwrite(cpmd %>% data.frame() %>% rownames_to_column(var = 'GeneID'), 'DGEresults/DGE_CPM_data.csv')
 ```
 
 ## Less conservative threshold for looking at expressed genes
