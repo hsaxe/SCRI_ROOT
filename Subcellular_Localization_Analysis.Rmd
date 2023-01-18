@@ -76,16 +76,16 @@ test = impCG %>%
   mutate(expected = (`-`/sum(`-`, na.rm = T)*sum(`+`, na.rm = T)),
          sum_neg = sum(`-`),
          sum_pos = sum(`+`),
-         neg_not_in_BP = sum_neg - `-`,
-         pos_not_in_BP = sum_pos - `+`,
+         neg_not_in_SL = sum_neg - `-`,
+         pos_not_in_SL = sum_pos - `+`,
          `+mod` =  ifelse(`+` == 0, min(expected)-0.1, `+`),
          num_genes = `+`+`-`,
          fold_enrichment = log2(`+mod`/expected)
          ) %>% 
   rowwise() %>%
   mutate(
-  fisher.p = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[1]],
-  fisher.odds = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[3]][1]
+  fisher.p = fisher.test(x = matrix(c(`+`, `-`, pos_not_in_SL, neg_not_in_SL), nrow = 2))[[1]],
+  fisher.odds = fisher.test(x = matrix(c(`+`, `-`, pos_not_in_SL, neg_not_in_SL), nrow = 2))[[3]][1]
   ) %>% 
   ungroup() %>% 
   mutate(FDR = p.adjust(fisher.p, method = 'BH'))  %>% 
@@ -189,16 +189,16 @@ test = impPHY %>%
   mutate(expected = (`-`/sum(`-`, na.rm = T)*sum(`+`, na.rm = T)),
          sum_neg = sum(`-`),
          sum_pos = sum(`+`),
-         neg_not_in_BP = sum_neg - `-`,
-         pos_not_in_BP = sum_pos - `+`,
+         neg_not_in_SL = sum_neg - `-`,
+         pos_not_in_SL = sum_pos - `+`,
          `+mod` =  ifelse(`+` == 0, min(expected)-0.1, `+`),
          num_genes = `+`+`-`,
          fold_enrichment = log2(`+mod`/expected)
          ) %>% 
   rowwise() %>%
   mutate(
-  fisher.p = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[1]],
-  fisher.odds = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[3]][1]
+  fisher.p = fisher.test(x = matrix(c(`+`, `-`, pos_not_in_SL, neg_not_in_SL), nrow = 2))[[1]],
+  fisher.odds = fisher.test(x = matrix(c(`+`, `-`, pos_not_in_SL, neg_not_in_SL), nrow = 2))[[3]][1]
   ) %>% 
   ungroup() %>% 
   mutate(FDR = p.adjust(fisher.p, method = 'BH'))  %>% 
@@ -302,16 +302,16 @@ test = impNEM %>%
   mutate(expected = (`-`/sum(`-`, na.rm = T)*sum(`+`, na.rm = T)),
          sum_neg = sum(`-`),
          sum_pos = sum(`+`),
-         neg_not_in_BP = sum_neg - `-`,
-         pos_not_in_BP = sum_pos - `+`,
+         neg_not_in_SL = sum_neg - `-`,
+         pos_not_in_SL = sum_pos - `+`,
          `+mod` =  ifelse(`+` == 0, min(expected)-0.1, `+`),
          num_genes = `+`+`-`,
          fold_enrichment = log2(`+mod`/expected)
          ) %>% 
   rowwise() %>%
   mutate(
-  fisher.p = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[1]],
-  fisher.odds = fisher.test(x = matrix(c(`+`, pos_not_in_BP, `-`, neg_not_in_BP), nrow = 2))[[3]][1]
+  fisher.p = fisher.test(x = matrix(c(`+`, `-`, pos_not_in_SL, neg_not_in_SL), nrow = 2))[[1]],
+  fisher.odds = fisher.test(x = matrix(c(`+`, `-`, pos_not_in_SL, neg_not_in_SL), nrow = 2))[[3]][1]
   ) %>% 
   ungroup() %>% 
   mutate(FDR = p.adjust(fisher.p, method = 'BH'))  %>% 
