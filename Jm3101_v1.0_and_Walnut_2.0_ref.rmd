@@ -213,7 +213,8 @@ fwrite(cpmd %>% data.frame() %>% rownames_to_column(var = 'GeneID'), 'DGEresults
 pca = plot_pca(cpmd, metadata,
                join_by_name = 'Sample',
                plotting_factors_in = 'col_names',
-               plotting_factors_name = Hybrid, 
+               # Using 'Group' here becuase 'Hybrid' is already in metadata. Will cause error if I used 'Hybrid'
+               plotting_factors_name = Group, 
                x = 'PC1',
                y = 'PC2',
                scale = T, 
@@ -289,7 +290,8 @@ pca$plot
 #  [7] "Pini.PCLR"   "Pini.PRLR"   "PHY_Dec."    "TwoY_length" "TwoY_RLN"    "NEM_Dec."   # [13] "Unity"       "PHY_Avg" 
 
 a = plot_pca(cpmd, metadata,
-             join_by_name = 'Sample',
+             # Having to use 'Hybrid' here to get it into the plotting data because the function drops everything but the join_by_name when summarizing for scatter
+             join_by_name = 'Hybrid',
              plotting_factors_in = 'col_names',
              plotting_factors_name = Hybrid,
              x = 'PC2', y = 'CG_Avg.',
@@ -300,7 +302,8 @@ a = plot_pca(cpmd, metadata,
              summarise_for_scatter = T)
 
 b = plot_pca(cpmd, metadata,
-             join_by_name = 'Sample',
+             # Having to use 'Hybrid' here to get it into the plotting data because the function drops everything but the join_by_name when summarizing for scatter
+             join_by_name = 'Hybrid',
              plotting_factors_in = 'col_names',
              plotting_factors_name = Hybrid,
              x = 'PC5',
@@ -312,7 +315,8 @@ b = plot_pca(cpmd, metadata,
              summarise_for_scatter = T)
 
 c = plot_pca(cpmd, metadata,
-             join_by_name = 'Sample',
+             # Having to use 'Hybrid' here to get it into the plotting data because the function drops everything but the join_by_name when summarizing for scatter
+             join_by_name = 'Hybrid',
              plotting_factors_in = 'col_names',
              plotting_factors_name = Hybrid, 
              x = 'PC1',
@@ -323,27 +327,27 @@ c = plot_pca(cpmd, metadata,
              plot_type = 'scatter',
              summarise_for_scatter = T)
 
-d2 = plot_pca(cpmd, metadata,
-             join_by_name = 'Sample',
-             plotting_factors_in = 'col_names',
-             plotting_factors_name = Hybrid, 
-             x = 'PC5',
-             y = 'TwoY_length',
-             scale = T, 
-             center = T, 
-             color = 'Hybrid',
-             plot_type = 'scatter',
-             summarise_for_scatter = T)
+# d2 = plot_pca(cpmd, metadata,
+#              join_by_name = 'Sample',
+#              plotting_factors_in = 'col_names',
+#              plotting_factors_name = Hybrid, 
+#              x = 'PC5',
+#              y = 'TwoY_length',
+#              scale = T, 
+#              center = T, 
+#              color = 'Hybrid',
+#              plot_type = 'scatter',
+#              summarise_for_scatter = T)
 
-arr = ggarrange(a$plot + ggtitle('Trait: Crown Gall Disease'),
-                b$plot + ggtitle('Trait: Phytophthora Root Rot'),
-                c$plot + ggtitle('Trait: Nematode Count'),
-                d2$plot + ggtitle('Trait: Length'),
-                labels = c('A)', 'B)', 'C)', 'D)'), nrow = 2, ncol = 2)
+arr = ggarrange(a$plot,
+                b$plot,
+                c$plot,
+                # d2$plot + ggtitle('Trait: Length'),
+                labels = c('A)', 'B)', 'C)'), nrow = 3, ncol = 1)
 
 arr
 
-sjPlot::save_plot('DGEresults/PCA_scatter_CG_PH_NEM.png', arr, height = 18, width = 28)
+sjPlot::save_plot('DGEresults/PCA_scatter_CG_PH_NEM.png', arr, height = 25, width = 14)
 ```
 
 
