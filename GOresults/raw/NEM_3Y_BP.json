@@ -1,0 +1,872 @@
+{"overrepresentation": {
+    "reference": {"reference_organism": "Juglans regia"},
+    "upload_lists": {"input_list": {
+        "organism": "Juglans regia",
+        "list_name": "NEM_3Y_DEGs_pos_GO.csv"
+    }},
+    "tool_release_date": 20221013,
+    "data_version_release_date": "GO Ontology database DOI:  10.5281/zenodo.7709866 Released 2023-03-06",
+    "annotation_type": "GO biological process complete",
+    "correction": "FDR",
+    "test_type": "FISHER",
+    "group": [
+        {"result": {
+            "input_list": {
+                "number_in_list": 1,
+                "fold_enrichment": 3,
+                "fdr": 1,
+                "expected": 0.3333333333333333,
+                "pValue": 0.464285714285714,
+                "mapped_id_list": {"mapped_id": "LOC108993193"},
+                "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                "plus_minus": "+"
+            },
+            "number_in_reference": 1,
+            "term": {"label": "UNCLASSIFIED"}
+        }},
+        {"result": [
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 0,
+                    "id": "GO:0006414",
+                    "label": "translational elongation"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 1,
+                    "id": "GO:0006412",
+                    "label": "translation"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 2,
+                    "id": "GO:0009059",
+                    "label": "macromolecule biosynthetic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 1.3333333333333333,
+                    "pValue": 0.4285714285714282,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 4,
+                "term": {
+                    "level": 3,
+                    "id": "GO:0043170",
+                    "label": "macromolecule metabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 1.3333333333333333,
+                    "pValue": 0.4285714285714282,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 4,
+                "term": {
+                    "level": 4,
+                    "id": "GO:0071704",
+                    "label": "organic substance metabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 1.3333333333333333,
+                    "pValue": 0.4285714285714282,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 4,
+                "term": {
+                    "level": 5,
+                    "id": "GO:0008152",
+                    "label": "metabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 3,
+                    "id": "GO:1901576",
+                    "label": "organic substance biosynthetic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 4,
+                    "id": "GO:0009058",
+                    "label": "biosynthetic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 2,
+                    "id": "GO:0043043",
+                    "label": "peptide biosynthetic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 3,
+                    "id": "GO:0006518",
+                    "label": "peptide metabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 1.3333333333333333,
+                    "pValue": 0.4285714285714282,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 4,
+                "term": {
+                    "level": 4,
+                    "id": "GO:1901564",
+                    "label": "organonitrogen compound metabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 1.3333333333333333,
+                    "pValue": 0.4285714285714282,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 4,
+                "term": {
+                    "level": 5,
+                    "id": "GO:0006807",
+                    "label": "nitrogen compound metabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 4,
+                    "id": "GO:0043603",
+                    "label": "amide metabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 3,
+                    "id": "GO:0043604",
+                    "label": "amide biosynthetic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 4,
+                    "id": "GO:0044271",
+                    "label": "cellular nitrogen compound biosynthetic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 5,
+                    "id": "GO:0034641",
+                    "label": "cellular nitrogen compound metabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 6,
+                    "id": "GO:0044237",
+                    "label": "cellular metabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 1,
+                    "fold_enrichment": 1.5,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 1.0000000000000004,
+                    "mapped_id_list": {"mapped_id": "LOC109003827"},
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "+"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 7,
+                    "id": "GO:0009987",
+                    "label": "cellular process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 5,
+                    "id": "GO:0044249",
+                    "label": "cellular biosynthetic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 3,
+                    "id": "GO:1901566",
+                    "label": "organonitrogen compound biosynthetic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 2,
+                    "id": "GO:0010467",
+                    "label": "gene expression"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 1.3333333333333333,
+                    "pValue": 0.4285714285714282,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 4,
+                "term": {
+                    "level": 2,
+                    "id": "GO:0019538",
+                    "label": "protein metabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 1.3333333333333333,
+                    "pValue": 0.4285714285714282,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 4,
+                "term": {
+                    "level": 3,
+                    "id": "GO:0044238",
+                    "label": "primary metabolic process"
+                }
+            }
+        ]},
+        {"result": [
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 0,
+                    "id": "GO:0000209",
+                    "label": "protein polyubiquitination"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 1,
+                    "id": "GO:0016567",
+                    "label": "protein ubiquitination"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 2,
+                    "id": "GO:0032446",
+                    "label": "protein modification by small protein conjugation"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 3,
+                    "id": "GO:0070647",
+                    "label": "protein modification by small protein conjugation or removal"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 4,
+                    "id": "GO:0036211",
+                    "label": "protein modification process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.6666666666666666,
+                    "pValue": 0.9999999999999999,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 2,
+                "term": {
+                    "level": 5,
+                    "id": "GO:0043412",
+                    "label": "macromolecule modification"
+                }
+            }
+        ]},
+        {"result": [
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 0,
+                    "id": "GO:0010222",
+                    "label": "stem vascular tissue pattern formation"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 1,
+                    "id": "GO:0010051",
+                    "label": "xylem and phloem pattern formation"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 2,
+                    "id": "GO:0003002",
+                    "label": "regionalization"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 3,
+                    "id": "GO:0007389",
+                    "label": "pattern specification process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 4,
+                    "id": "GO:0032501",
+                    "label": "multicellular organismal process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 4,
+                    "id": "GO:0007275",
+                    "label": "multicellular organism development"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 5,
+                    "id": "GO:0048856",
+                    "label": "anatomical structure development"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 6,
+                    "id": "GO:0032502",
+                    "label": "developmental process"
+                }
+            }
+        ]},
+        {"result": [
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 0,
+                    "id": "GO:0042221",
+                    "label": "response to chemical"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 1,
+                    "id": "GO:0050896",
+                    "label": "response to stimulus"
+                }
+            }
+        ]},
+        {"result": [
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 0,
+                    "id": "GO:0019941",
+                    "label": "modification-dependent protein catabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 1,
+                    "id": "GO:0043632",
+                    "label": "modification-dependent macromolecule catabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 2,
+                    "id": "GO:0009057",
+                    "label": "macromolecule catabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 3,
+                    "id": "GO:1901575",
+                    "label": "organic substance catabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 4,
+                    "id": "GO:0009056",
+                    "label": "catabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 1,
+                    "id": "GO:0051603",
+                    "label": "proteolysis involved in protein catabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 2,
+                    "id": "GO:0030163",
+                    "label": "protein catabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 3,
+                    "id": "GO:1901565",
+                    "label": "organonitrogen compound catabolic process"
+                }
+            },
+            {
+                "input_list": {
+                    "number_in_list": 0,
+                    "fold_enrichment": 0,
+                    "fdr": 1,
+                    "expected": 0.3333333333333333,
+                    "pValue": 1.0000000000000007,
+                    "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                    "plus_minus": "-"
+                },
+                "number_in_reference": 1,
+                "term": {
+                    "level": 2,
+                    "id": "GO:0006508",
+                    "label": "proteolysis"
+                }
+            }
+        ]},
+        {"result": {
+            "input_list": {
+                "number_in_list": 0,
+                "fold_enrichment": 0,
+                "fdr": 1,
+                "expected": 0.3333333333333333,
+                "pValue": 1.0000000000000007,
+                "list_name": "NEM_3Y_DEGs_pos_GO.csv",
+                "plus_minus": "-"
+            },
+            "number_in_reference": 1,
+            "term": {
+                "level": 0,
+                "id": "GO:0002181",
+                "label": "cytoplasmic translation"
+            }
+        }}
+    ]
+}}
