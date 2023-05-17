@@ -124,18 +124,62 @@ writeDataTable(wb2, sheet = 3, x = quick_results)
 
 # Write workbook of results
 ```{r}
-saveWorkbook(wb, 'File_S1_GO_BP_Subcell_full_results.xlsx', overwrite = T)
+saveWorkbook(wb, 'Final_Figs_and_Draft_Manuscript_SCRI_ROOT/File_S1_GO_BP_Subcell_full_results.xlsx', overwrite = T)
 
-saveWorkbook(wb2, 'File_S1_GO_BP_Subcell_quick_results.xlsx', overwrite = T)
+saveWorkbook(wb2, 'Final_Figs_and_Draft_Manuscript_SCRI_ROOT/File_S1_GO_BP_Subcell_quick_results.xlsx', overwrite = T)
 ```
 
 
-```{r, fig.width=10}
-dat = quick_results %>% 
-  filter(BP_term.label.y %like% 'cell wall' & BP_fdr <= 0.05 & Subcell_FDR <= 0.05) %>% 
-  select(!c(Subcell_GeneID, Subcell_name, BP_name)) %>% 
-  distinct()
+# Make DEG results workbook
+# Read in resulst
+```{r}
+CG = fread('DGEresults/Limma_results_table_CG.csv') %>% 
+  mutate(Analysis = 'CG')
 
-ggplot(dat, aes(reorder(Subcell_Subcell_loc, Subcell_fold_enrichment), Subcell_fold_enrichment, fill = Subcell_fold_enrichment))+
-  geom_col()
+PHY = fread('DGEresults/Limma_results_table_PHY.csv')%>% 
+  mutate(Analysis = 'PHY')
+
+NEM = fread('DGEresults/Limma_results_table_NEM.csv')%>% 
+  mutate(Analysis = 'NEM')
 ```
+
+```{r}
+# in_common2 = CG %>% 
+#   left_join(PHY, by = 'GeneID') %>% 
+#   left_join(NEM, by = 'GeneID') %>% 
+#   select(matches('GeneID|chromosome|Jr|name|Subcell|P.val|logFC')) %>% 
+#   filter(name.x %like% 'cellulose synthase' & 
+#            name.y %like% 'cellulose synthase' &
+#            name %like% 'cellulose synthase')
+
+in_common2 = CG %>% 
+  rbind(PHY) %>% 
+  rbind(NEM) %>% 
+  select(matches('GeneID|chromosome|Jr|name|start|end|Subcell|P.val|logFC|Analysis')) %>% 
+  filter(name %like% 'cellulose synthase')
+
+fwrite(in_common2, 'CESA_Genes_for_Paulo.csv')
+
+```
+
+
+
+```{r}
+wb = createWorkbook()
+
+addWorksheet(wb, sheetName = 'Crown Gall DEGs', gridLines = F)
+
+writeDataTable(wb, sheet = 1, x = CG)
+
+addWorksheet(wb, sheetName = 'Phytophtora DEGs', gridLines = F)
+
+writeDataTable(wb, sheet = 2, x = PHY)
+
+addWorksheet(wb, sheetName = 'Nematode DEGs', gridLines = F)
+
+writeDataTable(wb, sheet = 3, x = NEM)
+
+saveWorkbook(wb, 'Final_Figs_and_Draft_Manuscript_SCRI_ROOT/File_S1_DEGs_full_results.xlsx', overwrite = T)
+```
+
+

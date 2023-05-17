@@ -1,0 +1,333 @@
+---
+title: "EBH_Plotting_Jm3101_v1.0_and_Walnut_2.0_ref"
+author: "Houston Saxe"
+date: "2/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load neccessary libraries
+```{r message=FALSE, , results='hide', include=FALSE}
+pacman::p_load(dplyr,
+               tibble,
+               readr,
+               stringr,
+               data.table,
+               ggplot2,
+               sjPlot, 
+               tidyr,
+               ggpubr,
+               ggmosaic)
+
+```
+
+# Load data and annotation
+```{r}
+dat = fread('DGEresults/DGE_CPM_data.csv')
+
+head(dat)
+
+dat$GeneID %>% unique() %>% length()
+
+anno = fread('DGEresults/annotation_combined.csv')
+```
+
+# How many genes are being expressed from each haplotype?
+```{r}
+expressed = dat %>% 
+  as.data.frame() %>% 
+  mutate(GeneID = as.numeric(GeneID)) %>% 
+  select(GeneID) %>% 
+  left_join(anno) %>%
+  distinct(GeneID, Parent_haplotype) %>% 
+  count(Parent_haplotype, name = 'Expressed_gene_count')
+
+p = ggplot(expressed, aes(Parent_haplotype, Expressed_gene_count, fill = Parent_haplotype))+
+  geom_col(color = 'black')+
+  labs(y='Expressed genes')
+
+p
+
+```
+
+### View table
+```{r}
+expressed
+```
+
+# CG Read in results
+```{r}
+impCG = fread('DGEresults/Limma_results_table_CG.csv') %>% 
+  mutate(Gene_type = ifelse(logFC > 0, 'Susceptibility', 'Resistance'),
+         Parent_haplotype = factor(Parent_haplotype, levels = c('J.regia', 'J.microcarpa')))
+
+length(unique(impCG$GeneID))
+```
+
+### Total CG DEGs by haplotype
+```{r}
+ASEsums = impCG %>% 
+  distinct(GeneID, 
+           Parent_haplotype,
+           Gene_type) %>% 
+  count(Parent_haplotype,
+        Gene_type,
+        name = 'DEG_gene_count') %>% 
+  pivot_wider(names_from = Parent_haplotype, values_from = DEG_gene_count) %>% 
+  column_to_rownames(var = 'Gene_type') %>% 
+  select(J.microcarpa, J.regia)
+
+ASEsums
+
+```
+
+### Check to see if sum is correct, should match length(unique(impCG$GeneID))
+```{r}
+sum(ASEsums)
+```
+
+### Fisher's exact test, new structure
+```{r}
+fisher_res = fisher.test(ASEsums)
+
+fisher_res
+
+```
+
+### New mosaic plot
+```{r}
+uniq_impCG = impCG %>% 
+  distinct(GeneID, 
+           Parent_haplotype, 
+           Gene_type) %>% 
+  mutate(Pathogen = 'A. tumefaciens',
+         Stats = paste('Fisher p-value: ',
+                     formatC(fisher_res$p.val, format = 'e'),
+                     '\n', 'Odds ratio: ',
+                     round(fisher_res$estimate, 3), sep = ''))
+
+A = ggplot(uniq_impCG)+
+  geom_mosaic(aes(x = product(Parent_haplotype),
+                  conds = product(Gene_type), 
+                  fill = Parent_haplotype),
+              color = 'black')+
+  theme_grey(base_size = 14)+
+    theme(legend.position = 'none',
+          strip.text = element_text(face = 'italic'))+
+  facet_wrap(~Pathogen+Stats)
+
+A
+```
+
+# PHY Read in results
+```{r}
+impPHY = fread('DGEresults/Limma_results_table_PHY.csv') %>% 
+  mutate(Gene_type = ifelse(logFC > 0, 'Susceptiblity', 'Resistance'),
+         Parent_haplotype = factor(Parent_haplotype, levels = c('J.regia', 'J.microcarpa')))
+
+length(unique(impPHY$GeneID))
+```
+
+### Total PHY DEGs by haplotype
+```{r}
+ASEsums = impPHY %>% 
+  distinct(GeneID, 
+           Parent_haplotype,
+           Gene_type) %>% 
+  count(Parent_haplotype,
+        Gene_type,
+        name = 'DEG_gene_count') %>% 
+  pivot_wider(names_from = Parent_haplotype, values_from = DEG_gene_count) %>% 
+  column_to_rownames(var = 'Gene_type') %>% 
+  select(J.microcarpa, J.regia)
+
+```
+
+### Check to see if sum is correct, should match length(unique(impPHY$GeneID))
+```{r}
+sum(ASEsums)
+```
+
+### Fisher's exact test, new structure
+```{r}
+fisher_res = fisher.test(ASEsums)
+
+fisher_res
+
+```
+
+### New mosaic plot
+```{r}
+uniq_impPHY = impPHY %>% 
+  distinct(GeneID, Parent_haplotype, Gene_type) %>% 
+  mutate(Pathogen = 'Phytophthora',
+         Stats = paste('Fisher p-value: ',
+                     formatC(fisher_res$p.val, format = 'e'),
+                     '\n', 'Odds ratio: ',
+                     round(fisher_res$estimate, 3), sep = ''))
+
+A = ggplot(uniq_impPHY)+
+  geom_mosaic(aes(x = product(Parent_haplotype),
+                  conds = product(Gene_type), 
+                  fill = Parent_haplotype),
+              color = 'black')+
+  theme_grey(base_size = 14)+
+    theme(legend.position = 'none',
+          strip.text = element_text(face = 'italic'))+
+  facet_wrap(~Pathogen+Stats)
+
+A
+```
+
+# NEM_3Y Read in results
+```{r}
+impNEM_3Y = fread('DGEresults/Limma_results_table_NEM_3Y.csv') %>% 
+  mutate(Gene_type = ifelse(logFC > 0, 'Susceptiblity', 'Resistance'),
+         Parent_haplotype = factor(Parent_haplotype, levels = c('J.regia', 'J.microcarpa')))
+
+length(unique(impNEM_3Y$GeneID))
+```
+
+### Total NEM_3Y DEGs by haplotype
+```{r}
+ASEsums = impNEM_3Y %>% 
+  distinct(GeneID, 
+           Parent_haplotype,
+           Gene_type) %>% 
+  count(Parent_haplotype,
+        Gene_type,
+        name = 'DEG_gene_count') %>% 
+  pivot_wider(names_from = Parent_haplotype, values_from = DEG_gene_count) %>% 
+  column_to_rownames(var = 'Gene_type') %>% 
+  select(J.microcarpa, J.regia)
+
+```
+
+### Check to see if sum is correct, should match length(unique(impNEM_3Y$GeneID))
+```{r}
+sum(ASEsums)
+```
+
+### Fisher's exact test, new structure
+```{r}
+fisher_res = fisher.test(ASEsums)
+
+fisher_res
+
+```
+
+### New mosaic plot
+```{r}
+uniq_impNEM_3Y = impNEM_3Y %>% 
+  distinct(GeneID, Parent_haplotype, Gene_type) %>% 
+  mutate(Pathogen = 'P. vulnus',
+         Stats = paste('Fisher p-value: ',
+                     formatC(fisher_res$p.val, format = 'e'),
+                     '\n', 'Odds ratio: ',
+                     round(fisher_res$estimate, 3), sep = ''))
+
+A = ggplot(uniq_impNEM_3Y)+
+  geom_mosaic(aes(x = product(Parent_haplotype),
+                  conds = product(Gene_type), 
+                  fill = Parent_haplotype),
+              color = 'black')+
+  theme_grey(base_size = 14)+
+    theme(legend.position = 'none',
+          strip.text = element_text(face = 'italic'))+
+  facet_wrap(~Pathogen+Stats)
+
+A
+```
+
+# Length_3Y Read in results
+```{r}
+impLength_3Y = fread('DGEresults/Limma_results_table_Length_3Y.csv') %>% 
+  mutate(Gene_type = ifelse(logFC > 0, 'Susceptiblity', 'Resistance'),
+         Parent_haplotype = factor(Parent_haplotype, levels = c('J.regia', 'J.microcarpa')))
+
+length(unique(impLength_3Y$GeneID))
+```
+
+### Total Length_3Y DEGs by haplotype
+```{r}
+ASEsums = impLength_3Y %>% 
+  distinct(GeneID, 
+           Parent_haplotype,
+           Gene_type) %>% 
+  count(Parent_haplotype,
+        Gene_type,
+        name = 'DEG_gene_count') %>% 
+  pivot_wider(names_from = Parent_haplotype, values_from = DEG_gene_count) %>% 
+  column_to_rownames(var = 'Gene_type') %>% 
+  select(J.microcarpa, J.regia)
+
+```
+
+### Check to see if sum is correct, should match length(unique(impLength_3Y$GeneID))
+```{r}
+sum(ASEsums)
+```
+
+### Fisher's exact test, new structure
+```{r}
+fisher_res = fisher.test(ASEsums)
+
+fisher_res
+
+```
+
+### New mosaic plot
+```{r}
+uniq_impLength_3Y = impLength_3Y %>% 
+  distinct(GeneID, Parent_haplotype, Gene_type) %>% 
+  mutate(Pathogen = 'Three-year Tree Length',
+         Stats = paste('Fisher p-value: ',
+                     formatC(fisher_res$p.val, format = 'e'),
+                     '\n', 'Odds ratio: ',
+                     round(fisher_res$estimate, 3), sep = ''))
+
+A = ggplot(uniq_impLength_3Y)+
+  geom_mosaic(aes(x = product(Parent_haplotype),
+                  conds = product(Gene_type), 
+                  fill = Parent_haplotype),
+              color = 'black')+
+  theme_grey(base_size = 14)+
+    theme(legend.position = 'none',
+          strip.text = element_text(face = 'italic'))+
+  facet_wrap(~Pathogen+Stats)
+
+A
+```
+
+# Final fig for paper
+```{r}
+all = list(uniq_impCG,
+           uniq_impPHY, 
+           uniq_impNEM_3Y,
+           uniq_impLength_3Y) %>% 
+  bind_rows()
+
+D = ggplot(all)+
+  geom_mosaic(aes(x = product(Parent_haplotype),
+                  conds = product(Gene_type), 
+                  fill = Parent_haplotype),
+              color = 'black')+
+  theme_grey(base_size = 14)+
+    theme(legend.position = 'none',
+          strip.text = element_text(face = 'italic'))+
+  facet_wrap(~Pathogen+Stats)
+
+D
+
+sjPlot::save_plot('Final_Figs_and_Draft_Manuscript_SCRI_ROOT/CG_PHY_NEM_EBH_3.png', 
+                  D,
+                  height = 20, 
+                  width = 18)
+```
+
+
+
+

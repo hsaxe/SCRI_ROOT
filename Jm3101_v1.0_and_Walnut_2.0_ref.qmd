@@ -1,0 +1,2065 @@
+---
+title: "Jm3101_v1.0_and_Walnut_2.0_Differential_Expression_Analysis"
+author: "Houston Saxe"
+date: "1/28/2022"
+output: github_document
+editor: 
+  markdown: 
+    wrap: 90
+---
+
+\-\--
+
+title: "SCRI_ROOT_RNAs"
+
+author: "Houston Saxe"
+
+format: html
+
+editor: visual
+
+\-\--
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load neccessary libraries
+
+```{r echo=TRUE}
+pacman::p_load(base,
+               edgeR,
+               tidytable,
+               data.table,
+               dplyr,
+               stats,
+               ggpubr,
+               tidyr,
+               ggplot2,
+               gridExtra,
+               limma,
+               OmicsAnalyst,
+               sjPlot,
+               tibble,
+               tidytext,
+               utils,
+               statmod,
+               corrplot)
+```
+
+# Read in and prepare expression data
+
+```{r}
+dat = fread("C:/Users/hsaxe/OneDrive/Documents/ALAB/Transcriptome_data/Root/SCRI_ROOT_RNAseq_counts_combined_genomes.txt")
+
+dat$GeneID = gsub("LOC", "", dat$GeneID)
+
+# dat = dat %>% 
+#   select(!matches('STJM'))
+
+
+head(dat)
+```
+
+# Read in metadata
+
+```{r}
+metadata = fread("SCRI_Phenotype_Analysis/2023_metadata.csv", stringsAsFactors = T) %>% 
+  mutate(CAL_Wip_ID = gsub(' ', '-', CAL_Wip_ID) %>% 
+           gsub('M4', 'M-4', .)) %>% 
+  select(!matches('>'))
+
+head(metadata)
+```
+
+## Modify metadata for this analysis
+
+```{r}
+metadata = data.frame(Sample = colnames(dat)[colnames(dat) != 'GeneID']) %>%
+  mutate(Hybrid = as.factor(gsub("\\-\\d$", "", Sample))) %>%
+  left_join(metadata, by = c('Hybrid' = 'CAL_Wip_ID')) %>% 
+  rename_with(~ gsub('2Y-length', 'Length_2Y', .x) %>% 
+                gsub('3Y-length', 'Length_3Y', .) %>% 
+                gsub('2Y-RLN', 'RLN_2Y', .) %>% 
+                gsub('3Y-RLN', 'RLN_3Y', .)) %>% 
+   mutate(RLN_2_3Y = rowMeans(select(., matches('RLN'))))
+  # mutate(RLN_2Y = log10(RLN_2Y + 1))
+  
+row.names(metadata) = metadata$Sample
+
+fwrite(metadata, 'Plotting/metadata.csv')
+
+head(metadata)
+```
+
+## Plotting metadata
+
+```{r}
+metaLong = metadata %>% 
+  select(!Sample) %>% 
+  select(Hybrid, 
+         CG_Avg,
+         PHY_Avg,
+         RLN_2Y,
+         RLN_3Y,
+         length_3Y) %>% 
+  distinct() %>% 
+  pivot_longer(where(is.numeric), 
+               names_to = 'Trait')
+
+p = ggplot(metaLong,
+          aes(reorder_within(Hybrid, value, Trait), 
+              value, 
+              fill = Hybrid))+
+  geom_col()+
+  scale_x_reordered()+
+  theme(axis.text.x = element_text(angle = 30))+
+  facet_wrap(~Trait, scales = 'free', ncol = 2)
+p
+
+save_plot('DGEresults/metadata_plot.png', p, height = 10, width = 20)
+```
+
+## Center and scale predictors to make comparisons more interpretable in results
+
+```{r}
+metadata_S = metadata %>%
+  mutate_if(is.numeric, scale) 
+
+head(metadata_S)
+```
+
+## Plotting metadata
+
+```{r}
+metaLongS = metadata_S %>% 
+  select(!Sample) %>% 
+  select(Hybrid, CG_Avg, PHY_Avg, RLN_2Y, RLN_3Y) %>% 
+  distinct() %>% 
+  pivot_longer(where(is.numeric), names_to = 'Trait')
+
+p =ggplot(metaLongS, aes(reorder_within(Hybrid, value, Trait), value, fill = Hybrid))+
+  geom_col()+
+  scale_x_reordered()+
+  theme(axis.text.x = element_text(angle = 30))+
+  facet_wrap(~Trait, scales = 'free', ncol = 2)
+p
+```
+
+## Limma needs GeneIDs as rownames in expression data. Also, colnames of expression data need to match rownames of metadata
+
+```{r}
+dat1 = dat %>%
+  column_to_rownames(var =  "GeneID") %>%
+  as.matrix()
+
+## Do colnames in data match rownames in metadata? If they don't, use match(x,y) produces the order of y required to match the order of x
+
+all(colnames(dat1) == rownames(metadata_S))
+# Names match
+
+# If they didn't match, use below code
+## What order do rows of metadat need to be in to match colnames of dat1?
+# match(colnames(dat1), rownames(metadata))
+
+## Reset rownames
+# metadata = metadata[match(colnames(dat1), rownames(metadata)),]
+
+# all(colnames(dat1) == rownames(metadata))
+# now they match
+```
+
+## Microcarpa annotation
+
+```{r}
+annotation_Jm = fread("C:/Users/hsaxe/OneDrive/Documents/ALAB/Genome_info/Genomic_Annotation_2/Jm_x_Jr/Jm_x_Jr_Genomic_annotation.csv") %>% 
+    mutate(Parent_haplotype = "J.microcarpa")
+
+## Extract everything but class mRNA and other isoforms. This reduces duplication in the data
+annotation_Jm = annotation_Jm %>%
+  filter(feature != "mRNA", !grepl('\\sX[2-9]$|\\sX1[0-9]$', name)) %>%
+  mutate(GeneID = as.character(GeneID)) %>% 
+  mutate(Parent_haplotype = "J.microcarpa")
+
+head(annotation_Jm)
+
+```
+
+## Regia annotation
+
+```{r}
+annotation_Jr = fread("C:/Users/hsaxe/OneDrive/Documents/ALAB/Genome_info/Genomic_Annotation_2/Jr/Jr_Genomic_annotation.csv") %>% 
+    mutate(Parent_haplotype = "J.regia")
+
+## Extract everything but class mRNA and other isoforms. This reduces duplication in the data
+annotation_Jr = annotation_Jr %>%
+  filter(feature != "mRNA", !grepl('\\sX[2-9]$|\\sX1[0-9]$', name)) %>%
+  mutate(GeneID = as.character(GeneID)) %>% 
+  mutate(Parent_haplotype = "J.regia")
+
+head(annotation_Jr)
+
+fwrite(annotation_Jr %>% 
+         select(GeneID) %>% 
+         mutate(GeneID = paste0('LOC', GeneID)),
+       'Annotate_annotation_with_GO.csv')
+
+```
+
+# Combine Jm and Jr annotations
+
+```{r}
+annotation_combined = annotation_Jm %>%
+  rbind(annotation_Jr, fill = T)
+
+fwrite(annotation_combined, 'Plotting/annotation.csv')
+
+BP_anno = annotation_Jm %>% 
+  distinct(`Jr-GeneID`) %>% 
+  rbind(distinct(annotation_Jr, GeneID), use.names = F) %>% 
+  distinct(`Jr-GeneID`) %>% 
+  mutate(`Jr-GeneID` = paste0('LOC', `Jr-GeneID`))
+
+fwrite(BP_anno, 'GeneIDs_for_annotation_with_GO.csv')
+```
+
+# Create DGEList object
+
+```{r}
+library(edgeR)
+
+dds = DGEList(dat1)
+
+dim(dds$counts)
+
+## Calculate library normalization factors (does not do anything to data)
+dds = calcNormFactors(dds)
+
+## These are the size factors (normalization factors) for each sample
+# dds$samples
+```
+
+## Filter by max CPM of 75 (This is used for DGE analysis)
+
+```{r}
+d = expression_filter(dds, DGEList = T, FilterFUN = max, FilterThreshold = 30)
+
+## CPM normalized counts of all data
+cpm = cpm(dds, prior.count = 2, log = F) 
+
+cpm = cpm %>% 
+  data.frame() %>% 
+  rownames_to_column(var = 'GeneID') %>%  
+  rename_with(~ gsub('X', '', gsub('\\.', '-', .x)))
+
+fwrite(cpm, 'Plotting/cpm_plotting_data.csv')
+
+## CPM normalized counts of filtered data
+cpmd = cpm(d)
+
+fwrite(cpmd %>% data.frame() %>% rownames_to_column(var = 'GeneID'), 'DGEresults/DGE_CPM_data.csv')
+```
+
+```{r}
+nams = c(names(metadata), names(annotation_combined))
+
+plot_choices = as.data.frame(matrix(ncol = length(nams))) 
+
+names(plot_choices) = nams
+
+plot_choices$Expression = NA
+
+fwrite(plot_choices, 'Plotting/plot_choices.csv')
+```
+
+## STJM-4 was not sequenced to the same depth as other hybrids
+
+```{r}
+lib_sizes = d$samples %>% 
+  as.data.frame() %>% 
+  rownames_to_column(var = 'Sample') %>% 
+  mutate(Hybrid = gsub('-\\d$', '', Sample))
+
+ggplot(lib_sizes, aes(lib.size, color = Hybrid))+
+  geom_density(alpha = 0.5)
+```
+
+```{r}
+ggplot(lib_sizes, aes(reorder(Hybrid, lib.size), lib.size, color = Hybrid))+
+  geom_boxplot(alpha = 0.5)
+```
+
+```{r}
+sizes_lm = lm(lib.size ~ Hybrid, data = lib_sizes)
+
+summary(sizes_lm)
+```
+
+## Plot PCA to look in R
+
+```{r}
+pca = plot_pca(cpmd, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               # Using 'Group' here becuase 'Hybrid' is already in metadata. Will cause error if I used 'Hybrid'
+               plotting_factors_name = Group, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'Hybrid',
+               fill = 'Hybrid',
+               plot_type = '2D')
+```
+
+```{r}
+pca$plot
+```
+
+# PCA scatterplot with fitted line and correlation coefficient
+
+```{r fig.height=10, fig.width=7}
+a = plot_pca(cpmd, metadata,
+             # Having to use 'Hybrid' here to get it into the plotting data because the function drops everything but the join_by_name when summarizing for scatter
+             join_by_name = 'Hybrid',
+             plotting_factors_in = 'col_names',
+             plotting_factors_name = Hybrid,
+             x = 'PC1', y = 'CG_Avg',
+             scale = T,
+             center = T,
+             color = 'Hybrid',
+             plot_type = 'scatter',
+             summarise_for_scatter = T)
+
+b = plot_pca(cpmd, metadata,
+             # Having to use 'Hybrid' here to get it into the plotting data because the function drops everything but the join_by_name when summarizing for scatter
+             join_by_name = 'Hybrid',
+             plotting_factors_in = 'col_names',
+             plotting_factors_name = Hybrid,
+             x = 'PC1',
+             y = 'PHY_Avg',
+             scale = T,
+             center = T,
+             color = 'Hybrid',
+             plot_type = 'scatter',
+             summarise_for_scatter = T)
+
+arr = ggpubr::ggarrange(a$plot,
+                b$plot,
+                labels = c('A)', 'B)'), nrow = 2, ncol = 1)
+
+arr
+
+sjPlot::save_plot('DGEresults/PCA_scatter_CG_PH_NEM.png', arr, height = 24, width = 14)
+```
+
+```{r}
+cordat = a$plot_dat %>% 
+  select(PC1,
+         PC2,
+         PC3,
+         PC4,
+         PC5,
+         CG_Avg,
+         PHY_Avg,
+         RLN_3Y,
+         length_3Y)
+
+LT = cor(cordat,
+         use = "pairwise.complete.obs",
+         method = 'pearson')
+
+LT[lower.tri(LT)] = NA
+
+test = LT %>% 
+  as.table() %>% 
+  as.data.frame() %>% 
+  drop_na() %>% 
+  rename(Cor = Freq) %>% 
+  filter(Cor != 1)
+  
+
+# test2 = as.data.frame(as.table(cor.mtest(LL4[,-c(1,2)])$p)) %>% 
+#   rename(P.val = Freq)
+
+LT = cor.mtest(cordat,
+         use = "pairwise.complete.obs",
+         method = 'pearson')$p
+
+LT[lower.tri(LT)] = NA
+
+test2 = LT %>% 
+  as.table() %>% 
+  as.data.frame() %>% 
+  drop_na() %>% 
+  rename(P.val = Freq) 
+
+Cor_all_cases = test %>% 
+  left_join(test2) %>%
+  distinct(Cor, P.val,
+           .keep_all = T) %>% 
+  mutate(FDR = p.adjust(P.val, method = 'BH'))  
+
+```
+
+\# *\# Differential expression analysis \#*
+
+# CG Fit model for genes associated with CG score
+
+```{r}
+mm_CG = model.matrix(~poly(CG_Avg, 2), data = metadata_S)
+
+# mm_CG = model.matrix(~CG_Avg, data = metadata_S)
+
+head(mm_CG)
+```
+
+## What is voom?
+
+## 1. Counts are transformed to log2 counts per million reads (CPM), where "per million reads" is defined based on the normalization factors we calculated earlier.
+
+## 2. A linear model is fitted to the log2 CPM for each gene, and the residuals are calculated.
+
+## 3. A smoothed curve is fitted to the sqrt(residual standard deviation) by average expression.
+
+## (see red line in plot below)
+
+## 4. The smoothed curve is used to obtain weights for each gene and sample that are passed into limma along with the log2 CPMs.
+
+## More details at "[voom: precision weights unlock linear model analysis tools for RNA-seq read counts](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29)"
+
+## Filtered mean-variance trend CG
+
+```{r}
+y_CG <- voom(d, mm_CG , plot = T)
+```
+
+## Vs Unfiltered mean-variance trend CG
+
+```{r}
+# tmp <- voom(dds, mm, plot = T)
+```
+
+## Fitting linear models in limma with random effects CG
+
+```{r}
+## Need to tell limma where the within class correlation is coming from
+dupcor_CG = duplicateCorrelation(y_CG,
+                                 mm_CG,
+                                 block = metadata_S$Hybrid)
+
+## How correlated are the hybrid replicates on average?
+consensus.corr.CG = dupcor_CG$consensus.correlation
+
+consensus.corr.CG
+
+# lmFit fits a linear model using weighted least squares for each gene:
+fit_CG = lmFit(y_CG, 
+               design = mm_CG,
+               block = metadata_S$Hybrid, 
+               correlation = consensus.corr.CG) 
+```
+
+## The variance characteristics of low expressed genes are different from high expressed genes, if treated the same, the effect is to over represent low expressed genes in the DE list. This is corrected for by the log transformation and voom. However, some genes will have increased or decreased variance that is not a result of low expression, but due to other random factors. We are going to run empirical Bayes to adjust the variance of these genes.
+
+## Empirical Bayes smoothing of standard errors (shifts standard errors that are much larger or smaller than those from other genes towards the average standard error) (see "[Linear Models and Empirical Bayes Methods for Assessing Differential Expression in Microarray Experiments](https://www.degruyter.com/doi/10.2202/1544-6115.1027)"
+
+```{r}
+BlockFit_CG = eBayes(fit_CG)
+```
+
+# Limma results CG
+
+```{r}
+res_summaries_CG = BlockFit_CG %>% decideTests() %>% summary()
+
+res_summaries_CG
+```
+
+## Table of results CG
+
+```{r}
+impCG = limma::topTable(BlockFit_CG, 
+                        coef = 'poly(CG_Avg, 2)1',
+                        sort.by = "logFC",
+                        p.value = 0.05, 
+                        adjust.method = "BH",
+                        number = Inf) %>%
+  rownames_to_column(var = 'GeneID') %>% 
+  mutate(R = sqrt(t^2/(t^2 + 40)), AveExpr = 2^AveExpr)
+
+fwrite(impCG %>% select(GeneID, logFC) %>% 
+         mutate(GeneID = paste0('LOC', GeneID)), 'For_Panther/CG_test.csv', sep = '\t')
+
+fwrite(impCG, 'DGEresults/unAnnotated_results_CG.csv')
+
+rawCG = fread('DGEresults/unAnnotated_results_CG.csv')
+
+dim(impCG)
+## adding Hybrid as a blocking variable reduced DEGs by several thousand
+```
+
+## PCA of CG DEGs
+
+```{r}
+ids = impCG %>% 
+  select(GeneID)
+
+PCA_CG = cpmd %>% 
+  data.frame() %>% 
+  rownames_to_column(var = 'GeneID') %>% 
+  right_join(ids) %>% 
+  column_to_rownames(var = 'GeneID')
+
+pca_plot_CG = plot_pca(PCA_CG, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               plotting_factors_name = Group, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'CG_Avg',
+               fill = 'CG_Avg',
+               plot_type = '2D',
+               sep = '-')
+
+View(pca_plot_CG$plot_dat)
+
+```
+
+## Merge annotation with results CG
+
+```{r}
+impCG = impCG %>%
+
+  left_join(annotation_combined, by = "GeneID")
+
+head(impCG)
+
+length(unique(impCG$GeneID))
+
+fwrite(impCG, 'DGEresults/Limma_results_table_CG.csv')
+```
+
+## Read in CG results
+
+```{r}
+impCG = fread('DGEresults/Limma_results_table_CG.csv')
+```
+
+## Volcano plot
+
+```{r}
+labs = impCG %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+  slice_min(order_by = logFC, n = 5) %>% 
+  rbind(impCG %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+    slice_max(order_by = logFC, n = 5))
+      
+
+ggplot(impCG %>% 
+         distinct(logFC, adj.P.Val, name), aes(logFC, log10(adj.P.Val)*-1, color = logFC))+
+  geom_point()+
+   ggrepel::geom_label_repel(data = labs, aes(label = name), size = 3, color = 'black', box.padding = 0.4, label.padding = 0.1, max.overlaps = Inf)+
+  geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  geom_text(aes(min(logFC), log10(0.05)*-1), label = 'FDR 0.05', vjust = -1)+
+  geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+```
+
+## Positive CG DEGs for GO
+
+```{r}
+CG_GO_pos_Jm = impCG %>%
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`)
+
+length(unique(CG_GO_pos_Jm$GeneID))
+
+CG_GO_pos_both = impCG %>% 
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>%
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(CG_GO_pos_Jm)
+
+length(unique(CG_GO_pos_both$GeneID))
+
+head(CG_GO_pos_both)
+
+fwrite(CG_GO_pos_both, "For_Panther/CG_DEGs_pos_GO.csv", sep = '\t')
+
+```
+
+## Expression from alleles is causing duplication in GO results which means data loss as GO removes duplicates. However, these are not true duplicates.
+
+## Negative CG DEGs for GO
+
+```{r}
+CG_GO_neg_Jm = impCG %>%
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`) 
+ 
+
+length(unique(CG_GO_neg_Jm$GeneID))
+
+CG_GO_neg_both = impCG %>% 
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(CG_GO_neg_Jm) 
+
+length(unique(CG_GO_neg_both$GeneID))
+
+head(CG_GO_neg_both)
+
+fwrite(CG_GO_neg_both, "For_Panther/CG_DEGs_neg_GO.csv", sep = '\t')
+```
+
+## Annotate all DEGs with GO
+
+```{r}
+CG_GO_ALL = CG_GO_pos_both %>% 
+  rbind(CG_GO_neg_both) %>% 
+  distinct()
+
+fwrite(CG_GO_ALL, "For_Panther/CG_DEGs_all.csv", sep = '\t')
+```
+
+## Expression from alleles is causing duplication in GO results which means data loss as GO removes duplicates. However, these are not true duplicates.
+
+#\* \# PHY Fit model for genes associated with PHY score
+
+```{r}
+# mm_PHY = model.matrix(~poly(PHY_Avg, 2), 
+#                       data = metadata_S)
+
+mm_PHY = model.matrix(~PHY_Avg,
+                      data = metadata_S)
+
+head(mm_PHY)
+```
+
+## Filtered mean-variance trend PHY
+
+```{r}
+y_PHY <- voom(d, 
+              mm_PHY,
+              plot = T)
+```
+
+## Fitting linear models in limma with random effects PHY
+
+```{r}
+## Need to tell limma where the within class correlation is coming from
+dupcor_PHY = duplicateCorrelation(y_PHY,
+                                  mm_PHY,
+                                  block = metadata_S$Hybrid)
+
+## How correlated are the hybrid replicates on average?
+consensus.corr.PHY = dupcor_PHY$consensus.correlation
+
+consensus.corr.PHY
+
+# lmFit fits a linear model using weighted least squares for each gene:
+fit_PHY = lmFit(y_PHY,
+                design = mm_PHY,
+                block = metadata_S$Hybrid, 
+                correlation = consensus.corr.PHY) 
+
+# Ebayes
+BlockFit_PHY = eBayes(fit_PHY)
+```
+
+## Limma results PHY
+
+```{r}
+res_summaries_PHY = BlockFit_PHY %>% decideTests() %>% summary()
+
+res_summaries_PHY
+```
+
+## Table of results PHY
+
+```{r}
+impPHY = limma::topTable(BlockFit_PHY, 
+                        coef = 'PHY_Avg',
+                        sort.by = "logFC",
+                        p.value = 0.05, 
+                        adjust.method = "BH",
+                        number = Inf) %>%
+  rownames_to_column(var = 'GeneID') %>% 
+  mutate(R = sqrt(t^2/(t^2 + 40)), AveExpr = 2^AveExpr)
+
+fwrite(impPHY %>% select(GeneID, logFC) %>% 
+         mutate(GeneID = paste0('LOC', GeneID)), 'For_Panther/PHY_test.csv', sep = '\t')
+
+fwrite(impPHY, 'DGEresults/unAnnotated_results_PHY.csv')
+
+rawPHY = fread('DGEresults/unAnnotated_results_PHY.csv')
+
+dim(impPHY)
+## adding Hybrid as a blocking variable reduced DEGs by several thousand
+
+head(impPHY)
+```
+
+## PCA of PHY DEGs
+
+```{r}
+ids = impPHY %>% 
+  select(GeneID)
+
+PCA_PHY = cpmd %>% 
+  as.data.frame() %>% 
+  rownames_to_column(var = 'GeneID') %>% 
+  right_join(ids) %>% 
+  column_to_rownames(var = 'GeneID')
+
+pca_plot_PHY = plot_pca(PCA_PHY, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               plotting_factors_name = Group, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'PHY_Avg',
+               fill = 'PHY_Avg',
+               plot_type = '2D')
+
+pca_plot_PHY$plot
+
+```
+
+## Merge annotation with results PHY
+
+```{r}
+impPHY = impPHY %>%
+
+  left_join(annotation_combined, by = "GeneID")
+
+head(impPHY)
+
+fwrite(impPHY, 'DGEresults/Limma_results_table_PHY.csv')
+```
+
+## Read in PHY results
+
+```{r}
+impPHY = fread('DGEresults/Limma_results_table_PHY.csv')
+```
+
+## Volcano plot
+
+```{r}
+labs = impPHY %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+  slice_min(order_by = logFC, n = 5) %>% 
+  rbind(impPHY %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+    slice_max(order_by = logFC, n = 5))
+      
+
+ggplot(impPHY %>% 
+         distinct(logFC, adj.P.Val, name), aes(logFC, log10(adj.P.Val)*-1, color = logFC))+
+  geom_point()+
+   ggrepel::geom_label_repel(data = labs, aes(label = name), size = 3, color = 'black', box.padding = 0.4, label.padding = 0.1, max.overlaps = Inf)+
+  geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  geom_text(aes(min(logFC), log10(0.05)*-1), label = 'FDR 0.05', vjust = -1)+
+  geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+```
+
+## Positive PHY DEGs for GO
+
+```{r}
+PHY_GO_pos_Jm = impPHY %>%
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`)
+
+length(unique(PHY_GO_pos_Jm$GeneID))
+
+PHY_GO_pos_both = impPHY %>% 
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>%
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(PHY_GO_pos_Jm)
+
+length(unique(PHY_GO_pos_both$GeneID))
+
+head(PHY_GO_pos_both)
+
+fwrite(PHY_GO_pos_both, "For_Panther/PHY_DEGs_pos_GO.csv", sep = '\t')
+
+```
+
+## Expression from alleles is causing duplication in GO results which means data loss as GO removes duplicates. However, these are not true duplicates.
+
+## Negative PHY DEGs for GO
+
+```{r}
+PHY_GO_neg_Jm = impPHY %>%
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`) 
+ 
+
+length(unique(PHY_GO_neg_Jm$GeneID))
+
+PHY_GO_neg_both = impPHY %>% 
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(PHY_GO_neg_Jm) 
+
+length(unique(PHY_GO_neg_both$GeneID))
+
+head(PHY_GO_neg_both)
+
+fwrite(PHY_GO_neg_both, "For_Panther/PHY_DEGs_neg_GO.csv", sep = '\t')
+```
+
+## Annotate all DEGs with GO
+
+```{r}
+PHY_GO_ALL = PHY_GO_pos_both %>% 
+  rbind(PHY_GO_neg_both) %>% 
+  distinct()
+
+fwrite(PHY_GO_ALL, "For_Panther/PHY_DEGs_all.csv", sep = '\t')
+```
+
+#\* \# Length_2Y Fit model for genes associated with Length_2Y score
+
+```{r}
+mm_Length_2Y = model.matrix(~length_2Y, 
+                      data = metadata_S)
+
+head(mm_Length_2Y)
+```
+
+## Filtered mean-variance trend Length_2Y
+
+```{r}
+y_Length_2Y <- voom(d, 
+              mm_Length_2Y,
+              plot = T)
+```
+
+## Fitting linear models in limma with random effects Length_2Y
+
+```{r}
+## Need to tell limma where the within class correlation is coming from
+dupcor_Length_2Y = duplicateCorrelation(y_Length_2Y,
+                                  mm_Length_2Y,
+                                  block = metadata_S$Hybrid)
+
+## How correlated are the hybrid replicates on average?
+consensus.corr.Length_2Y = dupcor_Length_2Y$consensus.correlation
+
+consensus.corr.Length_2Y
+
+# lmFit fits a linear model using weighted least squares for each gene:
+fit_Length_2Y = lmFit(y_Length_2Y,
+                design = mm_Length_2Y,
+                block = metadata_S$Hybrid, 
+                correlation = consensus.corr.Length_2Y) 
+
+# Ebayes
+BlockFit_Length_2Y = eBayes(fit_Length_2Y)
+```
+
+## Limma results Length_2Y
+
+```{r}
+res_summaries_Length_2Y = BlockFit_Length_2Y %>% decideTests() %>% summary()
+
+res_summaries_Length_2Y
+```
+
+## Table of results Length_2Y
+
+```{r}
+impLength_2Y = topTable(BlockFit_Length_2Y,
+                  sort.by = "logFC", 
+                  p.value = 0.05,
+                  adjust.method = "BH", 
+                  number = Inf) %>%
+  rownames_to_column(var = 'GeneID') %>%
+  mutate(R = sqrt(t^2/(t^2 + 40)), AveExpr = 2^AveExpr)
+
+dim(impLength_2Y)
+## adding Hybrid as a blocking variable reduced DEGs by several thousand
+
+head(impLength_2Y)
+```
+
+## PCA of Length_2Y DEGs
+
+```{r}
+ids = impLength_2Y %>% 
+  select(GeneID)
+
+PCA_Length_2Y = cpmd %>% 
+  as.data.frame() %>% 
+  rownames_to_column(var = 'GeneID') %>% 
+  right_join(ids) %>% 
+  column_to_rownames(var = 'GeneID')
+
+pca_plot_Length_2Y = plot_pca(PCA_Length_2Y, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               plotting_factors_name = Group, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'length_2Y',
+               fill = 'length_2Y',
+               plot_type = '2D')
+
+pca_plot_Length_2Y$plot
+
+```
+
+## Merge annotation with results Length_2Y
+
+```{r}
+impLength_2Y = impLength_2Y %>%
+
+  left_join(annotation_combined, by = "GeneID")
+
+head(impLength_2Y)
+
+fwrite(impLength_2Y, 'DGEresults/Limma_results_table_Length_2Y.csv')
+```
+
+## Read in Length_2Y results
+
+```{r}
+impLength_2Y = fread('DGEresults/Limma_results_table_Length_2Y.csv')
+```
+
+## Volcano plot
+
+```{r}
+labs = impLength_2Y %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+  slice_min(order_by = logFC, n = 5) %>% 
+  rbind(impLength_2Y %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+    slice_max(order_by = logFC, n = 5))
+      
+
+ggplot(impLength_2Y %>% 
+         distinct(logFC, adj.P.Val, name), aes(logFC, log10(adj.P.Val)*-1, color = logFC))+
+  geom_point()+
+   ggrepel::geom_label_repel(data = labs, aes(label = name), size = 3, color = 'black', box.padding = 0.4, label.padding = 0.1, max.overlaps = Inf)+
+  geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  geom_text(aes(min(logFC), log10(0.05)*-1), label = 'FDR 0.05', vjust = -1)+
+  geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+```
+
+## Positive Length_2Y DEGs for GO
+
+```{r}
+Length_2Y_GO_pos_Jm = impLength_2Y %>%
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`)
+
+length(unique(Length_2Y_GO_pos_Jm$GeneID))
+
+Length_2Y_GO_pos_both = impLength_2Y %>% 
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>%
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(Length_2Y_GO_pos_Jm)
+
+length(unique(Length_2Y_GO_pos_both$GeneID))
+
+head(Length_2Y_GO_pos_both)
+
+fwrite(Length_2Y_GO_pos_both, "For_Panther/Length_2Y_DEGs_pos_GO.csv", sep = '\t')
+
+```
+
+## Expression from alleles is causing duplication in GO results which means data loss as GO removes duplicates. However, these are not true duplicates.
+
+## Negative Length_2Y DEGs for GO
+
+```{r}
+Length_2Y_GO_neg_Jm = impLength_2Y %>%
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`) 
+ 
+
+length(unique(Length_2Y_GO_neg_Jm$GeneID))
+
+Length_2Y_GO_neg_both = impLength_2Y %>% 
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(Length_2Y_GO_neg_Jm) 
+
+length(unique(Length_2Y_GO_neg_both$GeneID))
+
+head(Length_2Y_GO_neg_both)
+
+fwrite(Length_2Y_GO_neg_both, "For_Panther/Length_2Y_DEGs_neg_GO.csv", sep = '\t')
+```
+
+## Annotate all DEGs with GO
+
+```{r}
+Length_2Y_GO_ALL = Length_2Y_GO_pos_both %>% 
+  rbind(Length_2Y_GO_neg_both) %>% 
+  distinct()
+
+fwrite(Length_2Y_GO_ALL, "For_Panther/Length_2Y_DEGs_all.csv", sep = '\t')
+```
+
+# PCA plots of DEGs for each analysis
+
+```{r}
+save_plot('DGEresults/PCA_DEGs.png',
+ggarrange(pca_plot_CG$plot, 
+          pca_plot_PHY$plot,
+          labels = c('CG)', 'PHY)')),
+height = 20, width = 24
+)
+```
+
+#\* \# CG, PHY, and 2yLength Fit model for genes associated with ALL_seven score
+
+```{r}
+mm_ALL_seven = model.matrix(~CG_Avg + PHY_Avg + length_2Y + RLN_2Y,
+                      data = metadata_S)
+
+# mm_ALL_seven = model.matrix(~poly(CG_Avg, 2) + poly(PHY_Avg, 2) + poly(length_2Y, 2) + poly(RLN_2Y, 2),
+#                       data = metadata_S)
+
+head(mm_ALL_seven)
+```
+
+## Filtered mean-variance trend ALL_seven
+
+```{r}
+y_ALL_seven <- voom(d, 
+              mm_ALL_seven,
+              plot = T)
+```
+
+## Fitting linear models in limma with random effects ALL_seven
+
+```{r}
+## Need to tell limma where the within class correlation is coming from
+dupcor_ALL_seven = duplicateCorrelation(y_ALL_seven,
+                                  mm_ALL_seven,
+                                  block = metadata_S$Hybrid)
+
+## How correlated are the hybrid replicates on average?
+consensus.corr.ALL_seven = dupcor_ALL_seven$consensus.correlation
+
+consensus.corr.ALL_seven
+
+# lmFit fits a linear model using weighted least squares for each gene:
+fit_ALL_seven = lmFit(y_ALL_seven,
+                design = mm_ALL_seven,
+                block = metadata_S$Hybrid, 
+                correlation = consensus.corr.ALL_seven) 
+
+# Ebayes
+BlockFit_ALL_seven = eBayes(fit_ALL_seven)
+```
+
+## Limma results ALL_seven
+
+```{r}
+res_summaries_ALL_seven = BlockFit_ALL_seven %>% decideTests(method = 'separate') %>% summary()
+
+res_summaries_ALL_seven
+```
+
+## Table of results ALL_seven
+
+```{r}
+impALL_seven = topTable(BlockFit_ALL_seven,
+                  # sort.by = "logFC", 
+                  p.value = 0.05,
+                  adjust.method = "BH", 
+                  number = Inf) %>%
+  rownames_to_column(var = 'GeneID') 
+
+topCG = topTable(BlockFit_ALL_seven,
+                 coef = 'CG_Avg',
+                  sort.by = "logFC",
+                  p.value = 0.05,
+                  adjust.method = "BH", 
+                  number = Inf) %>%
+  rownames_to_column(var = 'GeneID') %>%
+  mutate(R = sqrt(t^2/(t^2 + 40)), AveExpr = 2^AveExpr)
+
+topPHY = topTable(BlockFit_ALL_seven,
+                 coef = 'PHY_Avg',
+                  sort.by = "logFC",
+                  p.value = 0.05,
+                  adjust.method = "BH", 
+                  number = Inf) %>%
+  rownames_to_column(var = 'GeneID')
+
+
+dim(impALL_seven)
+## adding Hybrid as a blocking variable reduced DEGs by several thousand
+
+head(impALL_seven)
+```
+
+```{r}
+topCG = topTable(BlockFit_ALL_seven,
+                 coef = 'CG_Avg',
+                  sort.by = "logFC",
+                  p.value = 0.05,
+                  adjust.method = "BH", 
+                  number = Inf) %>%
+  rownames_to_column(var = 'GeneID') %>% 
+  mutate(GeneID = paste0('LOC', GeneID)) 
+
+fwrite(topCG, 'For_Panther/top_CG.csv', sep = '\t')
+```
+
+```{r}
+toplength_2Y = topTable(BlockFit_ALL_seven,
+                 coef = 'length_2Y',
+                  sort.by = "logFC",
+                  p.value = 0.05,
+                  adjust.method = "BH", 
+                  number = Inf) %>%
+  rownames_to_column(var = 'GeneID') %>% 
+  mutate(GeneID = paste0('LOC', GeneID)) 
+
+fwrite(toplength_2Y, 'For_Panther/top_length_2Y.csv', sep = '\t')
+```
+
+```{r}
+topPHY_Avg = topTable(BlockFit_ALL_seven,
+                 coef = 'PHY_Avg',
+                  sort.by = "logFC",
+                  p.value = 0.05,
+                  adjust.method = "BH", 
+                  number = Inf) %>%
+  rownames_to_column(var = 'GeneID') %>% 
+  mutate(GeneID = paste0('LOC', GeneID)) 
+
+fwrite(topPHY_Avg, 'For_Panther/top_PHY_Avg.csv', sep = '\t')
+```
+
+## PCA of ALL_seven DEGs
+
+```{r}
+ids = impALL_seven %>% 
+  select(GeneID)
+
+PCA_ALL_seven = cpmd %>% 
+  as.data.frame() %>% 
+  rownames_to_column(var = 'GeneID') %>% 
+  right_join(ids) %>% 
+  column_to_rownames(var = 'GeneID')
+
+pca_plot_ALL_seven = plot_pca(PCA_ALL_seven, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               plotting_factors_name = Group, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'CG_Avg',
+               fill = 'CG_Avg',
+               plot_type = '2D')
+
+pca_plot_ALL_seven$plot
+
+```
+
+## Merge annotation with results ALL_seven
+
+```{r}
+impALL_seven = impALL_seven %>%
+  left_join(annotation_combined, by = "GeneID")
+
+head(impALL_seven)
+
+fwrite(impALL_seven, 'DGEresults/Limma_results_table_ALL_seven.csv')
+```
+
+## Read in ALL_seven results
+
+```{r}
+impALL_seven = fread('DGEresults/Limma_results_table_ALL_seven.csv')
+```
+
+```{r}
+CG_ALL = impALL_seven %>% 
+  mutate(GeneID = paste0('LOC', GeneID)) %>% 
+  distinct(GeneID, CG_Avg) 
+
+fwrite(CG_ALL, 'For_Panther/CG_ALL.csv', sep = '\t')
+```
+
+```{r}
+PHY_ALL = impALL_seven %>% 
+  mutate(GeneID = paste0('LOC', GeneID)) %>% 
+  distinct(GeneID, PHY_Avg) 
+
+fwrite(PHY_ALL, 'For_Panther/PHY_ALL.csv', sep = '\t')
+```
+
+```{r}
+length_2Y_ALL = impALL_seven %>% 
+  mutate(GeneID = paste0('LOC', GeneID)) %>% 
+  distinct(GeneID, length_2Y) 
+
+fwrite(length_2Y_ALL, 'For_Panther/length_2Y_ALL.csv', sep = '\t')
+```
+
+## Volcano plot
+
+```{r}
+labs = impALL_seven %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+  slice_min(order_by = logFC, n = 5) %>% 
+  rbind(impALL_seven %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+    slice_max(order_by = logFC, n = 5))
+      
+
+ggplot(impALL_seven %>% 
+         distinct(logFC, adj.P.Val, name), aes(logFC, log10(adj.P.Val)*-1, color = logFC))+
+  geom_point()+
+   ggrepel::geom_label_repel(data = labs, aes(label = name), size = 3, color = 'black', box.padding = 0.4, label.padding = 0.1, max.overlaps = Inf)+
+  geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  geom_text(aes(min(logFC), log10(0.05)*-1), label = 'FDR 0.05', vjust = -1)+
+  geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+```
+
+## Positive ALL_seven DEGs for GO
+
+```{r}
+ALL_seven_GO_pos_Jm = impALL_seven %>%
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`)
+
+length(unique(ALL_seven_GO_pos_Jm$GeneID))
+
+ALL_seven_GO_pos_both = impALL_seven %>% 
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>%
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(ALL_seven_GO_pos_Jm)
+
+length(unique(ALL_seven_GO_pos_both$GeneID))
+
+head(ALL_seven_GO_pos_both)
+
+fwrite(ALL_seven_GO_pos_both, "For_Panther/ALL_seven_DEGs_pos_GO.csv", sep = '\t')
+
+```
+
+## Expression from alleles is causing duplication in GO results which means data loss as GO removes duplicates. However, these are not true duplicates.
+
+## Negative ALL_seven DEGs for GO
+
+```{r}
+ALL_seven_GO_neg_Jm = impALL_seven %>%
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`) 
+ 
+
+length(unique(ALL_seven_GO_neg_Jm$GeneID))
+
+ALL_seven_GO_neg_both = impALL_seven %>% 
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(ALL_seven_GO_neg_Jm) 
+
+length(unique(ALL_seven_GO_neg_both$GeneID))
+
+head(ALL_seven_GO_neg_both)
+
+fwrite(ALL_seven_GO_neg_both, "For_Panther/ALL_seven_DEGs_neg_GO.csv", sep = '\t')
+```
+
+## Annotate all DEGs with GO
+
+```{r}
+ALL_seven_GO_ALL = ALL_seven_GO_pos_both %>% 
+  rbind(ALL_seven_GO_neg_both) %>% 
+  distinct()
+
+fwrite(ALL_seven_GO_ALL, "For_Panther/ALL_seven_DEGs_all.csv", sep = '\t')
+```
+
+# PCA plots of DEGs for each analysis
+
+```{r}
+save_plot('DGEresults/PCA_DEGs.png',
+ggarrange(pca_plot_CG$plot, 
+          pca_plot_PHY$plot,
+          labels = c('CG)', 'PHY)')),
+height = 20, width = 24
+)
+```
+
+#\*
+
+# NEM 3Y and length Create DGEList object
+
+# Have to do this becuse 3Y data are missing two samples, so cant use 'dat1'
+
+```{r}
+library(edgeR)
+
+dat2 = fread("C:/Users/hsaxe/OneDrive/Documents/ALAB/Transcriptome_data/Root/SCRI_ROOT_RNAseq_counts_combined_genomes.txt")
+
+dat2 = dat2 %>% 
+  mutate(GeneID = gsub("LOC", "", GeneID)) %>% 
+  select(!matches('JMS|STJM')) %>% 
+  column_to_rownames(var = 'GeneID') %>% 
+  as.matrix()
+
+
+dds2 = DGEList(dat2)
+
+dim(dds2$counts)
+
+## Calculate library normalization factors (does not do anything to data)
+dds2 = calcNormFactors(dds2)
+
+## These are the size factors (normalization factors) for each sample
+# dds$samples
+```
+
+```{r}
+metadata_S2 = metadata %>% 
+  filter(RLN_3Y != is.na(RLN_3Y)) %>% 
+  mutate_if(is.numeric, scale) 
+```
+
+## Filter by max CPM of 75 (This is used for DGE analysis)
+
+```{r}
+d2 = expression_filter(dds2, 
+                       DGEList = T,
+                       FilterFUN = max,
+                       FilterThreshold = 75)
+
+## CPM normalized counts of all data
+# cpm = cpm(dds, prior.count = 2, log = F) 
+# 
+# cpm = cpm %>% 
+#   data.frame() %>% 
+#   rownames_to_column(var = 'GeneID') %>%  
+#   rename_with(~ gsub('X', '', gsub('\\.', '-', .x)))
+
+# fwrite(cpm, 'DGEresults/cpm_plotting_data.csv')
+
+## CPM normalized counts of filtered data
+cpmd2 = cpm(d2)
+
+# fwrite(cpmd %>% data.frame() %>% rownames_to_column(var = 'GeneID'), 'DGEresults/DGE_CPM_data.csv')
+```
+
+## NEM_3Y Plot PCA to look in R
+
+```{r}
+pca3 = plot_pca(cpmd, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               # Using 'Group' here becuase 'Hybrid' is already in metadata. Will cause error if I used 'Hybrid'
+               plotting_factors_name = Group, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'RLN_3Y',
+               fill = 'RLN_3Y',
+               plot_type = '2D')
+```
+
+```{r}
+pca3$plot
+```
+
+```{r}
+c3 = plot_pca(cpmd, metadata,
+             # Having to use 'Hybrid' here to get it into the plotting data because the function drops everything but the join_by_name when summarizing for scatter
+             join_by_name = 'Hybrid',
+             plotting_factors_in = 'col_names',
+             plotting_factors_name = Hybrid, 
+             x = 'PC7',
+             y = 'RLN_3Y',
+             scale = T, 
+             center = T, 
+             color = 'Hybrid',
+             plot_type = 'scatter',
+             summarise_for_scatter = T)
+
+c3$plot
+```
+
+#\* \# NEM_3Y Fit model for genes associated with NEM score
+
+```{r}
+mm_NEM_3Y = model.matrix(~RLN_3Y, 
+                         data = metadata_S2)
+
+head(mm_NEM_3Y)
+```
+
+## Filtered mean-variance trend NEM
+
+```{r}
+y_NEM_3Y <- voom(d2, 
+                 mm_NEM_3Y,
+                 plot = T)
+```
+
+## Fitting linear models in limma with random effects NEM_3Y
+
+```{r}
+## Need to tell limma where the within class correlation is coming from
+dupcor_NEM_3Y = duplicateCorrelation(y_NEM_3Y,
+                                      mm_NEM_3Y, 
+                                      block = metadata_S2$Hybrid)
+
+## How correlated are the hybrid replicates on average?
+consensus.corr._NEM_3Y = dupcor_NEM_3Y$consensus.correlation
+
+consensus.corr._NEM_3Y
+
+# lmFit fits a linear model using weighted least squares for each gene:
+fit_NEM_3Y = lmFit(y_NEM_3Y, 
+            design = mm_NEM_3Y, 
+            block = metadata_S2$Hybrid,
+            correlation = consensus.corr._NEM_3Y) 
+
+# Ebayes
+BlockFit_NEM_3Y = eBayes(fit_NEM_3Y)
+```
+
+## Limma results \_NEM_3Y
+
+```{r}
+res_summaries_NEM_3Y = BlockFit_NEM_3Y %>% decideTests() %>% summary()
+
+res_summaries_NEM_3Y
+```
+
+## Table of results \_NEM_3Y
+
+```{r}
+impNEM_3Y = topTable(BlockFit_NEM_3Y,
+                  sort.by = "logFC",
+                  p.value = 0.05,
+                  adjust.method = "BH",
+                  number = Inf) %>%
+    rownames_to_column(var = 'GeneID') %>% 
+  mutate(R = sqrt(t^2/(t^2 + 40)), AveExpr = 2^AveExpr)
+
+dim(impNEM_3Y)
+## adding Hybrid as a blocking variable reduced DEGs by several thousand
+
+head(impNEM_3Y)
+```
+
+## PCA of \_NEM_3Y DEGs
+
+```{r}
+ids = impNEM_3Y %>% 
+  select(GeneID)
+
+PCA_NEM_3Y = cpmd2 %>% 
+  as.data.frame() %>% 
+  rownames_to_column(var = 'GeneID') %>% 
+  right_join(ids) %>% 
+  column_to_rownames(var = 'GeneID')
+
+pca_plot_NEM_3Y = plot_pca(PCA_NEM_3Y, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               plotting_factors_name = Group, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'RLN_3Y',
+               fill = 'RLN_3Y',
+               plot_type = '2D')
+
+pca_plot_NEM_3Y$plot
+
+```
+
+## Merge annotation with results \_NEM_3Y
+
+```{r}
+impNEM_3Y = impNEM_3Y %>%
+  left_join(annotation_combined, by = "GeneID")
+
+head(impNEM_3Y)
+
+fwrite(impNEM_3Y, 'DGEresults/Limma_results_table_NEM_3Y.csv')
+
+impNEM_3Y = fread('DGEresults/Limma_results_table_NEM_3Y.csv')
+```
+
+## Read in \_NEM_3Y results
+
+```{r}
+impNEM_3Y = fread('DGEresults/Limma_results_table_NEM_3Y.csv')
+```
+
+## Volcano plot
+
+```{r}
+labs = impNEM_3Y %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+  slice_min(order_by = logFC, n = 5) %>% 
+  rbind(impNEM_3Y %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+    slice_max(order_by = logFC, n = 5))
+      
+
+ggplot(impNEM_3Y %>% 
+         distinct(logFC, adj.P.Val, name), aes(logFC, log10(adj.P.Val)*-1, color = logFC))+
+  geom_point()+
+   ggrepel::geom_label_repel(data = labs, aes(label = name), size = 3, color = 'black', box.padding = 0.4, label.padding = 0.1, max.overlaps = Inf)+
+  geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  geom_text(aes(min(logFC), log10(0.05)*-1), label = 'FDR 0.05', vjust = -1)+
+  geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+```
+
+## Positive \_NEM_3Y DEGs for GO
+
+```{r}
+NEM_3Y_GO_pos_Jm = impNEM_3Y %>%
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`)
+
+length(unique(NEM_3Y_GO_pos_Jm$GeneID))
+
+NEM_3Y_GO_pos_both = impNEM_3Y %>% 
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>%
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(NEM_3Y_GO_pos_Jm)
+
+length(unique(NEM_3Y_GO_pos_both$GeneID))
+
+head(NEM_3Y_GO_pos_both)
+
+fwrite(NEM_3Y_GO_pos_both, "For_Panther/NEM_3Y_DEGs_pos_GO.csv", sep = '\t')
+
+```
+
+## Expression from alleles is causing duplication in GO results which means data loss as GO removes duplicates. However, these are not true duplicates.
+
+## Negative \_NEM_3Y DEGs for GO
+
+```{r}
+NEM_3Y_GO_neg_Jm = impNEM_3Y %>%
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`) 
+ 
+
+length(unique(NEM_3Y_GO_neg_Jm$GeneID))
+
+NEM_3Y_GO_neg_both = impNEM_3Y %>% 
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(NEM_3Y_GO_neg_Jm) 
+
+length(unique(NEM_3Y_GO_neg_both$GeneID))
+
+head(NEM_3Y_GO_neg_both)
+
+fwrite(NEM_3Y_GO_neg_both, "For_Panther/NEM_3Y_DEGs_neg_GO.csv", sep = '\t')
+```
+
+## Annotate all \_NEM_3Y DEGs with GO
+
+```{r}
+NEM_3Y_GO_ALL = NEM_3Y_GO_pos_both %>% 
+  rbind(NEM_3Y_GO_neg_both) %>% 
+  distinct()
+
+fwrite(NEM_3Y_GO_ALL, "For_Panther/NEM_3Y_DEGs_all.csv", sep = '\t')
+```
+
+#\* \# Length_3Y Plot PCA to look in R
+
+```{r}
+pca3 = plot_pca(cpmd, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               # Using 'Group' here becuase 'Hybrid' is already in metadata. Will cause error if I used 'Hybrid'
+               plotting_factors_name = Group, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'length_3Y',
+               fill = 'length_3Y',
+               plot_type = '2D')
+```
+
+```{r}
+pca3$plot
+```
+
+```{r}
+c3 = plot_pca(cpmd, metadata,
+             # Having to use 'Hybrid' here to get it into the plotting data because the function drops everything but the join_by_name when summarizing for scatter
+             join_by_name = 'Hybrid',
+             plotting_factors_in = 'col_names',
+             plotting_factors_name = Hybrid, 
+             x = 'PC7',
+             y = 'length_3Y',
+             scale = T, 
+             center = T, 
+             color = 'Hybrid',
+             plot_type = 'scatter',
+             summarise_for_scatter = T)
+
+c3$plot
+```
+
+# Length_3Y Fit model for genes associated with NEM score
+
+```{r}
+mm_Length_3Y = model.matrix(~length_3Y, 
+                         data = metadata_S2)
+
+head(mm_Length_3Y)
+```
+
+## Filtered mean-variance trend NEM
+
+```{r}
+y_Length_3Y <- voom(d2, 
+                 mm_Length_3Y,
+                 plot = T)
+```
+
+## Fitting linear models in limma with random effects Length_3Y
+
+```{r}
+## Need to tell limma where the within class correlation is coming from
+dupcor_Length_3Y = duplicateCorrelation(y_Length_3Y,
+                                      mm_Length_3Y, 
+                                      block = metadata_S2$Hybrid)
+
+## How correlated are the hybrid replicates on average?
+consensus.corr._Length_3Y = dupcor_Length_3Y$consensus.correlation
+
+consensus.corr._Length_3Y
+
+# lmFit fits a linear model using weighted least squares for each gene:
+fit_Length_3Y = lmFit(y_Length_3Y, 
+            design = mm_Length_3Y, 
+            block = metadata_S2$Hybrid,
+            correlation = consensus.corr._Length_3Y) 
+
+# Ebayes
+BlockFit_Length_3Y = eBayes(fit_Length_3Y)
+```
+
+## Limma results \_Length_3Y
+
+```{r}
+res_summaries_Length_3Y = BlockFit_Length_3Y %>% decideTests() %>% summary()
+
+res_summaries_Length_3Y
+```
+
+## Table of results \_Length_3Y
+
+```{r}
+impLength_3Y = topTable(BlockFit_Length_3Y,
+                  sort.by = "logFC",
+                  p.value = 0.05,
+                  adjust.method = "BH",
+                  number = Inf) %>%
+    rownames_to_column(var = 'GeneID') %>% 
+  mutate(R = sqrt(t^2/(t^2 + 40)), AveExpr = 2^AveExpr)
+
+dim(impLength_3Y)
+## adding Hybrid as a blocking variable reduced DEGs by several thousand
+
+head(impLength_3Y)
+```
+
+## PCA of \_Length_3Y DEGs
+
+```{r}
+ids = impLength_3Y %>% 
+  select(GeneID)
+
+PCA_Length_3Y = cpmd2 %>% 
+  as.data.frame() %>% 
+  rownames_to_column(var = 'GeneID') %>% 
+  right_join(ids) %>% 
+  column_to_rownames(var = 'GeneID')
+
+pca_plot_Length_3Y = plot_pca(PCA_Length_3Y, metadata,
+               join_by_name = 'Sample',
+               plotting_factors_in = 'col_names',
+               plotting_factors_name = Group, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'length_3Y',
+               fill = 'length_3Y',
+               plot_type = '2D')
+
+pca_plot_Length_3Y$plot
+
+```
+
+## Merge annotation with results \_Length_3Y
+
+```{r}
+impLength_3Y = impLength_3Y %>%
+  left_join(annotation_combined, by = "GeneID")
+
+head(impLength_3Y)
+
+fwrite(impLength_3Y, 'DGEresults/Limma_results_table_Length_3Y.csv')
+
+impLength_3Y = fread('DGEresults/Limma_results_table_Length_3Y.csv')
+```
+
+## Read in \_Length_3Y results
+
+```{r}
+impLength_3Y = fread('DGEresults/Limma_results_table_Length_3Y.csv')
+```
+
+## Volcano plot
+
+```{r}
+labs = impLength_3Y %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+  slice_min(order_by = logFC, n = 5) %>% 
+  rbind(impLength_3Y %>% 
+  distinct(logFC, adj.P.Val, name) %>% 
+    slice_max(order_by = logFC, n = 5))
+      
+
+ggplot(impLength_3Y %>% 
+         distinct(logFC, adj.P.Val, name), aes(logFC, log10(adj.P.Val)*-1, color = logFC))+
+  geom_point()+
+   ggrepel::geom_label_repel(data = labs, aes(label = name), size = 3, color = 'black', box.padding = 0.4, label.padding = 0.1, max.overlaps = Inf)+
+  geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  geom_text(aes(min(logFC), log10(0.05)*-1), label = 'FDR 0.05', vjust = -1)+
+  geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+```
+
+## Positive \_Length_3Y DEGs for GO
+
+```{r}
+Length_3Y_GO_pos_Jm = impLength_3Y %>%
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`)
+
+length(unique(Length_3Y_GO_pos_Jm$GeneID))
+
+Length_3Y_GO_pos_both = impLength_3Y %>% 
+  filter(logFC > 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>%
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(Length_3Y_GO_pos_Jm)
+
+length(unique(Length_3Y_GO_pos_both$GeneID))
+
+head(Length_3Y_GO_pos_both)
+
+fwrite(Length_3Y_GO_pos_both, "For_Panther/Length_3Y_DEGs_pos_GO.csv", sep = '\t')
+
+```
+
+## Expression from alleles is causing duplication in GO results which means data loss as GO removes duplicates. However, these are not true duplicates.
+
+## Negative \_Length_3Y DEGs for GO
+
+```{r}
+Length_3Y_GO_neg_Jm = impLength_3Y %>%
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype, `Jr-GeneID`) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  select(`Jr-GeneID`, logFC) %>%
+  mutate(`Jr-GeneID` = paste0("LOC", `Jr-GeneID`)) %>% 
+  dplyr::rename(GeneID = `Jr-GeneID`) 
+ 
+
+length(unique(Length_3Y_GO_neg_Jm$GeneID))
+
+Length_3Y_GO_neg_both = impLength_3Y %>% 
+  filter(logFC < 0) %>%
+  distinct(GeneID, logFC, Parent_haplotype) %>%
+  drop_na() %>% 
+  filter(Parent_haplotype == "J.regia") %>% 
+  select(GeneID, logFC) %>%
+  mutate(GeneID = paste0("LOC", GeneID)) %>% 
+  rbind(Length_3Y_GO_neg_Jm) 
+
+length(unique(Length_3Y_GO_neg_both$GeneID))
+
+head(Length_3Y_GO_neg_both)
+
+fwrite(Length_3Y_GO_neg_both, "For_Panther/Length_3Y_DEGs_neg_GO.csv", sep = '\t')
+```
+
+## Annotate all \_Length_3Y DEGs with GO
+
+```{r}
+Length_3Y_GO_ALL = Length_3Y_GO_pos_both %>% 
+  rbind(Length_3Y_GO_neg_both) %>% 
+  distinct()
+
+fwrite(Length_3Y_GO_ALL, "For_Panther/Length_3Y_DEGs_all.csv", sep = '\t')
+```
+
+#\* \# PCA plots of DEGs for each analysis
+
+```{r}
+save_plot('DGEresults/PCA_DEGs.png',
+ggarrange(pca_plot_CG$plot, pca_plot_PHY$plot, pca_plot_NEM$plot, labels = c('CG)', 'PHY)', 'NEM)')),
+height = 20, width = 24
+)
+```
+
+# Venn Diagram positive genes
+
+```{r}
+CG_pos = impCG %>%
+  filter(logFC >= 0) %>% 
+  distinct(GeneID) %>% 
+  pull(GeneID)
+  
+
+PHY_pos = impPHY %>%
+  filter(logFC >= 0) %>% 
+  distinct(GeneID) %>% 
+  pull(GeneID)
+
+NEM_pos = impNEM_3Y %>%
+  filter(logFC >= 0) %>% 
+  distinct(GeneID)  %>% 
+  pull(GeneID)
+
+Length_pos = impLength_3Y %>%
+  filter(logFC >= 0) %>% 
+  distinct(GeneID)  %>% 
+  pull(GeneID)
+
+venn_pos = list(CG_pos = CG_pos, 
+                PHY_pos = PHY_pos,
+                NEM_pos = NEM_pos,
+                Length_pos = Length_pos)
+
+```
+
+# Venn Diagram negative genes
+
+```{r}
+CG_neg = impCG %>%
+  filter(logFC <= 0) %>% 
+  distinct(GeneID) %>% 
+  pull(GeneID)
+  
+
+PHY_neg = impPHY %>%
+  filter(logFC <= 0) %>% 
+  distinct(GeneID) %>% 
+  pull(GeneID)
+
+NEM_neg = impNEM_3Y %>%
+  filter(logFC <= 0) %>% 
+  distinct(GeneID)  %>% 
+  pull(GeneID)
+
+Length_neg = impLength_3Y %>%
+  filter(logFC <= 0) %>% 
+  distinct(GeneID)  %>% 
+  pull(GeneID)
+
+venn_neg = list(CG_neg = CG_neg,
+                PHY_neg = PHY_neg, 
+                NEM_neg = NEM_neg,
+                Length_neg = Length_neg)
+
+```
+
+# Plot and save venn diagram figure with results summaries
+
+```{r}
+library(ggvenn)
+
+a = ggvenn(venn_pos, text_size = 6)
+
+b = ggvenn(venn_neg, text_size = 6)
+
+p = tableGrob(summary)
+
+c = grid.arrange(p)
+
+ggarrange(a, b, labels = c('A)', 'B)'), label.y = 0.75)
+
+
+save_plot('DGEresults/Venn_Pos_Neg.png',
+          ggarrange(a, b, labels = c('A)', 'B)'), 
+                    font.label = list(size = 25),
+                    label.y = 0.75, 
+                    heights = c(4,1)),
+                    width = 45, 
+                    height = 23)
+```
+
+####End of analysis
+
+# Extras\>\>\>\>\>\>
+
+# Trait data have some collinearity
+
+```{r}
+library(ggcorrplot)
+
+# Get matrix for correlation
+cordat =  metadata_S %>%
+  select(CG_Avg, PHY_Avg, RLN_2Y) %>%
+  scale() %>%
+  as.matrix()
+
+# Calculate p-values
+corpmat1 = cor_pmat(cordat, method = 'pearson')
+
+# Calculate correlation coefficients
+cormat1 =cor(cordat, method = 'pearson')
+
+# Plot. All relationships are significant
+p = ggcorrplot(cormat1, type = 'lower', hc.order = T, lab = T, p.mat = corpmat1)
+
+p
+
+save_plot('DGEresults/Pheno_corrplot.png', p)
+```

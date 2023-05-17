@@ -1,0 +1,14 @@
+name: SCRI_Phenotype_Analysis
+title: SCRI_Phenotype_Analysis
+username:
+account: hjsaxe
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8591392
+bundleId: 7118899
+url: https://hjsaxe.shinyapps.io/SCRI_Phenotype_Analysis/
+when: 1682093609.54342
+lastSyncTime: 1682093609.54344
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: 2_3_Year_RLN_Counts_and_tree_lengths.csv|2023.02.08 CAL Masterlist lab inventory to CAL fr GTB (1).xlsx|2023.03.22 SCRI Masterlist cal_AW.xlsx|2023.03.29 SCRI Masterlist DK edited.xlsx|2023.04.06 SCRI Masterlist.xlsx|2023.04.18 SCRI Masterlist with AW updates.xlsx|2023_metadata.csv|CG_Avg_Score.csv|PHY_Avg_Score.csv|SCRI_Phenotype_Data_Complete_Cases.csv|SCRI_Phenotype_Data_Spearman_Correlation_InComplete_Cases_Table.csv|SCRI_Phenotype_Data_Spearman_Correlation_InComplete_Cases_Table.xlsx|SCRI_Phenotype_PCA_Complete_Cases_Data.png|SCRI_Phenotype_PCA_Complete_Cases_Data_RLN_Transform.png|WalnutClean_FEB_2023.xlsx

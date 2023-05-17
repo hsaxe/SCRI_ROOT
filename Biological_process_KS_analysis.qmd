@@ -1,0 +1,884 @@
+---
+title: "GO_results_SCRI_ROOT_RNAseq"
+author: "Houston Saxe"
+date: "1/24/2022"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load libraries
+
+```{r}
+pacman::p_load(dplyr, 
+               tibble, 
+               readr, 
+               stringr, 
+               data.table, 
+               ggplot2, 
+               sjPlot, 
+               ggpubr, 
+               tidyr, 
+               jsonlite,
+               openxlsx)
+```
+
+# Get GO biological process annotation for J.regia genome
+
+```{r}
+BP_annotation = fread('Full_GO_BP_Annotation/Full_Jr_Genes_BP_Annotated.csv') 
+
+```
+
+# CG Get logFCs from limma results for J.regia and J.microcarpa and merge with GO results
+
+```{r}
+impCG = fread('DGEresults/Limma_results_table_CG.csv') %>% 
+  select(GeneID,
+         name,
+         logFC,
+         `Jr-GeneID`,
+         Parent_haplotype) %>% 
+  distinct() %>% 
+  mutate(name = gsub('thioesterase.*', 'thioesterase', name))
+
+CG_GO_JM = impCG %>%
+  distinct(GeneID, 
+           logFC, 
+           name,
+           Parent_haplotype,
+           `Jr-GeneID`) %>%
+  # drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  mutate(`GeneID` = `Jr-GeneID`) 
+
+length(unique(CG_GO_JM$GeneID))
+
+CG_GO_JM_JR = impCG %>% 
+  distinct(GeneID,
+           logFC,
+           name,
+           Parent_haplotype) %>%
+  # drop_na() %>%
+  filter(Parent_haplotype == "J.regia") %>%
+  rbind(CG_GO_JM, fill = T) %>% 
+  select(!`Jr-GeneID`)
+
+length(unique(CG_GO_JM_JR$GeneID))
+
+length(duplicated(CG_GO_JM_JR$GeneID)[duplicated(CG_GO_JM_JR$GeneID) == T]) 
+
+length(duplicated(CG_GO_JM_JR$logFC)[duplicated(CG_GO_JM_JR$logFC) == T]) 
+
+dups = CG_GO_JM_JR %>% 
+  group_by(logFC, GeneID) %>%
+  filter(n()>1)
+
+
+head(CG_GO_JM_JR)
+
+```
+
+```{r}
+impdups = impCG %>% 
+  group_by(GeneID, logFC) %>% 
+  filter(n() > 1)
+```
+
+
+## Merge DEG data with BP annotation
+
+```{r}
+impCG_BP = CG_GO_JM_JR %>% 
+  left_join(BP_annotation, by = c('GeneID' = 'mapped_id')) %>% 
+  distinct()
+
+length(unique(impCG_BP$logFC))
+
+length(duplicated(impCG_BP$logFC))
+```
+
+## Maked list for KS test results
+
+```{r}
+print_res = list()
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular biological process are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## CG BP KS test
+
+```{r}
+ref_CG = impCG_BP %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+ks_res_CG = impCG_BP %>% 
+  group_by(term.label) %>% 
+  mutate(p.val = ks.test(logFC, ref_CG)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_CG = ks_res_CG %>% 
+  select(!c(GeneID, 
+            logFC,
+            # name,
+            Parent_haplotype)) %>% 
+  distinct() %>% 
+  mutate(p.val = ifelse(p.val == 0, 0.000000000000001, p.val),
+           fdr = p.adjust(p.val, method = 'fdr')) %>% 
+  filter(term.level <= 2)
+
+print_res$CG_No_filter = print(paste('Total of',
+            ks_res_CG %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_CG %>% pull(term.label) %>% unique() %>% length(),
+            'biological processes and',
+            ks_res_CG %>% pull(term.level) %>% unique() %>% length(),
+            'term levels for A. tumefaciens'))
+            
+print_res$CG_Filter = print(paste('and with fdr <= 0.05', 
+            ks_res_CG %>% filter(fdr < 0.05) %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_CG %>% filter(fdr < 0.05) %>% pull(term.label) %>% unique() %>% length(),
+            'biological processes and',
+            ks_res_CG %>% filter(fdr < 0.05) %>% pull(term.level) %>% unique() %>% length(),
+            'term levels for A. tumefaciens'))
+```
+
+## Summary of KS results
+
+```{r}
+print_res
+```
+
+## CG Make plotting data
+
+```{r fig.height=8, fig.width=10}
+one = ks_res_less_CG %>% 
+  # Summarise these terms into broad categories
+  mutate(term.label = gsub('with\\sbulged\\sadenosine\\sas\\snucleophile|to\\s', '', term.label)) 
+
+# Merge DGE results with GO results
+plot_dat = one %>% 
+  select(term.label, 
+         term.level,
+         # term.label.mod, 
+         fdr,
+         `Number_of_genes`,
+         Avg_logFC) %>% 
+  distinct() %>%
+  drop_na() %>% 
+  filter(fdr <= 0.05)
+  
+
+# Make new table for combining DEG results with GO results and writing out
+impCG_BP_Enrichment_out = ks_res_CG %>% 
+  mutate(Trait = 'CG')
+
+labs_normal = plot_dat %>% 
+  # Make labels for terms containing these strings and fdr less than or equal to 0.05
+  filter(term.label %like% 'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene' &
+           fdr <= 0.05) %>% 
+  select(term.label,
+         term.level,
+         # term.label.mod, 
+         fdr,
+         Avg_logFC,
+         `Number_of_genes`) %>% 
+  distinct()
+
+counts = labs_normal %>% 
+  count(term.label)
+
+# Labels for top 5 terms by fdr
+top = plot_dat %>% 
+  slice_min(order_by = fdr, n = 5) %>% 
+  rbind(labs_normal) %>% 
+  distinct() %>% 
+  mutate(Gene_type = ifelse(Avg_logFC >= 0, 'Susceptibility', 'Resistance'))
+
+```
+
+## CG Make plot2
+
+```{r fig.height=6, fig.width=9, warning=FALSE, message=FALSE}
+
+CG = ggplot(top, aes(x = Gene_type, y = reorder(term.label, Avg_logFC), color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1, color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1), shape = 1, stroke = 0.25, color = 'black')+
+  labs(title = 'Biological Process Kolmogorov-Smirnov Test A. tumefaciens',
+       x = 'Gene Type',
+       y = 'Selected Biological Processes',
+       color = 'Mean log2\nExpression\nFold Change',
+       size = 'log10(fdr)*-1')+
+  theme_grey(base_size = 16)+
+  theme(plot.title = element_text(hjust = 0.9))+
+  # geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  # geom_text(aes(min(Avg_logFC), log10(0.05)*-1),
+  #           label = 'FDR 0.05',
+  #           vjust = 1.5,
+  #           hjust = 0.5, 
+  #           color = 'black',
+  #           size = 3)+
+  # geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  # geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),
+  #      y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+
+  # scale_size_continuous(breaks = c(5, 20, 50, 200, 600),
+  #                       limits = c(0, 600))+
+    # facet_wrap(~term.level, ncol = 2, scales = 'free')
+
+save_plot('Biological_Process_KS_results/BP_Enrich_testing_CG.png', 
+          CG,
+          width = 25, 
+          height = 30, 
+          dpi = 300)
+```
+
+# PHY Get logFCs from limma results for J.regia and J.microcarpa and merge with GO results
+
+```{r}
+impPHY = fread('DGEresults/Limma_results_table_PHY.csv') %>% 
+  select(GeneID,
+         name,
+         logFC,
+         `Jr-GeneID`,
+         Parent_haplotype) %>% 
+  distinct() %>% 
+  mutate(name = gsub('thioesterase.*', 'thioesterase', name))
+
+PHY_GO_JM = impPHY %>%
+  distinct(GeneID, 
+           logFC, 
+           name,
+           Parent_haplotype,
+           `Jr-GeneID`) %>%
+  # drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  mutate(`GeneID` = `Jr-GeneID`) 
+
+length(unique(PHY_GO_JM$GeneID))
+
+PHY_GO_JM_JR = impPHY %>% 
+  distinct(GeneID,
+           logFC,
+           name,
+           Parent_haplotype) %>%
+  # drop_na() %>%
+  filter(Parent_haplotype == "J.regia") %>%
+  rbind(PHY_GO_JM, fill = T) %>% 
+  select(!`Jr-GeneID`)
+
+length(unique(PHY_GO_JM_JR$GeneID))
+
+length(duplicated(PHY_GO_JM_JR$GeneID)[duplicated(PHY_GO_JM_JR$GeneID) == T]) 
+
+length(duplicated(PHY_GO_JM_JR$logFC)[duplicated(PHY_GO_JM_JR$logFC) == T]) 
+
+dups = PHY_GO_JM_JR %>% 
+  group_by(logFC, GeneID) %>%
+  filter(n()>1)
+
+
+head(PHY_GO_JM_JR)
+
+```
+
+```{r}
+impdups = impPHY %>% 
+  group_by(GeneID, logFC) %>% 
+  filter(n() > 1)
+```
+
+
+## Merge DEG data with BP annotation
+
+```{r}
+impPHY_BP = PHY_GO_JM_JR %>% 
+  left_join(BP_annotation, by = c('GeneID' = 'mapped_id')) %>% 
+  distinct()
+
+length(unique(impPHY_BP$logFC))
+
+length(duplicated(impPHY_BP$logFC))
+```
+
+## Maked list for KS test results
+
+```{r}
+print_res = list()
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular biological process are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## PHY BP KS test
+
+```{r}
+ref_PHY = impPHY_BP %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+ks_res_PHY = impPHY_BP %>% 
+  group_by(term.label) %>% 
+  mutate(p.val = ks.test(logFC, ref_PHY)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_PHY = ks_res_PHY %>% 
+  select(!c(GeneID, 
+            logFC,
+            # name,
+            Parent_haplotype)) %>% 
+  distinct() %>% 
+  mutate(p.val = ifelse(p.val == 0, 0.000000000000001, p.val),
+           fdr = p.adjust(p.val, method = 'fdr')) %>% 
+  filter(term.level <= 2)
+
+print_res$PHY_No_filter = print(paste('Total of',
+            ks_res_PHY %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_PHY %>% pull(term.label) %>% unique() %>% length(),
+            'biological processes and',
+            ks_res_PHY %>% pull(term.level) %>% unique() %>% length(),
+            'term levels for A. tumefaciens'))
+            
+print_res$PHY_Filter = print(paste('and with fdr <= 0.05', 
+            ks_res_PHY %>% filter(fdr < 0.05) %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_PHY %>% filter(fdr < 0.05) %>% pull(term.label) %>% unique() %>% length(),
+            'biological processes and',
+            ks_res_PHY %>% filter(fdr < 0.05) %>% pull(term.level) %>% unique() %>% length(),
+            'term levels for A. tumefaciens'))
+```
+
+## Summary of KS results
+
+```{r}
+print_res
+```
+
+## PHY Make plotting data
+
+```{r fig.height=8, fig.width=10}
+one = ks_res_less_PHY %>% 
+  # Summarise these terms into broad categories
+  mutate(term.label = gsub('with\\sbulged\\sadenosine\\sas\\snucleophile|to\\s', '', term.label)) 
+
+# Merge DGE results with GO results
+plot_dat = one %>% 
+  select(term.label, 
+         term.level,
+         # term.label.mod, 
+         fdr,
+         `Number_of_genes`,
+         Avg_logFC) %>% 
+  distinct() %>%
+  drop_na() %>% 
+  filter(fdr <= 0.05)
+  
+
+# Make new table for combining DEG results with GO results and writing out
+impPHY_BP_Enrichment_out = ks_res_PHY %>% 
+  mutate(Trait = 'PHY')
+
+labs_normal = plot_dat %>% 
+  # Make labels for terms containing these strings and fdr less than or equal to 0.05
+  filter(term.label %like% 'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene' &
+           fdr <= 0.05) %>% 
+  select(term.label,
+         term.level,
+         # term.label.mod, 
+         fdr,
+         Avg_logFC,
+         `Number_of_genes`) %>% 
+  distinct()
+
+counts = labs_normal %>% 
+  count(term.label)
+
+# Labels for top 5 terms by fdr
+top = plot_dat %>% 
+  slice_min(order_by = fdr, n = 5) %>% 
+  rbind(labs_normal) %>% 
+  distinct() %>% 
+  mutate(Gene_type = ifelse(Avg_logFC >= 0, 'Susceptibility', 'Resistance'))
+
+```
+
+## PHY Make plot2
+
+```{r fig.height=6, fig.width=9, warning=FALSE, message=FALSE}
+
+PHY = ggplot(top, aes(x = Gene_type, y = reorder(term.label, Avg_logFC), color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1, color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1), shape = 1, stroke = 0.25, color = 'black')+
+  labs(title = 'Biological Process Kolmogorov-Smirnov Test Phytophthora',
+       x = 'Gene Type',
+       y = 'Selected Biological Processes',
+       color = 'Mean log2\nExpression\nFold Change',
+       size = 'log10(fdr)*-1')+
+  theme_grey(base_size = 16)+
+  theme(plot.title = element_text(hjust = 0.9))+
+  # geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  # geom_text(aes(min(Avg_logFC), log10(0.05)*-1),
+  #           label = 'FDR 0.05',
+  #           vjust = 1.5,
+  #           hjust = 0.5, 
+  #           color = 'black',
+  #           size = 3)+
+  # geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  # geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),
+  #      y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+
+  # scale_size_continuous(breaks = c(5, 20, 50, 200, 600),
+  #                       limits = c(0, 600))+
+    # facet_wrap(~term.level, ncol = 2, scales = 'free')
+
+save_plot('Biological_Process_KS_results/BP_Enrich_testing_PHY.png', 
+          PHY,
+          width = 25, 
+          height = 30, 
+          dpi = 300)
+```
+
+# NEM_3Y Get logFCs from limma results for J.regia and J.microcarpa and merge with GO results
+
+```{r}
+impNEM_3Y = fread('DGEresults/Limma_results_table_NEM_3Y.csv') %>% 
+  select(GeneID,
+         name,
+         logFC,
+         `Jr-GeneID`,
+         Parent_haplotype) %>% 
+  distinct() %>% 
+  mutate(name = gsub('thioesterase.*', 'thioesterase', name))
+
+NEM_3Y_GO_JM = impNEM_3Y %>%
+  distinct(GeneID, 
+           logFC, 
+           name,
+           Parent_haplotype,
+           `Jr-GeneID`) %>%
+  # drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  mutate(`GeneID` = `Jr-GeneID`) 
+
+length(unique(NEM_3Y_GO_JM$GeneID))
+
+NEM_3Y_GO_JM_JR = impNEM_3Y %>% 
+  distinct(GeneID,
+           logFC,
+           name,
+           Parent_haplotype) %>%
+  # drop_na() %>%
+  filter(Parent_haplotype == "J.regia") %>%
+  rbind(NEM_3Y_GO_JM, fill = T) %>% 
+  select(!`Jr-GeneID`)
+
+length(unique(NEM_3Y_GO_JM_JR$GeneID))
+
+length(duplicated(NEM_3Y_GO_JM_JR$GeneID)[duplicated(NEM_3Y_GO_JM_JR$GeneID) == T]) 
+
+length(duplicated(NEM_3Y_GO_JM_JR$logFC)[duplicated(NEM_3Y_GO_JM_JR$logFC) == T]) 
+
+dups = NEM_3Y_GO_JM_JR %>% 
+  group_by(logFC, GeneID) %>%
+  filter(n()>1)
+
+
+head(NEM_3Y_GO_JM_JR)
+
+```
+
+```{r}
+impdups = impNEM_3Y %>% 
+  group_by(GeneID, logFC) %>% 
+  filter(n() > 1)
+```
+
+
+## Merge DEG data with BP annotation
+
+```{r}
+impNEM_3Y_BP = NEM_3Y_GO_JM_JR %>% 
+  left_join(BP_annotation, by = c('GeneID' = 'mapped_id')) %>% 
+  distinct()
+
+length(unique(impNEM_3Y_BP$logFC))
+
+length(duplicated(impNEM_3Y_BP$logFC))
+```
+
+## Maked list for KS test results
+
+```{r}
+print_res = list()
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular biological process are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## NEM_3Y BP KS test
+
+```{r}
+ref_NEM_3Y = impNEM_3Y_BP %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+ks_res_NEM_3Y = impNEM_3Y_BP %>% 
+  group_by(term.label) %>% 
+  mutate(p.val = ks.test(logFC, ref_NEM_3Y)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_NEM_3Y = ks_res_NEM_3Y %>% 
+  select(!c(GeneID, 
+            logFC,
+            # name,
+            Parent_haplotype)) %>% 
+  distinct() %>% 
+  mutate(p.val = ifelse(p.val == 0, 0.000000000000001, p.val),
+           fdr = p.adjust(p.val, method = 'fdr')) %>% 
+  filter(term.level <= 2)
+
+print_res$NEM_3Y_No_filter = print(paste('Total of',
+            ks_res_NEM_3Y %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_NEM_3Y %>% pull(term.label) %>% unique() %>% length(),
+            'biological processes and',
+            ks_res_NEM_3Y %>% pull(term.level) %>% unique() %>% length(),
+            'term levels for A. tumefaciens'))
+            
+print_res$NEM_3Y_Filter = print(paste('and with fdr <= 0.05', 
+            ks_res_NEM_3Y %>% filter(fdr < 0.05) %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_NEM_3Y %>% filter(fdr < 0.05) %>% pull(term.label) %>% unique() %>% length(),
+            'biological processes and',
+            ks_res_NEM_3Y %>% filter(fdr < 0.05) %>% pull(term.level) %>% unique() %>% length(),
+            'term levels for A. tumefaciens'))
+```
+
+## Summary of KS results
+
+```{r}
+print_res
+```
+
+## NEM_3Y Make plotting data
+
+```{r fig.height=8, fig.width=10}
+one = ks_res_less_NEM_3Y %>% 
+  # Summarise these terms into broad categories
+  mutate(term.label = gsub('with\\sbulged\\sadenosine\\sas\\snucleophile|to\\s', '', term.label)) 
+
+# Merge DGE results with GO results
+plot_dat = one %>% 
+  select(term.label, 
+         term.level,
+         # term.label.mod, 
+         fdr,
+         `Number_of_genes`,
+         Avg_logFC) %>% 
+  distinct() %>%
+  drop_na() %>% 
+  filter(fdr <= 0.05)
+  
+
+# Make new table for combining DEG results with GO results and writing out
+impNEM_3Y_BP_Enrichment_out = ks_res_NEM_3Y %>% 
+  mutate(Trait = 'NEM_3Y')
+
+labs_normal = plot_dat %>% 
+  # Make labels for terms containing these strings and fdr less than or equal to 0.05
+  filter(term.label %like% 'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene' &
+           fdr <= 0.05) %>% 
+  select(term.label,
+         term.level,
+         # term.label.mod, 
+         fdr,
+         Avg_logFC,
+         `Number_of_genes`) %>% 
+  distinct()
+
+counts = labs_normal %>% 
+  count(term.label)
+
+# Labels for top 5 terms by fdr
+top = plot_dat %>% 
+  slice_min(order_by = fdr, n = 5) %>% 
+  rbind(labs_normal) %>% 
+  distinct() %>% 
+  mutate(Gene_type = ifelse(Avg_logFC >= 0, 'Susceptibility', 'Resistance'))
+
+```
+
+## NEM_3Y Make plot2
+
+```{r fig.height=6, fig.width=9, warning=FALSE, message=FALSE}
+
+NEM_3Y = ggplot(top, aes(x = Gene_type, y = reorder(term.label, Avg_logFC), color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1, color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1), shape = 1, stroke = 0.25, color = 'black')+
+  labs(title = 'Biological Process Kolmogorov-Smirnov Test P. vulnus',
+       x = 'Gene Type',
+       y = 'Selected Biological Processes',
+       color = 'Mean log2\nExpression\nFold Change',
+       size = 'log10(fdr)*-1')+
+  theme_grey(base_size = 16)+
+  theme(plot.title = element_text(hjust = 0.9))+
+  # geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  # geom_text(aes(min(Avg_logFC), log10(0.05)*-1),
+  #           label = 'FDR 0.05',
+  #           vjust = 1.5,
+  #           hjust = 0.5, 
+  #           color = 'black',
+  #           size = 3)+
+  # geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  # geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),
+  #      y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+
+  # scale_size_continuous(breaks = c(5, 20, 50, 200, 600),
+  #                       limits = c(0, 600))+
+    # facet_wrap(~term.level, ncol = 2, scales = 'free')
+
+save_plot('Biological_Process_KS_results/BP_Enrich_testing_NEM_3Y.png', 
+          NEM_3Y,
+          width = 25, 
+          height = 30, 
+          dpi = 300)
+```
+
+# Length_3Y Get logFCs from limma results for J.regia and J.microcarpa and merge with GO results
+
+```{r}
+impLength_3Y = fread('DGEresults/Limma_results_table_Length_3Y.csv') %>% 
+  select(GeneID,
+         name,
+         logFC,
+         `Jr-GeneID`,
+         Parent_haplotype) %>% 
+  distinct() %>% 
+  mutate(name = gsub('thioesterase.*', 'thioesterase', name))
+
+Length_3Y_GO_JM = impLength_3Y %>%
+  distinct(GeneID, 
+           logFC, 
+           name,
+           Parent_haplotype,
+           `Jr-GeneID`) %>%
+  # drop_na() %>% 
+  filter(Parent_haplotype == "J.microcarpa") %>%
+  mutate(`GeneID` = `Jr-GeneID`) 
+
+length(unique(Length_3Y_GO_JM$GeneID))
+
+Length_3Y_GO_JM_JR = impLength_3Y %>% 
+  distinct(GeneID,
+           logFC,
+           name,
+           Parent_haplotype) %>%
+  # drop_na() %>%
+  filter(Parent_haplotype == "J.regia") %>%
+  rbind(Length_3Y_GO_JM, fill = T) %>% 
+  select(!`Jr-GeneID`)
+
+length(unique(Length_3Y_GO_JM_JR$GeneID))
+
+length(duplicated(Length_3Y_GO_JM_JR$GeneID)[duplicated(Length_3Y_GO_JM_JR$GeneID) == T]) 
+
+length(duplicated(Length_3Y_GO_JM_JR$logFC)[duplicated(Length_3Y_GO_JM_JR$logFC) == T]) 
+
+dups = Length_3Y_GO_JM_JR %>% 
+  group_by(logFC, GeneID) %>%
+  filter(n()>1)
+
+
+head(Length_3Y_GO_JM_JR)
+
+```
+
+```{r}
+impdups = impLength_3Y %>% 
+  group_by(GeneID, logFC) %>% 
+  filter(n() > 1)
+```
+
+
+## Merge DEG data with BP annotation
+
+```{r}
+impLength_3Y_BP = Length_3Y_GO_JM_JR %>% 
+  left_join(BP_annotation, by = c('GeneID' = 'mapped_id')) %>% 
+  distinct()
+
+length(unique(impLength_3Y_BP$logFC))
+
+length(duplicated(impLength_3Y_BP$logFC))
+```
+
+## Maked list for KS test results
+
+```{r}
+print_res = list()
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular biological process are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## Length_3Y BP KS test
+
+```{r}
+ref_Length_3Y = impLength_3Y_BP %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+ks_res_Length_3Y = impLength_3Y_BP %>% 
+  group_by(term.label) %>% 
+  mutate(p.val = ks.test(logFC, ref_Length_3Y)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_Length_3Y = ks_res_Length_3Y %>% 
+  select(!c(GeneID, 
+            logFC,
+            # name,
+            Parent_haplotype)) %>% 
+  distinct() %>% 
+  mutate(p.val = ifelse(p.val == 0, 0.000000000000001, p.val),
+           fdr = p.adjust(p.val, method = 'fdr')) %>% 
+  filter(term.level <= 2)
+
+print_res$Length_3Y_No_filter = print(paste('Total of',
+            ks_res_Length_3Y %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_Length_3Y %>% pull(term.label) %>% unique() %>% length(),
+            'biological processes and',
+            ks_res_Length_3Y %>% pull(term.level) %>% unique() %>% length(),
+            'term levels for A. tumefaciens'))
+            
+print_res$Length_3Y_Filter = print(paste('and with fdr <= 0.05', 
+            ks_res_Length_3Y %>% filter(fdr < 0.05) %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_Length_3Y %>% filter(fdr < 0.05) %>% pull(term.label) %>% unique() %>% length(),
+            'biological processes and',
+            ks_res_Length_3Y %>% filter(fdr < 0.05) %>% pull(term.level) %>% unique() %>% length(),
+            'term levels for A. tumefaciens'))
+```
+
+## Summary of KS results
+
+```{r}
+print_res
+```
+
+## Length_3Y Make plotting data
+
+```{r fig.height=8, fig.width=10}
+one = ks_res_less_Length_3Y %>% 
+  # Summarise these terms into broad categories
+  mutate(term.label = gsub('with\\sbulged\\sadenosine\\sas\\snucleophile|to\\s', '', term.label)) 
+
+# Merge DGE results with GO results
+plot_dat = one %>% 
+  select(term.label, 
+         term.level,
+         # term.label.mod, 
+         fdr,
+         `Number_of_genes`,
+         Avg_logFC) %>% 
+  distinct() %>%
+  drop_na() %>% 
+  filter(fdr <= 0.05)
+  
+
+# Make new table for combining DEG results with GO results and writing out
+impLength_3Y_BP_Enrichment_out = ks_res_Length_3Y %>% 
+  mutate(Trait = 'Length_3Y')
+
+labs_normal = plot_dat %>% 
+  # Make labels for terms containing these strings and fdr less than or equal to 0.05
+  filter(term.label %like% 'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene' &
+           fdr <= 0.05) %>% 
+  select(term.label,
+         term.level,
+         # term.label.mod, 
+         fdr,
+         Avg_logFC,
+         `Number_of_genes`) %>% 
+  distinct()
+
+counts = labs_normal %>% 
+  count(term.label)
+
+# Labels for top 5 terms by fdr
+top = plot_dat %>% 
+  slice_min(order_by = fdr, n = 5) %>% 
+  rbind(labs_normal) %>% 
+  distinct() %>% 
+  mutate(Gene_type = ifelse(Avg_logFC >= 0, 'Susceptibility', 'Resistance'))
+
+```
+
+## Length_3Y Make plot2
+
+```{r fig.height=6, fig.width=9, warning=FALSE, message=FALSE}
+
+Length_3Y = ggplot(top, aes(x = Gene_type, y = reorder(term.label, Avg_logFC), color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1, color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1), shape = 1, stroke = 0.25, color = 'black')+
+  labs(title = 'Biological Process Kolmogorov-Smirnov Test Three-year Tree Length',
+       x = 'Gene Type',
+       y = 'Selected Biological Processes',
+       color = 'Mean log2\nExpression\nFold Change',
+       size = 'log10(fdr)*-1')+
+  theme_grey(base_size = 16)+
+  theme(plot.title = element_text(hjust = 0.9))+
+  # geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  # geom_text(aes(min(Avg_logFC), log10(0.05)*-1),
+  #           label = 'FDR 0.05',
+  #           vjust = 1.5,
+  #           hjust = 0.5, 
+  #           color = 'black',
+  #           size = 3)+
+  # geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  # geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),
+  #      y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+
+  # scale_size_continuous(breaks = c(5, 20, 50, 200, 600),
+  #                       limits = c(0, 600))+
+    # facet_wrap(~term.level, ncol = 2, scales = 'free')
+
+save_plot('Biological_Process_KS_results/BP_Enrich_testing_Length_3Y.png', 
+          Length_3Y,
+          width = 25, 
+          height = 30, 
+          dpi = 300)
+```
+
+# Write out full results for supplementary data
+
+```{r}
+total_results = impCG_BP_Enrichment_out %>% 
+  rbind(impPHY_BP_Enrichment_out) %>% 
+  rbind(impNEM_3Y_BP_Enrichment_out) %>% 
+  rbind(impLength_3Y_BP_Enrichment_out)
+
+fwrite(total_results, 'Biological_Process_KS_results/Full_supplementary_results_KS_BP.csv')
+```

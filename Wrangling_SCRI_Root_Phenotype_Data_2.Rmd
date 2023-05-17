@@ -1,0 +1,334 @@
+---
+title: "Wrangling_SCRI_Root_Phenotype_Data_2"
+author: "Houston Saxe"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE
+)
+```
+
+# Load packages
+```{r}
+pacman::p_load(data.table,
+               tidyr,
+               dplyr,
+               tibble,
+               naniar,
+               corrplot,
+               ggpubr,
+               ggplot2,
+               ggfortify,
+               cowplot,
+               OmicsAnalyst)
+```
+
+# Read in data
+```{r}
+LL = openxlsx::read.xlsx("SCRI_Phenotype_Analysis/2023.04.18 SCRI Masterlist with AW updates.xlsx",
+                         sheet = 1,
+                         startRow = 1)
+
+# LL = openxlsx::read.xlsx("SCRI_Phenotype_Analysis/2023.04.06 SCRI Masterlist.xlsx",
+#                          sheet = 1,
+#                          startRow = 1)
+
+# LL = openxlsx::read.xlsx("SCRI_Phenotype_Analysis/2023.03.29 SCRI Masterlist DK edited.xlsx",
+#                          sheet = 1,
+#                          startRow = 1)
+
+# LL = openxlsx::read.xlsx("SCRI_Phenotype_Analysis/2023.02.08 CAL Masterlist lab inventory to CAL fr GTB (1).xlsx",
+#                          sheet = 1,
+#                          startRow = 2)
+
+# LL = openxlsx::read.xlsx("SCRI_Phenotype_Analysis/2023.03.22 SCRI Masterlist cal_AW.xlsx",
+#                          sheet = 1,
+#                          startRow = 1)
+
+# LL = read.csv('SCRI_Phenotype_Analysis/2023_masterlist.csv')
+
+# LL = openxlsx::read.xlsx("SCRI_Phenotype_Analysis/WalnutClean_FEB_2023.xlsx",
+#                          sheet = 1,
+#                          startRow = 1)
+
+# nemTest = LL %>%
+#   filter(CAL_Wip_ID %in% c('MS1-36', 'MS1-41', 'MS1-56', 'MS1-122', 'STJM4', '29JM 11', 'JMS 12'))
+
+LL = LL[!duplicated(names(LL))]
+
+## Replacing all non-data containing observations with NAs
+LL = replace_with_na_all(LL, ~.x %in% c("", ".")) %>% 
+  rename_with(~ gsub('\\.|:|-', '_', .x) %>% 
+                gsub('__', '_', .) %>% 
+                gsub('>', 'Over_', .) %>% 
+                gsub('CAL.*Wip.*ID.*', 'CAL_Wip_ID', .))
+
+head(LL)
+```
+
+# Averaging CG scores into one column. This assumes all year scoring is important
+```{r}
+LL = LL %>%
+  mutate(across(-c(matches('CAL..WIP.ID.*'),
+                   genotype), ~ gsub('\\(.*?\\)', '', .x))) %>% 
+  mutate(across(matches("CG_Phenotype|P_cinn|P_cit|RLN|length"), as.numeric)) %>% 
+  mutate(CG_Avg = rowMeans(select(., matches("CG.Phenotype")), na.rm = T) %>% 
+         ifelse(is.nan(.), NA, .),
+         PHY_Avg = rowMeans(select(., matches('P.cinn|P.cit')), na.rm = T) %>% 
+           ifelse(is.nan(.), NA, .),
+         Female_Parent = as.numeric(Female_Parent)) %>% 
+  relocate(CG_Avg, PHY_Avg, .after = `GTB_Notes_on_value_in_Chiape_Trial,_San_Joaquin_Co`) %>%
+  select(!matches('P_cinn|P_cit')) %>% 
+  select(!matches("DAK|PJB|SG.|Dave.s|Proposed|X2021|GTB"))
+
+nemTest = LL %>% 
+  filter(CAL_Wip_ID %like% 'MS1-36|MS1-41|MS1-56|MS1-122|STJM4|29JM 11|JMS 12')
+
+```
+
+# Where are the NAs coming from?
+```{r}
+## Sums of NAs for all columns
+naSums = LL %>%
+  summarise_all(list(~sum(is.na(.)))) %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "NaSums") %>%
+  arrange(NaSums)
+
+## plotting shows where the NAs are coming from
+ggplot(naSums, aes(x = NaSums, y = reorder(Variable, NaSums)))+
+  geom_bar(stat = "identity")
+```
+
+# Picking variables
+```{r}
+# Data with only 31.01 and 31.09 progeny
+LL2 = LL %>%
+  select(matches('CAL.WIP.ID'), 
+         genotype,
+         Female_Parent, 
+         CG_Avg, 
+         PHY_Avg, 
+         matches('length|RLN')) %>%
+  filter(Female_Parent %in% c('31.01', '31.09'))
+
+# Data with all female parents
+LL_all_parents = LL %>% 
+  select(matches('CAL.WIP.ID'), 
+         genotype,
+         Female_Parent, 
+         CG_Avg, 
+         PHY_Avg, 
+         matches('length|RLN')) 
+  
+  
+
+## Sums of NAs for all columns
+naSums = LL2 %>%
+  summarise_all(list(~sum(is.na(.)))) %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "NaSums") %>%
+  arrange(NaSums)
+
+## plotting shows where the NAs are coming from
+ggplot(naSums, aes(x = NaSums, y = reorder(Variable, NaSums)))+
+  geom_bar(stat = "identity")
+
+length(which(complete.cases(LL2) == TRUE))
+```
+## NEM data
+```{r}
+NEM_dat = LL_all_parents %>% 
+  select(matches('CAL.WIP.ID'), 
+         genotype,
+         Female_Parent, 
+         matches('length|RLN')) %>% 
+  rename_with(~ gsub('2Y_RLN', 'RLN_2Y', .x) %>% 
+                gsub('3Y_RLN', 'RLN_3Y', .) %>% 
+                gsub('2Y_length', 'length_2Y', .) %>% 
+                gsub('3Y_length', 'length_3Y', .))
+
+fwrite(NEM_dat, 'SCRI_Phenotype_Analysis/2_3_Year_RLN_Counts_and_tree_lengths.csv')
+```
+
+## CG data
+```{r}
+CG_dat = LL_all_parents %>% 
+  select(matches('CAL.WIP.ID'),
+         CG_Avg)
+
+fwrite(CG_dat, 'SCRI_Phenotype_Analysis/CG_Avg_Score.csv')
+```
+
+## PHY data
+```{r}
+PHY_dat = LL_all_parents %>% 
+  select(matches('CAL.WIP.ID'),
+         PHY_Avg) 
+
+fwrite(PHY_dat, 'SCRI_Phenotype_Analysis/PHY_Avg_Score.csv')
+```
+
+# Make and save metadata from RNA-seq experiment
+```{r}
+metadata = NEM_dat %>% 
+  left_join(CG_dat) %>% 
+  left_join(PHY_dat)
+
+RNA_seq_dat = metadata %>%
+  filter(CAL_Wip_ID %in% c('MS1-36', 'MS1-41', 'MS1-56', 'MS1-122', 'STJM4', '29JM 11', 'JMS 12'))
+
+fwrite(RNA_seq_dat,
+       'SCRI_Phenotype_Analysis/2023_metadata.csv')
+```
+
+# DF of incomplete cases from LL2
+```{r}
+LL3 = LL2 %>%
+  select(!matches('Over_3Y|2Y')) %>% 
+  slice(which(complete.cases(.) == TRUE))
+
+
+fwrite(LL3, 'SCRI_Phenotype_Analysis/SCRI_Phenotype_Data_Complete_Cases.csv')
+
+LL4 = LL2 %>%
+  # remove rows with all NAs except CAL_Wip_ID 
+  filter(., !rowSums(is.na(.)) == ncol(.)-1) %>% 
+  filter(., !rowSums(is.na(.)) == ncol(.))
+
+fwrite(LL4, 'SCRI_Phenotype_Analysis/SCRI_Phenotype_Data_InComplete_Cases.csv')
+
+```
+
+
+```{r}
+LL3 = fread('SCRI_Phenotype_Analysis/SCRI_Phenotype_Data_Complete_Cases.csv')
+
+Elite_classifying = LL3 %>% 
+  mutate(Elite = factor(ifelse(`3Y_RLN` <= 75 &
+                                CG_Avg <= 2 &
+                                PHY_Avg <= 30, 'Elite',
+                                'Not Elite')))
+```
+
+
+# How do phenotypes cluster with eachother?
+```{r}
+p = plot_pca(LL3 %>%
+               select(!c(genotype)) %>% 
+               column_to_rownames(var = 'CAL_Wip_ID'),
+         center = T,
+         scale = T)
+
+p$plot
+
+sjPlot::save_plot('SCRI_Phenotype_Analysis/SCRI_Phenotype_PCA_Complete_Cases_Data.png',
+          p$plot,
+          dpi = 300,
+          width = 15)
+```
+
+# How do phenotypes cluster with eachother? Log10 transformation of NEM data
+```{r}
+RLN_transform = LL3 %>% 
+  mutate(across(matches('RLN'), ~ log10(.x+1)))
+  
+
+p = plot_pca(RLN_transform %>%
+               column_to_rownames(var = 'CAL:CAL_Wip_ID'),
+         center = F,
+         scale = F)
+
+p$plot
+
+# sjPlot::save_plot('SCRI_Phenotype_Analysis/SCRI_Phenotype_PCA_Complete_Cases_Data_RLN_Transform.png',
+#           p$plot,
+#           dpi = 300,
+#           width = 15)
+```
+
+# Correlation of data with complete cases across rows
+```{r}
+test = as.data.frame(as.table(cor(LL3[,-c(1,2)]))) %>% 
+  rename(Cor = Freq)
+
+test2 = as.data.frame(as.table(cor.mtest(LL3[,-c(1,2)])$p)) %>% 
+  rename(P.val = Freq)
+
+cor_Complete_cases = test %>% 
+  left_join(test2) %>% 
+  distinct(Cor, P.val,
+           .keep_all = T) %>% 
+  mutate(FDR = p.adjust(P.val, method = 'BH'))
+
+```
+
+# Correlation of data with incomplete cases across rows (NAs not removes)
+```{r}
+LT = cor(LL4[,-c(1,2)],
+         use = "pairwise.complete.obs",
+         method = 'spearman')
+
+LT[lower.tri(LT)] = NA
+
+test = LT %>% 
+  as.table() %>% 
+  as.data.frame() %>% 
+  drop_na() %>% 
+  rename(Cor = Freq) %>% 
+  filter(Cor != 1)
+  
+
+test2 = as.data.frame(as.table(cor.mtest(LL4[,-c(1,2)])$p)) %>% 
+  rename(P.val = Freq)
+
+LT = cor.mtest(LL4[,-c(1,2)],
+         use = "pairwise.complete.obs",
+         method = 'spearman')$p
+
+LT[lower.tri(LT)] = NA
+
+test2 = LT %>% 
+  as.table() %>% 
+  as.data.frame() %>% 
+  drop_na() %>% 
+  rename(P.val = Freq) 
+
+Cor_all_cases = test %>% 
+  left_join(test2) %>%
+  distinct(Cor, P.val,
+           .keep_all = T) %>% 
+  mutate(FDR = p.adjust(P.val, method = 'BH'))
+
+
+fwrite(Cor_all_cases,
+       'SCRI_Phenotype_Analysis/SCRI_Phenotype_Data_Spearman_Correlation_InComplete_Cases_Table.csv')
+```
+
+
+```{r}
+LT = cor(LL4[,-c(1,2)],
+         use = "pairwise.complete.obs",
+         method = 'spearman') %>% 
+  data.frame() 
+
+LT_Noah = LT %>% 
+  select(PHY_Avg)
+
+LT_p = cor.mtest(LL4[,-c(1,2)],
+         use = "pairwise.complete.obs",
+         method = 'spearman')$p
+
+LT_P_Noah = LT_p %>% 
+  data.frame() %>% 
+  select(PHY_Avg) %>%
+  rename(P.val = PHY_Avg) %>% 
+  mutate(FDR = p.adjust(P.val)) 
+
+final = LT_P_Noah %>% 
+  rownames_to_column(var = 'Vars') %>% 
+  left_join(LT_Noah %>% 
+              rownames_to_column(var = 'Vars'))
+```
+

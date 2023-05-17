@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Houston Saxe">
+<meta name="dcterms.date" content="2022-01-24">
+
+<title>GO_results_SCRI_ROOT_RNAseq</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="Subcell_KS_analysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Subcell_KS_analysis_files/libs/quarto-html/quarto.js"></script>
+<script src="Subcell_KS_analysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="Subcell_KS_analysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Subcell_KS_analysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Subcell_KS_analysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Subcell_KS_analysis_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Subcell_KS_analysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Subcell_KS_analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Subcell_KS_analysis_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">GO_results_SCRI_ROOT_RNAseq</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Houston Saxe </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 24, 2022</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="load-libraries" class="level1">
+<h1>Load libraries</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(dplyr, </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               tibble, </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               readr, </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>               stringr, </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>               data.table, </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>               ggplot2, </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>               sjPlot, </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>               ggpubr, </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>               tidyr, </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>               jsonlite,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>               openxlsx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="get-go-subcellular-loci-annotation-for-j.-regia-genome" class="level1">
+<h1>Get GO Subcellular loci annotation for J. regia genome</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SL_annotation <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'C:/Users/hsaxe/OneDrive/Documents/ALAB/Genome_info/Genomic_Annotation_2/Jm_x_Jr/Jm_x_Jr_Genomic_annotation.csv'</span>) </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>SL_annotation <span class="ot">=</span> SL_annotation <span class="sc">%&gt;%</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(GeneID, Subcell_loc)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>SL_annotation[SL_annotation <span class="sc">==</span> <span class="st">''</span>] <span class="ot">&lt;-</span> <span class="st">'Unmapped'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="cg-get-logfcs-from-limma-results-for-j.-regia-and-j.-microcarpa-and-merge-with-go-results" class="level1">
+<h1>CG Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>impCG <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_CG.csv'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID, name, logFC, Parent_haplotype)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="merge-deg-data-with-bp-annotation" class="level2">
+<h2 class="anchored" data-anchor-id="merge-deg-data-with-bp-annotation">Merge DEG data with BP annotation</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>impCG_SL <span class="ot">=</span> impCG <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(SL_annotation) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(GeneID)`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(impCG_SL<span class="sc">$</span>logFC))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5909</code></pre>
+</div>
+</div>
+</section>
+<section id="make-list-for-ks-test-results" class="level2">
+<h2 class="anchored" data-anchor-id="make-list-for-ks-test-results">Make list for KS test results</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>print_res <span class="ot">=</span> <span class="fu">list</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="panther-uses-kolmogorov-smirnov-ks-test-to-test-that-the-distribution-of-logfc-values-for-a-particular-subcellular-loci-are-different-from-a-null-distribution.-in-this-case-im-using-the-enitre-set-of-deg-logfcs-as-the-null-distribution." class="level1">
+<h1>Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Subcellular loci are different from a null distribution. In this case, I’m using the enitre set of DEG logFCs as the null distribution.</h1>
+<section id="cg-bp-ks-test" class="level2">
+<h2 class="anchored" data-anchor-id="cg-bp-ks-test">CG BP KS test</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ref_CG <span class="ot">=</span> impCG_SL <span class="sc">%&gt;%</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID, logFC) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(logFC)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>ks_res_CG <span class="ot">=</span> impCG_SL <span class="sc">%&gt;%</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Subcell_loc) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p.val =</span> <span class="fu">ks.test</span>(logFC, ref_CG)<span class="sc">$</span>p.value,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">Avg_logFC =</span> <span class="fu">mean</span>(logFC),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">Number_of_genes =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fdr =</span> <span class="fu">p.adjust</span>(p.val, <span class="at">method =</span> <span class="st">'fdr'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There were 16 warnings in `mutate()`.
+The first warning was:
+ℹ In argument: `p.val = ks.test(logFC, ref_CG)$p.value`.
+ℹ In group 1: `Subcell_loc = "Unmapped"`.
+Caused by warning in `ks.test.default()`:
+! p-value will be approximate in the presence of ties
+ℹ Run `dplyr::last_dplyr_warnings()` to see the 15 remaining warnings.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ks_res_less_CG <span class="ot">=</span> ks_res_CG <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span><span class="fu">c</span>(GeneID,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>            logFC,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>            name,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>            Parent_haplotype)) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p.val =</span> <span class="fu">ifelse</span>(p.val <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.000000000000001</span>, p.val),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">fdr =</span> <span class="fu">p.adjust</span>(p.val, <span class="at">method =</span> <span class="st">'fdr'</span>)) </span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>print_res<span class="sc">$</span>CG_No_filter <span class="ot">=</span> <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'Total of'</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>            ks_res_CG <span class="sc">%&gt;%</span> <span class="fu">pull</span>(logFC) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">'genes mapped to'</span>, </span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>            ks_res_CG <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Subcell_loc) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Subcellular loci '</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Total of 5909 genes mapped to 16 Subcellular loci "</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>print_res<span class="sc">$</span>CG_Filter <span class="ot">=</span> <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'and with fdr &lt;= 0.05'</span>, </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>            ks_res_CG <span class="sc">%&gt;%</span> <span class="fu">filter</span>(fdr <span class="sc">&lt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(logFC) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">'genes mapped to'</span>, </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>            ks_res_CG <span class="sc">%&gt;%</span> <span class="fu">filter</span>(fdr <span class="sc">&lt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Subcell_loc) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Subcellular loci '</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "and with fdr &lt;= 0.05 5909 genes mapped to 9 Subcellular loci "</code></pre>
+</div>
+</div>
+</section>
+<section id="summary-of-ks-results" class="level2">
+<h2 class="anchored" data-anchor-id="summary-of-ks-results">Summary of KS results</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>print_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$CG_No_filter
+[1] "Total of 5909 genes mapped to 16 Subcellular loci "
+
+$CG_Filter
+[1] "and with fdr &lt;= 0.05 5909 genes mapped to 9 Subcellular loci "</code></pre>
+</div>
+</div>
+</section>
+<section id="cg-make-plotting-data" class="level2">
+<h2 class="anchored" data-anchor-id="cg-make-plotting-data">CG Make plotting data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>one <span class="ot">=</span> ks_res_less_CG <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Summarise these terms into broad categories</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Subcell_loc =</span> <span class="fu">gsub</span>(<span class="st">'with</span><span class="sc">\\</span><span class="st">sbulged</span><span class="sc">\\</span><span class="st">sadenosine</span><span class="sc">\\</span><span class="st">sas</span><span class="sc">\\</span><span class="st">snucleophile|to</span><span class="sc">\\</span><span class="st">s'</span>, <span class="st">''</span>, Subcell_loc)) </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge DGE results with GO results</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>plot_dat <span class="ot">=</span> one <span class="sc">%&gt;%</span> </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Subcell_loc, </span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>         fdr,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number_of_genes</span><span class="st">`</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>         Avg_logFC) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(fdr <span class="sc">&lt;=</span> <span class="fl">0.05</span>)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Make new table for combining DEG results with GO results and writing out</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>impCG_SL_Enrichment_out <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Trait =</span> <span class="st">'CG'</span>)</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>labs_normal <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Make labels for terms containing these strings and fdr less than or equal to 0.05</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Subcell_loc <span class="sc">%like%</span> <span class="st">'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene'</span> <span class="sc">&amp;</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>           fdr <span class="sc">&lt;=</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Subcell_loc,</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>         fdr,</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>         Avg_logFC,</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number_of_genes</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">=</span> labs_normal <span class="sc">%&gt;%</span> </span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Subcell_loc)</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Labels for top 5 terms by fdr</span></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>top <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(<span class="at">order_by =</span> fdr, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(labs_normal) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Gene_type =</span> <span class="fu">ifelse</span>(Avg_logFC <span class="sc">&gt;=</span> <span class="dv">0</span>, <span class="st">'Susceptibility'</span>, <span class="st">'Resistance'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="cg-make-plot2" class="level2">
+<h2 class="anchored" data-anchor-id="cg-make-plot2">CG Make plot2</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>CG <span class="ot">=</span> <span class="fu">ggplot</span>(top, <span class="fu">aes</span>(<span class="at">x =</span> Gene_type, <span class="at">y =</span> <span class="fu">reorder</span>(Subcell_loc, Avg_logFC), <span class="at">color =</span> Avg_logFC))<span class="sc">+</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">log10</span>(fdr)<span class="sc">*-</span><span class="dv">1</span>, <span class="at">color =</span> Avg_logFC))<span class="sc">+</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">log10</span>(fdr)<span class="sc">*-</span><span class="dv">1</span>), <span class="at">shape =</span> <span class="dv">1</span>, <span class="at">stroke =</span> <span class="fl">0.25</span>, <span class="at">color =</span> <span class="st">'black'</span>)<span class="sc">+</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Subcellular locus Kolmogorov-Smirnov Test A. tumefaciens'</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">'Gene Type'</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">'Subcellular Loci'</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">'Mean log2</span><span class="sc">\n</span><span class="st">Expression</span><span class="sc">\n</span><span class="st">Fold Change'</span>,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">size =</span> <span class="st">'log10(fdr)*-1'</span>)<span class="sc">+</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_grey</span>(<span class="at">base_size =</span> <span class="dv">12</span>)<span class="sc">+</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.9</span>))<span class="sc">+</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_text(aes(min(Avg_logFC), log10(0.05)*-1),</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           label = 'FDR 0.05',</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           vjust = 1.5,</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           hjust = 0.5, </span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           color = 'black',</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           size = 3)+</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#      y = c(-1, max(log10(plot_dat$fdr)*-1)))+</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient2</span>(<span class="at">low =</span> <span class="st">'blue'</span>, <span class="at">high =</span> <span class="st">'red'</span>)</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># scale_size_continuous(breaks = c(5, 20, 50, 200, 600),</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">#                       limits = c(0, 600))+</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># facet_wrap(~term.level, ncol = 2, scales = 'free')</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a><span class="fu">save_plot</span>(<span class="st">'Subcell_KS_results/SL_Enrich_testing_CG.png'</span>, </span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>          CG,</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>          <span class="at">width =</span> <span class="dv">18</span>, </span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>          <span class="at">height =</span> <span class="dv">15</span>, </span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>          <span class="at">dpi =</span> <span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>png 
+  2 </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="phy-get-logfcs-from-limma-results-for-j.-regia-and-j.-microcarpa-and-merge-with-go-results" class="level1">
+<h1>PHY Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>impPHY <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_PHY.csv'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID, name, logFC, Parent_haplotype)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="merge-deg-data-with-bp-annotation-1" class="level2">
+<h2 class="anchored" data-anchor-id="merge-deg-data-with-bp-annotation-1">Merge DEG data with BP annotation</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>impPHY_SL <span class="ot">=</span> impPHY <span class="sc">%&gt;%</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(SL_annotation) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(GeneID)`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(impPHY_SL<span class="sc">$</span>logFC))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1468</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="panther-uses-kolmogorov-smirnov-ks-test-to-test-that-the-distribution-of-logfc-values-for-a-particular-subcellular-loci-are-different-from-a-null-distribution.-in-this-case-im-using-the-enitre-set-of-deg-logfcs-as-the-null-distribution.-1" class="level1">
+<h1>Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Subcellular loci are different from a null distribution. In this case, I’m using the enitre set of DEG logFCs as the null distribution.</h1>
+<section id="phy-bp-ks-test" class="level2">
+<h2 class="anchored" data-anchor-id="phy-bp-ks-test">PHY BP KS test</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>ref_PHY <span class="ot">=</span> impPHY_SL <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID, logFC) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(logFC)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>ks_res_PHY <span class="ot">=</span> impPHY_SL <span class="sc">%&gt;%</span> </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Subcell_loc) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p.val =</span> <span class="fu">ks.test</span>(logFC, ref_PHY)<span class="sc">$</span>p.value,</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">Avg_logFC =</span> <span class="fu">mean</span>(logFC),</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">Number_of_genes =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fdr =</span> <span class="fu">p.adjust</span>(p.val, <span class="at">method =</span> <span class="st">'fdr'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There were 14 warnings in `mutate()`.
+The first warning was:
+ℹ In argument: `p.val = ks.test(logFC, ref_PHY)$p.value`.
+ℹ In group 1: `Subcell_loc = "Unmapped"`.
+Caused by warning in `ks.test.default()`:
+! p-value will be approximate in the presence of ties
+ℹ Run `dplyr::last_dplyr_warnings()` to see the 13 remaining warnings.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ks_res_less_PHY <span class="ot">=</span> ks_res_PHY <span class="sc">%&gt;%</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span><span class="fu">c</span>(GeneID,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>            logFC,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>            name,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>            Parent_haplotype)) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p.val =</span> <span class="fu">ifelse</span>(p.val <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.000000000000001</span>, p.val),</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">fdr =</span> <span class="fu">p.adjust</span>(p.val, <span class="at">method =</span> <span class="st">'fdr'</span>)) </span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>print_res<span class="sc">$</span>PHY_No_filter <span class="ot">=</span> <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'Total of'</span>,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>            ks_res_PHY <span class="sc">%&gt;%</span> <span class="fu">pull</span>(logFC) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">'genes mapped to'</span>, </span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>            ks_res_PHY <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Subcell_loc) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Subcellular loci '</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Total of 1468 genes mapped to 16 Subcellular loci "</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>print_res<span class="sc">$</span>PHY_Filter <span class="ot">=</span> <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'and with fdr &lt;= 0.05'</span>, </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>            ks_res_PHY <span class="sc">%&gt;%</span> <span class="fu">filter</span>(fdr <span class="sc">&lt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(logFC) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">'genes mapped to'</span>, </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>            ks_res_PHY <span class="sc">%&gt;%</span> <span class="fu">filter</span>(fdr <span class="sc">&lt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Subcell_loc) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Subcellular loci '</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "and with fdr &lt;= 0.05 437 genes mapped to 3 Subcellular loci "</code></pre>
+</div>
+</div>
+</section>
+<section id="summary-of-ks-results-1" class="level2">
+<h2 class="anchored" data-anchor-id="summary-of-ks-results-1">Summary of KS results</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>print_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$CG_No_filter
+[1] "Total of 5909 genes mapped to 16 Subcellular loci "
+
+$CG_Filter
+[1] "and with fdr &lt;= 0.05 5909 genes mapped to 9 Subcellular loci "
+
+$PHY_No_filter
+[1] "Total of 1468 genes mapped to 16 Subcellular loci "
+
+$PHY_Filter
+[1] "and with fdr &lt;= 0.05 437 genes mapped to 3 Subcellular loci "</code></pre>
+</div>
+</div>
+</section>
+<section id="phy-make-plotting-data" class="level2">
+<h2 class="anchored" data-anchor-id="phy-make-plotting-data">PHY Make plotting data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>one <span class="ot">=</span> ks_res_less_PHY <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Summarise these terms into broad categories</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Subcell_loc =</span> <span class="fu">gsub</span>(<span class="st">'with</span><span class="sc">\\</span><span class="st">sbulged</span><span class="sc">\\</span><span class="st">sadenosine</span><span class="sc">\\</span><span class="st">sas</span><span class="sc">\\</span><span class="st">snucleophile|to</span><span class="sc">\\</span><span class="st">s'</span>, <span class="st">''</span>, Subcell_loc)) </span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge DGE results with GO results</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>plot_dat <span class="ot">=</span> one <span class="sc">%&gt;%</span> </span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Subcell_loc, </span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>         fdr,</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number_of_genes</span><span class="st">`</span>,</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>         Avg_logFC) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(fdr <span class="sc">&lt;=</span> <span class="fl">0.05</span>)</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Make new table for combining DEG results with GO results and writing out</span></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>impPHY_SL_Enrichment_out <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Trait =</span> <span class="st">'PHY'</span>)</span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>labs_normal <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Make labels for terms containing these strings and fdr less than or equal to 0.05</span></span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Subcell_loc <span class="sc">%like%</span> <span class="st">'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene'</span> <span class="sc">&amp;</span></span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>           fdr <span class="sc">&lt;=</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Subcell_loc,</span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a>         fdr,</span>
+<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a>         Avg_logFC,</span>
+<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number_of_genes</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span>
+<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">=</span> labs_normal <span class="sc">%&gt;%</span> </span>
+<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Subcell_loc)</span>
+<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Labels for top 5 terms by fdr</span></span>
+<span id="cb33-34"><a href="#cb33-34" aria-hidden="true" tabindex="-1"></a>top <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb33-35"><a href="#cb33-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(<span class="at">order_by =</span> fdr, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-36"><a href="#cb33-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(labs_normal) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-37"><a href="#cb33-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb33-38"><a href="#cb33-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Gene_type =</span> <span class="fu">ifelse</span>(Avg_logFC <span class="sc">&gt;=</span> <span class="dv">0</span>, <span class="st">'Susceptibility'</span>, <span class="st">'Resistance'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="phy-make-plot2" class="level2">
+<h2 class="anchored" data-anchor-id="phy-make-plot2">PHY Make plot2</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>PHY <span class="ot">=</span> <span class="fu">ggplot</span>(top, <span class="fu">aes</span>(<span class="at">x =</span> Gene_type, <span class="at">y =</span> <span class="fu">reorder</span>(Subcell_loc, Avg_logFC), <span class="at">color =</span> Avg_logFC))<span class="sc">+</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">log10</span>(fdr)<span class="sc">*-</span><span class="dv">1</span>, <span class="at">color =</span> Avg_logFC))<span class="sc">+</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">log10</span>(fdr)<span class="sc">*-</span><span class="dv">1</span>), <span class="at">shape =</span> <span class="dv">1</span>, <span class="at">stroke =</span> <span class="fl">0.25</span>, <span class="at">color =</span> <span class="st">'black'</span>)<span class="sc">+</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Subcellular locus Kolmogorov-Smirnov Test Phytophthora'</span>,</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">'Gene Type'</span>,</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">'Subcellular Loci'</span>,</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">'Mean log2</span><span class="sc">\n</span><span class="st">Expression</span><span class="sc">\n</span><span class="st">Fold Change'</span>,</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">size =</span> <span class="st">'log10(fdr)*-1'</span>)<span class="sc">+</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_grey</span>(<span class="at">base_size =</span> <span class="dv">12</span>)<span class="sc">+</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.9</span>))<span class="sc">+</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_text(aes(min(Avg_logFC), log10(0.05)*-1),</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           label = 'FDR 0.05',</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           vjust = 1.5,</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           hjust = 0.5, </span></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           color = 'black',</span></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           size = 3)+</span></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+</span></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),</span></span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#      y = c(-1, max(log10(plot_dat$fdr)*-1)))+</span></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient2</span>(<span class="at">low =</span> <span class="st">'blue'</span>, <span class="at">high =</span> <span class="st">'red'</span>)</span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># scale_size_continuous(breaks = c(5, 20, 50, 200, 600),</span></span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">#                       limits = c(0, 600))+</span></span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># facet_wrap(~term.level, ncol = 2, scales = 'free')</span></span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a><span class="fu">save_plot</span>(<span class="st">'Subcell_KS_results/SL_Enrich_testing_PHY.png'</span>, </span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>          PHY,</span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>          <span class="at">width =</span> <span class="dv">18</span>, </span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>          <span class="at">height =</span> <span class="dv">15</span>, </span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>          <span class="at">dpi =</span> <span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>png 
+  2 </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="nem_3y-get-logfcs-from-limma-results-for-j.-regia-and-j.-microcarpa-and-merge-with-go-results" class="level1">
+<h1>NEM_3Y Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>impNEM_3Y <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_NEM_3Y.csv'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID, name, logFC, Parent_haplotype)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="merge-deg-data-with-bp-annotation-2" class="level2">
+<h2 class="anchored" data-anchor-id="merge-deg-data-with-bp-annotation-2">Merge DEG data with BP annotation</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>impNEM_3Y_SL <span class="ot">=</span> impNEM_3Y <span class="sc">%&gt;%</span> </span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(SL_annotation) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(GeneID)`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(impNEM_3Y_SL<span class="sc">$</span>logFC))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 20</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="panther-uses-kolmogorov-smirnov-ks-test-to-test-that-the-distribution-of-logfc-values-for-a-particular-subcellular-loci-are-different-from-a-null-distribution.-in-this-case-im-using-the-enitre-set-of-deg-logfcs-as-the-null-distribution.-2" class="level1">
+<h1>Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Subcellular loci are different from a null distribution. In this case, I’m using the enitre set of DEG logFCs as the null distribution.</h1>
+<section id="nem_3y-bp-ks-test" class="level2">
+<h2 class="anchored" data-anchor-id="nem_3y-bp-ks-test">NEM_3Y BP KS test</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>ref_NEM_3Y <span class="ot">=</span> impNEM_3Y_SL <span class="sc">%&gt;%</span> </span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID, logFC) <span class="sc">%&gt;%</span> </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(logFC)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>ks_res_NEM_3Y <span class="ot">=</span> impNEM_3Y_SL <span class="sc">%&gt;%</span> </span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Subcell_loc) <span class="sc">%&gt;%</span> </span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p.val =</span> <span class="fu">ks.test</span>(logFC, ref_NEM_3Y)<span class="sc">$</span>p.value,</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">Avg_logFC =</span> <span class="fu">mean</span>(logFC),</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">Number_of_genes =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fdr =</span> <span class="fu">p.adjust</span>(p.val, <span class="at">method =</span> <span class="st">'fdr'</span>))</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>ks_res_less_NEM_3Y <span class="ot">=</span> ks_res_NEM_3Y <span class="sc">%&gt;%</span> </span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span><span class="fu">c</span>(GeneID,</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>            logFC,</span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>            name,</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>            Parent_haplotype)) <span class="sc">%&gt;%</span> </span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p.val =</span> <span class="fu">ifelse</span>(p.val <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.000000000000001</span>, p.val),</span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">fdr =</span> <span class="fu">p.adjust</span>(p.val, <span class="at">method =</span> <span class="st">'fdr'</span>)) </span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>print_res<span class="sc">$</span>NEM_3Y_No_filter <span class="ot">=</span> <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'Total of'</span>,</span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>            ks_res_NEM_3Y <span class="sc">%&gt;%</span> <span class="fu">pull</span>(logFC) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>            <span class="st">'genes mapped to'</span>, </span>
+<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>            ks_res_NEM_3Y <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Subcell_loc) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Subcellular loci '</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Total of 20 genes mapped to 7 Subcellular loci "</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>print_res<span class="sc">$</span>NEM_3Y_Filter <span class="ot">=</span> <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'and with fdr &lt;= 0.05'</span>, </span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>            ks_res_NEM_3Y <span class="sc">%&gt;%</span> <span class="fu">filter</span>(fdr <span class="sc">&lt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(logFC) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">'genes mapped to'</span>, </span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>            ks_res_NEM_3Y <span class="sc">%&gt;%</span> <span class="fu">filter</span>(fdr <span class="sc">&lt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Subcell_loc) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Subcellular loci '</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "and with fdr &lt;= 0.05 0 genes mapped to 0 Subcellular loci "</code></pre>
+</div>
+</div>
+</section>
+<section id="summary-of-ks-results-2" class="level2">
+<h2 class="anchored" data-anchor-id="summary-of-ks-results-2">Summary of KS results</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>print_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$CG_No_filter
+[1] "Total of 5909 genes mapped to 16 Subcellular loci "
+
+$CG_Filter
+[1] "and with fdr &lt;= 0.05 5909 genes mapped to 9 Subcellular loci "
+
+$PHY_No_filter
+[1] "Total of 1468 genes mapped to 16 Subcellular loci "
+
+$PHY_Filter
+[1] "and with fdr &lt;= 0.05 437 genes mapped to 3 Subcellular loci "
+
+$NEM_3Y_No_filter
+[1] "Total of 20 genes mapped to 7 Subcellular loci "
+
+$NEM_3Y_Filter
+[1] "and with fdr &lt;= 0.05 0 genes mapped to 0 Subcellular loci "</code></pre>
+</div>
+</div>
+</section>
+<section id="nem_3y-make-plotting-data" class="level2">
+<h2 class="anchored" data-anchor-id="nem_3y-make-plotting-data">NEM_3Y Make plotting data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>one <span class="ot">=</span> ks_res_less_NEM_3Y <span class="sc">%&gt;%</span> </span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Summarise these terms into broad categories</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Subcell_loc =</span> <span class="fu">gsub</span>(<span class="st">'with</span><span class="sc">\\</span><span class="st">sbulged</span><span class="sc">\\</span><span class="st">sadenosine</span><span class="sc">\\</span><span class="st">sas</span><span class="sc">\\</span><span class="st">snucleophile|to</span><span class="sc">\\</span><span class="st">s'</span>, <span class="st">''</span>, Subcell_loc)) </span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge DGE results with GO results</span></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>plot_dat <span class="ot">=</span> one <span class="sc">%&gt;%</span> </span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Subcell_loc, </span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>         fdr,</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number_of_genes</span><span class="st">`</span>,</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>         Avg_logFC) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(fdr <span class="sc">&lt;=</span> <span class="fl">0.05</span>)</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Make new table for combining DEG results with GO results and writing out</span></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>impNEM_3Y_SL_Enrichment_out <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Trait =</span> <span class="st">'NEM_3Y'</span>)</span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a>labs_normal <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Make labels for terms containing these strings and fdr less than or equal to 0.05</span></span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Subcell_loc <span class="sc">%like%</span> <span class="st">'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene'</span> <span class="sc">&amp;</span></span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a>           fdr <span class="sc">&lt;=</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Subcell_loc,</span>
+<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a>         fdr,</span>
+<span id="cb47-26"><a href="#cb47-26" aria-hidden="true" tabindex="-1"></a>         Avg_logFC,</span>
+<span id="cb47-27"><a href="#cb47-27" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number_of_genes</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-28"><a href="#cb47-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span>
+<span id="cb47-29"><a href="#cb47-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-30"><a href="#cb47-30" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">=</span> labs_normal <span class="sc">%&gt;%</span> </span>
+<span id="cb47-31"><a href="#cb47-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Subcell_loc)</span>
+<span id="cb47-32"><a href="#cb47-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-33"><a href="#cb47-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Labels for top 5 terms by fdr</span></span>
+<span id="cb47-34"><a href="#cb47-34" aria-hidden="true" tabindex="-1"></a>top <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb47-35"><a href="#cb47-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(<span class="at">order_by =</span> fdr, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-36"><a href="#cb47-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(labs_normal) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-37"><a href="#cb47-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb47-38"><a href="#cb47-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Gene_type =</span> <span class="fu">ifelse</span>(Avg_logFC <span class="sc">&gt;=</span> <span class="dv">0</span>, <span class="st">'Susceptibility'</span>, <span class="st">'Resistance'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="nem_3y-make-plot2" class="level2">
+<h2 class="anchored" data-anchor-id="nem_3y-make-plot2">NEM_3Y Make plot2</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>NEM_3Y <span class="ot">=</span> <span class="fu">ggplot</span>(top, <span class="fu">aes</span>(<span class="at">x =</span> Gene_type, <span class="at">y =</span> <span class="fu">reorder</span>(Subcell_loc, Avg_logFC), <span class="at">color =</span> Avg_logFC))<span class="sc">+</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">log10</span>(fdr)<span class="sc">*-</span><span class="dv">1</span>, <span class="at">color =</span> Avg_logFC))<span class="sc">+</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">log10</span>(fdr)<span class="sc">*-</span><span class="dv">1</span>), <span class="at">shape =</span> <span class="dv">1</span>, <span class="at">stroke =</span> <span class="fl">0.25</span>, <span class="at">color =</span> <span class="st">'black'</span>)<span class="sc">+</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Subcellular locus Kolmogorov-Smirnov Test P. vulnus 3Y'</span>,</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">'Gene Type'</span>,</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">'Subcellular Loci'</span>,</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">'Mean log2</span><span class="sc">\n</span><span class="st">Expression</span><span class="sc">\n</span><span class="st">Fold Change'</span>,</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">size =</span> <span class="st">'log10(fdr)*-1'</span>)<span class="sc">+</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_grey</span>(<span class="at">base_size =</span> <span class="dv">12</span>)<span class="sc">+</span></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.9</span>))<span class="sc">+</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+</span></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_text(aes(min(Avg_logFC), log10(0.05)*-1),</span></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           label = 'FDR 0.05',</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           vjust = 1.5,</span></span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           hjust = 0.5, </span></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           color = 'black',</span></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           size = 3)+</span></span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+</span></span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+</span></span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),</span></span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#      y = c(-1, max(log10(plot_dat$fdr)*-1)))+</span></span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient2</span>(<span class="at">low =</span> <span class="st">'blue'</span>, <span class="at">high =</span> <span class="st">'red'</span>)</span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># scale_size_continuous(breaks = c(5, 20, 50, 200, 600),</span></span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">#                       limits = c(0, 600))+</span></span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># facet_wrap(~term.level, ncol = 2, scales = 'free')</span></span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a><span class="fu">save_plot</span>(<span class="st">'Subcell_KS_results/SL_Enrich_testing_NEM_3Y.png'</span>, </span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>          NEM_3Y,</span>
+<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a>          <span class="at">width =</span> <span class="dv">18</span>, </span>
+<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a>          <span class="at">height =</span> <span class="dv">15</span>, </span>
+<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a>          <span class="at">dpi =</span> <span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>png 
+  2 </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="length_3y-get-logfcs-from-limma-results-for-j.-regia-and-j.-microcarpa-and-merge-with-go-results" class="level1">
+<h1>Length_3Y Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>impLength_3Y <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_Length_3Y.csv'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID, name, logFC, Parent_haplotype)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="merge-deg-data-with-bp-annotation-3" class="level2">
+<h2 class="anchored" data-anchor-id="merge-deg-data-with-bp-annotation-3">Merge DEG data with BP annotation</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>impLength_3Y_SL <span class="ot">=</span> impLength_3Y <span class="sc">%&gt;%</span> </span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(SL_annotation) <span class="sc">%&gt;%</span> </span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(GeneID)`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(impLength_3Y_SL<span class="sc">$</span>logFC))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5324</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="panther-uses-kolmogorov-smirnov-ks-test-to-test-that-the-distribution-of-logfc-values-for-a-particular-subcellular-loci-are-different-from-a-null-distribution.-in-this-case-im-using-the-enitre-set-of-deg-logfcs-as-the-null-distribution.-3" class="level1">
+<h1>Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Subcellular loci are different from a null distribution. In this case, I’m using the enitre set of DEG logFCs as the null distribution.</h1>
+<section id="length_3y-bp-ks-test" class="level2">
+<h2 class="anchored" data-anchor-id="length_3y-bp-ks-test">Length_3Y BP KS test</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>ref_Length_3Y <span class="ot">=</span> impLength_3Y_SL <span class="sc">%&gt;%</span> </span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID, logFC) <span class="sc">%&gt;%</span> </span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(logFC)</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>ks_res_Length_3Y <span class="ot">=</span> impLength_3Y_SL <span class="sc">%&gt;%</span> </span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Subcell_loc) <span class="sc">%&gt;%</span> </span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p.val =</span> <span class="fu">ks.test</span>(logFC, ref_Length_3Y)<span class="sc">$</span>p.value,</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">Avg_logFC =</span> <span class="fu">mean</span>(logFC),</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">Number_of_genes =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fdr =</span> <span class="fu">p.adjust</span>(p.val, <span class="at">method =</span> <span class="st">'fdr'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There were 16 warnings in `mutate()`.
+The first warning was:
+ℹ In argument: `p.val = ks.test(logFC, ref_Length_3Y)$p.value`.
+ℹ In group 1: `Subcell_loc = "Unmapped"`.
+Caused by warning in `ks.test.default()`:
+! p-value will be approximate in the presence of ties
+ℹ Run `dplyr::last_dplyr_warnings()` to see the 15 remaining warnings.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>ks_res_less_Length_3Y <span class="ot">=</span> ks_res_Length_3Y <span class="sc">%&gt;%</span> </span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span><span class="fu">c</span>(GeneID,</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>            logFC,</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>            name,</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>            Parent_haplotype)) <span class="sc">%&gt;%</span> </span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p.val =</span> <span class="fu">ifelse</span>(p.val <span class="sc">==</span> <span class="dv">0</span>, <span class="fl">0.000000000000001</span>, p.val),</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">fdr =</span> <span class="fu">p.adjust</span>(p.val, <span class="at">method =</span> <span class="st">'fdr'</span>)) </span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>print_res<span class="sc">$</span>Length_3Y_No_filter <span class="ot">=</span> <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'Total of'</span>,</span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>            ks_res_Length_3Y <span class="sc">%&gt;%</span> <span class="fu">pull</span>(logFC) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">'genes mapped to'</span>, </span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>            ks_res_Length_3Y <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Subcell_loc) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Subcellular loci '</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Total of 5324 genes mapped to 17 Subcellular loci "</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>print_res<span class="sc">$</span>Length_3Y_Filter <span class="ot">=</span> <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'and with fdr &lt;= 0.05'</span>, </span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>            ks_res_Length_3Y <span class="sc">%&gt;%</span> <span class="fu">filter</span>(fdr <span class="sc">&lt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(logFC) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">'genes mapped to'</span>, </span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>            ks_res_Length_3Y <span class="sc">%&gt;%</span> <span class="fu">filter</span>(fdr <span class="sc">&lt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Subcell_loc) <span class="sc">%&gt;%</span> <span class="fu">unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">'Subcellular loci '</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "and with fdr &lt;= 0.05 5324 genes mapped to 8 Subcellular loci "</code></pre>
+</div>
+</div>
+</section>
+<section id="summary-of-ks-results-3" class="level2">
+<h2 class="anchored" data-anchor-id="summary-of-ks-results-3">Summary of KS results</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>print_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$CG_No_filter
+[1] "Total of 5909 genes mapped to 16 Subcellular loci "
+
+$CG_Filter
+[1] "and with fdr &lt;= 0.05 5909 genes mapped to 9 Subcellular loci "
+
+$PHY_No_filter
+[1] "Total of 1468 genes mapped to 16 Subcellular loci "
+
+$PHY_Filter
+[1] "and with fdr &lt;= 0.05 437 genes mapped to 3 Subcellular loci "
+
+$NEM_3Y_No_filter
+[1] "Total of 20 genes mapped to 7 Subcellular loci "
+
+$NEM_3Y_Filter
+[1] "and with fdr &lt;= 0.05 0 genes mapped to 0 Subcellular loci "
+
+$Length_3Y_No_filter
+[1] "Total of 5324 genes mapped to 17 Subcellular loci "
+
+$Length_3Y_Filter
+[1] "and with fdr &lt;= 0.05 5324 genes mapped to 8 Subcellular loci "</code></pre>
+</div>
+</div>
+</section>
+<section id="length_3y-make-plotting-data" class="level2">
+<h2 class="anchored" data-anchor-id="length_3y-make-plotting-data">Length_3Y Make plotting data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>one <span class="ot">=</span> ks_res_less_Length_3Y <span class="sc">%&gt;%</span> </span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Summarise these terms into broad categories</span></span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Subcell_loc =</span> <span class="fu">gsub</span>(<span class="st">'with</span><span class="sc">\\</span><span class="st">sbulged</span><span class="sc">\\</span><span class="st">sadenosine</span><span class="sc">\\</span><span class="st">sas</span><span class="sc">\\</span><span class="st">snucleophile|to</span><span class="sc">\\</span><span class="st">s'</span>, <span class="st">''</span>, Subcell_loc)) </span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge DGE results with GO results</span></span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>plot_dat <span class="ot">=</span> one <span class="sc">%&gt;%</span> </span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Subcell_loc, </span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>         fdr,</span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number_of_genes</span><span class="st">`</span>,</span>
+<span id="cb63-10"><a href="#cb63-10" aria-hidden="true" tabindex="-1"></a>         Avg_logFC) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-11"><a href="#cb63-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb63-12"><a href="#cb63-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb63-13"><a href="#cb63-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(fdr <span class="sc">&lt;=</span> <span class="fl">0.05</span>)</span>
+<span id="cb63-14"><a href="#cb63-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb63-15"><a href="#cb63-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-16"><a href="#cb63-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Make new table for combining DEG results with GO results and writing out</span></span>
+<span id="cb63-17"><a href="#cb63-17" aria-hidden="true" tabindex="-1"></a>impLength_3Y_SL_Enrichment_out <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb63-18"><a href="#cb63-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Trait =</span> <span class="st">'Length_3Y'</span>)</span>
+<span id="cb63-19"><a href="#cb63-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-20"><a href="#cb63-20" aria-hidden="true" tabindex="-1"></a>labs_normal <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb63-21"><a href="#cb63-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Make labels for terms containing these strings and fdr less than or equal to 0.05</span></span>
+<span id="cb63-22"><a href="#cb63-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Subcell_loc <span class="sc">%like%</span> <span class="st">'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene'</span> <span class="sc">&amp;</span></span>
+<span id="cb63-23"><a href="#cb63-23" aria-hidden="true" tabindex="-1"></a>           fdr <span class="sc">&lt;=</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-24"><a href="#cb63-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Subcell_loc,</span>
+<span id="cb63-25"><a href="#cb63-25" aria-hidden="true" tabindex="-1"></a>         fdr,</span>
+<span id="cb63-26"><a href="#cb63-26" aria-hidden="true" tabindex="-1"></a>         Avg_logFC,</span>
+<span id="cb63-27"><a href="#cb63-27" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Number_of_genes</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-28"><a href="#cb63-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span>
+<span id="cb63-29"><a href="#cb63-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-30"><a href="#cb63-30" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">=</span> labs_normal <span class="sc">%&gt;%</span> </span>
+<span id="cb63-31"><a href="#cb63-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Subcell_loc)</span>
+<span id="cb63-32"><a href="#cb63-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-33"><a href="#cb63-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Labels for top 5 terms by fdr</span></span>
+<span id="cb63-34"><a href="#cb63-34" aria-hidden="true" tabindex="-1"></a>top <span class="ot">=</span> plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb63-35"><a href="#cb63-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(<span class="at">order_by =</span> fdr, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-36"><a href="#cb63-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(labs_normal) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-37"><a href="#cb63-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb63-38"><a href="#cb63-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Gene_type =</span> <span class="fu">ifelse</span>(Avg_logFC <span class="sc">&gt;=</span> <span class="dv">0</span>, <span class="st">'Susceptibility'</span>, <span class="st">'Resistance'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="length_3y-make-plot2" class="level2">
+<h2 class="anchored" data-anchor-id="length_3y-make-plot2">Length_3Y Make plot2</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>Length_3Y <span class="ot">=</span> <span class="fu">ggplot</span>(top, <span class="fu">aes</span>(<span class="at">x =</span> Gene_type, <span class="at">y =</span> <span class="fu">reorder</span>(Subcell_loc, Avg_logFC), <span class="at">color =</span> Avg_logFC))<span class="sc">+</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">log10</span>(fdr)<span class="sc">*-</span><span class="dv">1</span>, <span class="at">color =</span> Avg_logFC))<span class="sc">+</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">log10</span>(fdr)<span class="sc">*-</span><span class="dv">1</span>), <span class="at">shape =</span> <span class="dv">1</span>, <span class="at">stroke =</span> <span class="fl">0.25</span>, <span class="at">color =</span> <span class="st">'black'</span>)<span class="sc">+</span></span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Subcellular locus Kolmogorov-Smirnov Test Tree Length 3Y'</span>,</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">'Gene Type'</span>,</span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">'Subcellular Loci'</span>,</span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">'Mean log2</span><span class="sc">\n</span><span class="st">Expression</span><span class="sc">\n</span><span class="st">Fold Change'</span>,</span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">size =</span> <span class="st">'log10(fdr)*-1'</span>)<span class="sc">+</span></span>
+<span id="cb64-9"><a href="#cb64-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_grey</span>(<span class="at">base_size =</span> <span class="dv">12</span>)<span class="sc">+</span></span>
+<span id="cb64-10"><a href="#cb64-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.9</span>))<span class="sc">+</span></span>
+<span id="cb64-11"><a href="#cb64-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+</span></span>
+<span id="cb64-12"><a href="#cb64-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_text(aes(min(Avg_logFC), log10(0.05)*-1),</span></span>
+<span id="cb64-13"><a href="#cb64-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           label = 'FDR 0.05',</span></span>
+<span id="cb64-14"><a href="#cb64-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           vjust = 1.5,</span></span>
+<span id="cb64-15"><a href="#cb64-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           hjust = 0.5, </span></span>
+<span id="cb64-16"><a href="#cb64-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           color = 'black',</span></span>
+<span id="cb64-17"><a href="#cb64-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">#           size = 3)+</span></span>
+<span id="cb64-18"><a href="#cb64-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+</span></span>
+<span id="cb64-19"><a href="#cb64-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+</span></span>
+<span id="cb64-20"><a href="#cb64-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),</span></span>
+<span id="cb64-21"><a href="#cb64-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#      y = c(-1, max(log10(plot_dat$fdr)*-1)))+</span></span>
+<span id="cb64-22"><a href="#cb64-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient2</span>(<span class="at">low =</span> <span class="st">'blue'</span>, <span class="at">high =</span> <span class="st">'red'</span>)</span>
+<span id="cb64-23"><a href="#cb64-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-24"><a href="#cb64-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># scale_size_continuous(breaks = c(5, 20, 50, 200, 600),</span></span>
+<span id="cb64-25"><a href="#cb64-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">#                       limits = c(0, 600))+</span></span>
+<span id="cb64-26"><a href="#cb64-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># facet_wrap(~term.level, ncol = 2, scales = 'free')</span></span>
+<span id="cb64-27"><a href="#cb64-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-28"><a href="#cb64-28" aria-hidden="true" tabindex="-1"></a><span class="fu">save_plot</span>(<span class="st">'Subcell_KS_results/SL_Enrich_testing_Length_3Y.png'</span>, </span>
+<span id="cb64-29"><a href="#cb64-29" aria-hidden="true" tabindex="-1"></a>          Length_3Y,</span>
+<span id="cb64-30"><a href="#cb64-30" aria-hidden="true" tabindex="-1"></a>          <span class="at">width =</span> <span class="dv">18</span>, </span>
+<span id="cb64-31"><a href="#cb64-31" aria-hidden="true" tabindex="-1"></a>          <span class="at">height =</span> <span class="dv">15</span>, </span>
+<span id="cb64-32"><a href="#cb64-32" aria-hidden="true" tabindex="-1"></a>          <span class="at">dpi =</span> <span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>png 
+  2 </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="write-out-full-results-for-supplementary-data" class="level1">
+<h1>Write out full results for supplementary data</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>total_results <span class="ot">=</span> impCG_SL_Enrichment_out <span class="sc">%&gt;%</span> </span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(impPHY_SL_Enrichment_out) <span class="sc">%&gt;%</span> </span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(impNEM_3Y_SL_Enrichment_out) <span class="sc">%&gt;%</span> </span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(impLength_3Y_SL_Enrichment_out)</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a><span class="fu">fwrite</span>(total_results, <span class="st">'Biological_Process_KS_results/Full_supplementary_results_KS_SL.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

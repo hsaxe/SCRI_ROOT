@@ -1,0 +1,447 @@
+---
+title: "GO_results_SCRI_ROOT_RNAseq"
+author: "Houston Saxe"
+date: "1/24/2022"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load libraries
+
+```{r}
+pacman::p_load(dplyr, 
+               tibble, 
+               readr, 
+               stringr, 
+               data.table, 
+               ggplot2, 
+               sjPlot, 
+               ggpubr, 
+               tidyr, 
+               jsonlite,
+               openxlsx)
+```
+
+# Get GO Chromosome annotation for J. regia genome
+
+```{r}
+CHr_annotation = fread('DGEresults/annotation_combined.csv') 
+
+# QTL peaks from Ramasamay et al.
+peaks = CHr_annotation %>% 
+  filter(start >= 26359154 & end <= 26669075 & chromosome == '4D')
+```
+
+# Get GO biological process annotation for J. regia genome
+
+```{r}
+BP_annotation = fread('Full_GO_BP_Annotation/Full_Jr_Genes_BP_Annotated.csv') 
+
+```
+
+# CG Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
+
+```{r}
+impCG = fread('DGEresults/Limma_results_table_CG.csv') %>% 
+  distinct(GeneID, 
+           name, 
+           logFC,
+           `Jr-GeneID`,
+           Parent_haplotype) 
+```
+
+## Make list for KS test results
+
+```{r}
+print_res = list()
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Chromosome are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## CG Chromosome KS test
+
+```{r}
+impCG_peaks = impCG %>% 
+  inner_join(peaks,
+             by = 'GeneID') %>% 
+  select(!matches('.*y$')) %>% 
+  inner_join(BP_annotation, by = c('Jr-GeneID.x' = 'mapped_id')) %>% 
+  mutate(Trait = 'CG') %>% 
+  filter(term.level < 3)
+
+length(unique(impCG_peaks$GeneID))
+```
+```{r}
+impCG_ALL = fread('DGEresults/Limma_results_table_CG_ALL.csv') %>% 
+  distinct(GeneID, 
+           name, 
+           logFC,
+           adj.P.Val,
+           start,
+           chromosome,
+           `Jr-GeneID`,
+           Parent_haplotype) 
+```
+
+
+
+```{r}
+manhattan_Jr_cg_FC = ggplot(impCG_ALL %>%
+                        filter(Parent_haplotype == 'J.regia') %>%
+                        distinct(logFC,
+                                 chromosome, 
+                                 start, 
+                                 Parent_haplotype),
+       aes(start, logFC,
+           color = logFC))+
+  geom_point()+
+  scale_color_gradient2(low = 'blue', mid = 'white', high = 'red')+
+  facet_wrap(~chromosome, scales = 'free_x')
+
+save_plot(fig = manhattan_Jr_cg_FC,
+          'QTL_Peaks_results/manhattan_Jr_cg_FC.png', 
+          width = 30, 
+          height = 20)
+```
+
+```{r}
+manhattan_Jm_cg_FC = ggplot(impCG_ALL %>%
+                        filter(Parent_haplotype == 'J.microcarpa') %>%
+                        distinct(logFC,
+                                 chromosome, 
+                                 start, 
+                                 Parent_haplotype),
+       aes(start, logFC,
+           color = logFC))+
+  geom_point()+
+  scale_color_gradient2(low = 'blue', mid = 'white', high = 'red')+
+  facet_wrap(~chromosome, scales = 'free_x')
+
+save_plot(fig = manhattan_Jm_cg_FC,
+          'QTL_Peaks_results/manhattan_Jm_cg_FC.png', 
+          width = 30, 
+          height = 30)
+```
+
+```{r}
+manhattan_Jr_cg = ggplot(impCG_ALL %>%
+                        filter(Parent_haplotype == 'J.regia') %>%
+                        distinct(adj.P.Val,
+                                 chromosome, 
+                                 start, 
+                                 Parent_haplotype),
+       aes(start, log10(adj.P.Val)*-1,
+           color = log10(adj.P.Val)*-1))+
+  geom_point()+
+  scale_color_gradient2(low = 'blue', mid = 'white', high = 'red')+
+  facet_wrap(~chromosome, scales = 'free_x')
+
+save_plot(fig = manhattan_Jr_cg,
+          'QTL_Peaks_results/manhattan_Jr_cg.png', 
+          width = 30, 
+          height = 20)
+```
+
+```{r}
+manhattan_Jm_cg = ggplot(impCG_ALL %>%
+                        filter(Parent_haplotype == 'J.microcarpa') %>%
+                        distinct(adj.P.Val,
+                                 chromosome, 
+                                 start, 
+                                 Parent_haplotype),
+       aes(start, log10(adj.P.Val)*-1,
+           color = log10(adj.P.Val)*-1))+
+  geom_point()+
+  scale_color_gradient2(low = 'blue', mid = 'white', high = 'red')+
+  facet_wrap(~chromosome, scales = 'free_x')
+
+save_plot(fig = manhattan_Jm_cg,
+          'QTL_Peaks_results/manhattan_Jm_cg.png', 
+          width = 30, 
+          height = 30)
+```
+
+
+```{r}
+ref_CG_peaks = impCG_peaks %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+ks_res_CG_peaks_SL = impCG_peaks %>% 
+  distinct(GeneID, 
+           logFC,
+           Subcell_loc) %>%
+  group_by(Subcell_loc) %>% 
+  mutate(p.val = ks.test(logFC, ref_CG_peaks)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_CG_peaks_SL = ks_res_CG_peaks_SL %>% 
+  select(Subcell_loc,
+         Avg_logFC,
+         fdr) %>% 
+  distinct() 
+```
+
+
+```{r}
+ks_res_CG_peaks_BP = impCG_peaks %>% 
+  distinct(GeneID, 
+           logFC,
+           term.label) %>%
+  group_by(term.label) %>% 
+  mutate(p.val = ks.test(logFC, ref_CG_peaks)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_CG_peaks_BP = ks_res_CG_peaks_BP %>% 
+  select(term.label,
+         Avg_logFC,
+         fdr) %>% 
+  distinct() 
+```
+
+# PHY Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
+
+```{r}
+impPHY = fread('DGEresults/Limma_results_table_PHY.csv') %>% 
+  distinct(GeneID, 
+           name, 
+           logFC,
+           `Jr-GeneID`,
+           Parent_haplotype)
+```
+
+## Make list for KS test results
+
+```{r}
+print_res = list()
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Chromosome are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## PHY Chromosome KS test
+
+```{r}
+impPHY_peaks = impPHY %>% 
+  inner_join(peaks) %>% 
+  inner_join(BP_annotation, by = c('Jr-GeneID' = 'mapped_id')) %>% 
+  mutate(Trait = 'PHY')
+
+length(unique(impPHY_peaks$GeneID))
+```
+
+```{r}
+ref_PHY_peaks = impPHY_peaks %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+ks_res_PHY_peaks_SL = impPHY_peaks %>% 
+  distinct(GeneID, 
+           logFC,
+           Subcell_loc) %>%
+  group_by(Subcell_loc) %>% 
+  mutate(p.val = ks.test(logFC, ref_PHY_peaks)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_PHY_peaks_SL = ks_res_PHY_peaks_SL %>% 
+  select(Subcell_loc,
+         Avg_logFC,
+         fdr) %>% 
+  distinct() 
+```
+
+
+```{r}
+ks_res_PHY_peaks_BP = impPHY_peaks %>% 
+  distinct(GeneID, 
+           logFC,
+           term.label) %>%
+  group_by(term.label) %>% 
+  mutate(p.val = ks.test(logFC, ref_PHY_peaks)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_PHY_peaks_BP = ks_res_PHY_peaks_BP %>% 
+  select(term.label,
+         Avg_logFC,
+         fdr) %>% 
+  distinct() 
+```
+
+# NEM_3Y Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
+
+```{r}
+impNEM_3Y = fread('DGEresults/Limma_results_table_NEM_3Y.csv') %>% 
+  distinct(GeneID, 
+           name, 
+           logFC,
+           `Jr-GeneID`,
+           Parent_haplotype)
+```
+
+## Make list for KS test results
+
+```{r}
+print_res = list()
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Chromosome are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## NEM_3Y Chromosome KS test
+
+```{r}
+impNEM_3Y_peaks = impNEM_3Y %>% 
+  inner_join(peaks) %>% 
+  inner_join(BP_annotation, by = c('Jr-GeneID' = 'mapped_id')) %>% 
+  mutate(Trait = 'NEM_3Y')
+
+length(unique(impNEM_3Y_peaks$GeneID))
+```
+
+```{r}
+ref_NEM_3Y_peaks = impNEM_3Y_peaks %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+ks_res_NEM_3Y_peaks_SL = impNEM_3Y_peaks %>% 
+  distinct(GeneID, 
+           logFC,
+           Subcell_loc) %>%
+  group_by(Subcell_loc) %>% 
+  mutate(p.val = ks.test(logFC, ref_NEM_3Y_peaks)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_NEM_3Y_peaks_SL = ks_res_NEM_3Y_peaks_SL %>% 
+  select(Subcell_loc,
+         Avg_logFC,
+         fdr) %>% 
+  distinct() 
+```
+
+
+```{r}
+ks_res_NEM_3Y_peaks_BP = impNEM_3Y_peaks %>% 
+  distinct(GeneID, 
+           logFC,
+           term.label) %>%
+  group_by(term.label) %>% 
+  mutate(p.val = ks.test(logFC, ref_NEM_3Y_peaks)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_NEM_3Y_peaks_BP = ks_res_NEM_3Y_peaks_BP %>% 
+  select(term.label,
+         Avg_logFC,
+         fdr) %>% 
+  distinct() 
+```
+
+# Length_3Y Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
+
+```{r}
+impLength_3Y = fread('DGEresults/Limma_results_table_Length_3Y.csv') %>% 
+  distinct(GeneID, 
+           name, 
+           logFC,
+           `Jr-GeneID`,
+           Parent_haplotype)
+```
+
+## Make list for KS test results
+
+```{r}
+print_res = list()
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Chromosome are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## Length_3Y Chromosome KS test
+
+```{r}
+impLength_3Y_peaks = impLength_3Y %>% 
+  inner_join(peaks) %>% 
+  inner_join(BP_annotation, by = c('Jr-GeneID' = 'mapped_id')) %>% 
+  mutate(Trait = 'Length_3Y')
+
+length(unique(impLength_3Y_peaks$GeneID))
+```
+
+```{r}
+ref_Length_3Y_peaks = impLength_3Y_peaks %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+ks_res_Length_3Y_peaks_SL = impLength_3Y_peaks %>% 
+  distinct(GeneID, 
+           logFC,
+           Subcell_loc) %>%
+  group_by(Subcell_loc) %>% 
+  mutate(p.val = ks.test(logFC, ref_Length_3Y_peaks)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_Length_3Y_peaks_SL = ks_res_Length_3Y_peaks_SL %>% 
+  select(Subcell_loc,
+         Avg_logFC,
+         fdr) %>% 
+  distinct() 
+```
+
+
+```{r}
+ks_res_Length_3Y_peaks_BP = impLength_3Y_peaks %>% 
+  distinct(GeneID, 
+           logFC,
+           term.label) %>%
+  group_by(term.label) %>% 
+  mutate(p.val = ks.test(logFC, ref_Length_3Y_peaks)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+ks_res_less_Length_3Y_peaks_BP = ks_res_Length_3Y_peaks_BP %>% 
+  select(term.label,
+         Avg_logFC,
+         fdr) %>% 
+  distinct() 
+```
+
+# Write out full results for supplementary data
+
+```{r}
+total_results = impCG_peaks %>% 
+  rbind(impPHY_peaks) %>% 
+  rbind(impNEM_3Y_peaks) %>% 
+  rbind(impLength_3Y_peaks)
+
+fwrite(total_results, 'QTL_Peaks_results/Full_supplementary_results_KS_QTL_Peaks.csv')
+```
+
+```{r}
+Simple_total_results = total_results %>% 
+  distinct(name, Trait, logFC) %>%
+  count(Trait)
+```
+
+

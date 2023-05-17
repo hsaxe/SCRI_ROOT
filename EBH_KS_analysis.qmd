@@ -1,0 +1,639 @@
+---
+title: "GO_results_SCRI_ROOT_RNAseq"
+author: "Houston Saxe"
+date: Sys.Date()
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load libraries
+
+```{r}
+pacman::p_load(dplyr, 
+               tibble, 
+               readr, 
+               stringr, 
+               data.table, 
+               ggplot2, 
+               sjPlot, 
+               ggpubr, 
+               tidyr, 
+               jsonlite,
+               openxlsx)
+```
+
+# CG Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
+
+```{r}
+impCG = fread('DGEresults/Limma_results_table_CG.csv') %>% 
+  distinct(GeneID, 
+           name,
+           logFC,
+           Parent_haplotype)
+
+length(unique(impCG$GeneID))
+```
+
+## Make list for KS test results
+
+```{r}
+print_res = list()
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Subcellular loci are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## CG BP KS test
+
+```{r}
+# Make vector of unique logFC values
+ref_CG = impCG %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+# Conduct KS enrichment testing
+ks_res_CG = impCG %>% 
+  group_by(Parent_haplotype) %>% 
+  mutate(p.val = ks.test(logFC, ref_CG)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+# KS results without gene names and IDs, less info to sift through
+ks_res_less_CG = ks_res_CG %>% 
+  select(!c(GeneID,
+            logFC,
+            name,
+            Parent_haplotype)) %>% 
+  distinct() %>% 
+  mutate(p.val = ifelse(p.val == 0, 0.000000000000001, p.val),
+           fdr = p.adjust(p.val, method = 'fdr')) 
+
+# Some summary stats
+print_res$CG_No_filter = print(paste('Total of',
+            ks_res_CG %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_CG %>% pull(Parent_haplotype) %>% unique() %>% length(),
+            'Subcellular loci '))
+            
+print_res$CG_Filter = print(paste('and with fdr <= 0.05', 
+            ks_res_CG %>% filter(fdr < 0.05) %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_CG %>% filter(fdr < 0.05) %>% pull(Parent_haplotype) %>% unique() %>% length(),
+            'Subcellular loci '))
+```
+
+## Summary of KS results
+
+```{r}
+print_res
+```
+
+## CG Make plotting data
+
+```{r fig.height=8, fig.width=10}
+one = ks_res_less_CG %>% 
+  # Summarise these terms into broad categories
+  mutate(Parent_haplotype = gsub('with\\sbulged\\sadenosine\\sas\\snucleophile|to\\s', '', Parent_haplotype)) 
+
+# Merge DGE results with GO results
+plot_dat = one %>% 
+  select(Parent_haplotype, 
+         fdr,
+         `Number_of_genes`,
+         Avg_logFC) %>% 
+  distinct() %>%
+  drop_na() %>% 
+  filter(fdr <= 0.05)
+  
+
+# Make new table for combining DEG results with GO results and writing out
+impCG_Enrichment_out = plot_dat %>% 
+  mutate(Trait = 'CG')
+
+labs_normal = plot_dat %>% 
+  # Make labels for terms containing these strings and fdr less than or equal to 0.05
+  filter(Parent_haplotype %like% 'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene' &
+           fdr <= 0.05) %>% 
+  select(Parent_haplotype,
+         fdr,
+         Avg_logFC,
+         `Number_of_genes`) %>% 
+  distinct()
+
+counts = labs_normal %>% 
+  count(Parent_haplotype)
+
+# Labels for top 5 terms by fdr
+top = plot_dat %>% 
+  slice_min(order_by = fdr, n = 5) %>% 
+  rbind(labs_normal) %>% 
+  distinct() %>% 
+  mutate(Gene_type = ifelse(Avg_logFC >= 0, 'Susceptibility', 'Resistance'))
+
+```
+
+## CG Make plot2
+
+```{r fig.height=6, fig.width=9, warning=FALSE, message=FALSE}
+
+CG = ggplot(top, aes(x = Gene_type, y = reorder(Parent_haplotype, Avg_logFC), color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1, color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1), shape = 1, stroke = 0.25, color = 'black')+
+  labs(title = 'Subcellular locus Kolmogorov-Smirnov Test A. tumefaciens',
+       x = 'Gene Type',
+       y = 'Subcellular Loci',
+       color = 'Mean log2\nExpression\nFold Change',
+       size = 'log10(fdr)*-1')+
+  theme_grey(base_size = 12)+
+  theme(plot.title = element_text(hjust = 0.9))+
+  # geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  # geom_text(aes(min(Avg_logFC), log10(0.05)*-1),
+  #           label = 'FDR 0.05',
+  #           vjust = 1.5,
+  #           hjust = 0.5, 
+  #           color = 'black',
+  #           size = 3)+
+  # geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  # geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),
+  #      y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+
+  # scale_size_continuous(breaks = c(5, 20, 50, 200, 600),
+  #                       limits = c(0, 600))+
+    # facet_wrap(~term.level, ncol = 2, scales = 'free')
+
+save_plot('Subcell_KS_results/SL_Enrich_testing_CG.png', 
+          CG,
+          width = 18, 
+          height = 15, 
+          dpi = 300)
+```
+
+# PHY Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
+
+```{r}
+impPHY = fread('DGEresults/Limma_results_table_PHY.csv') %>% 
+  distinct(GeneID, name, logFC, Parent_haplotype)
+
+```
+
+## Merge DEG data with BP annotation
+
+```{r}
+impPHY = impPHY %>% 
+  left_join(SL_annotation) %>% 
+  distinct()
+
+length(unique(impPHY$logFC))
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Subcellular loci are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## PHY BP KS test
+
+```{r}
+# Make vector of unique logFC values
+ref_PHY = impPHY %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+# Conduct KS enrichment testing
+ks_res_PHY = impPHY %>% 
+  group_by(Parent_haplotype) %>% 
+  mutate(p.val = ks.test(logFC, ref_PHY)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+# KS results without gene names and IDs, less info to sift through
+ks_res_less_PHY = ks_res_PHY %>% 
+  select(!c(GeneID,
+            logFC,
+            name,
+            Parent_haplotype)) %>% 
+  distinct() %>% 
+  mutate(p.val = ifelse(p.val == 0, 0.000000000000001, p.val),
+           fdr = p.adjust(p.val, method = 'fdr')) 
+
+# Some summary stats
+
+print_res$PHY_No_filter = print(paste('Total of',
+            ks_res_PHY %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_PHY %>% pull(Parent_haplotype) %>% unique() %>% length(),
+            'Subcellular loci '))
+            
+print_res$PHY_Filter = print(paste('and with fdr <= 0.05', 
+            ks_res_PHY %>% filter(fdr < 0.05) %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_PHY %>% filter(fdr < 0.05) %>% pull(Parent_haplotype) %>% unique() %>% length(),
+            'Subcellular loci '))
+```
+
+## Summary of KS results
+
+```{r}
+print_res
+```
+
+## PHY Make plotting data
+
+```{r fig.height=8, fig.width=10}
+one = ks_res_less_PHY %>% 
+  # Summarise these terms into broad categories
+  mutate(Parent_haplotype = gsub('with\\sbulged\\sadenosine\\sas\\snucleophile|to\\s', '', Parent_haplotype)) 
+
+# Merge DGE results with GO results
+plot_dat = one %>% 
+  select(Parent_haplotype, 
+         fdr,
+         `Number_of_genes`,
+         Avg_logFC) %>% 
+  distinct() %>%
+  drop_na() %>% 
+  filter(fdr <= 0.05)
+  
+
+# Make new table for combining DEG results with GO results and writing out
+impPHY_Enrichment_out = plot_dat %>% 
+  mutate(Trait = 'PHY')
+
+labs_normal = plot_dat %>% 
+  # Make labels for terms containing these strings and fdr less than or equal to 0.05
+  filter(Parent_haplotype %like% 'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene' &
+           fdr <= 0.05) %>% 
+  select(Parent_haplotype,
+         fdr,
+         Avg_logFC,
+         `Number_of_genes`) %>% 
+  distinct()
+
+counts = labs_normal %>% 
+  count(Parent_haplotype)
+
+# Labels for top 5 terms by fdr
+top = plot_dat %>% 
+  slice_min(order_by = fdr, n = 5) %>% 
+  rbind(labs_normal) %>% 
+  distinct() %>% 
+  mutate(Gene_type = ifelse(Avg_logFC >= 0, 'Susceptibility', 'Resistance'))
+
+```
+
+## PHY Make plot2
+
+```{r fig.height=6, fig.width=9, warning=FALSE, message=FALSE}
+
+PHY = ggplot(top, aes(x = Gene_type, y = reorder(Parent_haplotype, Avg_logFC), color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1, color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1), shape = 1, stroke = 0.25, color = 'black')+
+  labs(title = 'Subcellular locus Kolmogorov-Smirnov Test Phytophthora',
+       x = 'Gene Type',
+       y = 'Subcellular Loci',
+       color = 'Mean log2\nExpression\nFold Change',
+       size = 'log10(fdr)*-1')+
+  theme_grey(base_size = 12)+
+  theme(plot.title = element_text(hjust = 0.9))+
+  # geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  # geom_text(aes(min(Avg_logFC), log10(0.05)*-1),
+  #           label = 'FDR 0.05',
+  #           vjust = 1.5,
+  #           hjust = 0.5, 
+  #           color = 'black',
+  #           size = 3)+
+  # geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  # geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),
+  #      y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+
+  # scale_size_continuous(breaks = c(5, 20, 50, 200, 600),
+  #                       limits = c(0, 600))+
+    # facet_wrap(~term.level, ncol = 2, scales = 'free')
+
+save_plot('Subcell_KS_results/SL_Enrich_testing_PHY.png', 
+          PHY,
+          width = 18, 
+          height = 15, 
+          dpi = 300)
+```
+
+# NEM_3Y Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
+
+```{r}
+impNEM_3Y = fread('DGEresults/Limma_results_table_NEM_3Y.csv') %>% 
+  distinct(GeneID, name, logFC, Parent_haplotype)
+
+```
+
+## Merge DEG data with BP annotation
+
+```{r}
+impNEM_3Y = impNEM_3Y %>% 
+  left_join(SL_annotation) %>% 
+  distinct()
+
+length(unique(impNEM_3Y$logFC))
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Subcellular loci are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## NEM_3Y BP KS test
+
+```{r}
+# Make vector of unique logFC values
+ref_NEM_3Y = impNEM_3Y %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+# Conduct KS enrichment testing
+ks_res_NEM_3Y = impNEM_3Y %>% 
+  group_by(Parent_haplotype) %>% 
+  mutate(p.val = ks.test(logFC, ref_NEM_3Y)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+# KS results without gene names and IDs, less info to sift through
+ks_res_less_NEM_3Y = ks_res_NEM_3Y %>% 
+  select(!c(GeneID,
+            logFC,
+            name,
+            Parent_haplotype)) %>% 
+  distinct() %>% 
+  mutate(p.val = ifelse(p.val == 0, 0.000000000000001, p.val),
+           fdr = p.adjust(p.val, method = 'fdr')) 
+
+# Some summary stats
+
+print_res$NEM_3Y_No_filter = print(paste('Total of',
+            ks_res_NEM_3Y %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_NEM_3Y %>% pull(Parent_haplotype) %>% unique() %>% length(),
+            'Subcellular loci '))
+            
+print_res$NEM_3Y_Filter = print(paste('and with fdr <= 0.05', 
+            ks_res_NEM_3Y %>% filter(fdr < 0.05) %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_NEM_3Y %>% filter(fdr < 0.05) %>% pull(Parent_haplotype) %>% unique() %>% length(),
+            'Subcellular loci '))
+```
+
+## Summary of KS results
+
+```{r}
+print_res
+```
+
+## NEM_3Y Make plotting data
+
+```{r fig.height=8, fig.width=10}
+one = ks_res_less_NEM_3Y %>% 
+  # Summarise these terms into broad categories
+  mutate(Parent_haplotype = gsub('with\\sbulged\\sadenosine\\sas\\snucleophile|to\\s', '', Parent_haplotype)) 
+
+# Merge DGE results with GO results
+plot_dat = one %>% 
+  select(Parent_haplotype, 
+         fdr,
+         `Number_of_genes`,
+         Avg_logFC) %>% 
+  distinct() %>%
+  drop_na() %>% 
+  filter(fdr <= 0.05)
+  
+
+# Make new table for combining DEG results with GO results and writing out
+impNEM_3Y_Enrichment_out = plot_dat %>% 
+  mutate(Trait = 'NEM_3Y')
+
+labs_normal = plot_dat %>% 
+  # Make labels for terms containing these strings and fdr less than or equal to 0.05
+  filter(Parent_haplotype %like% 'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene' &
+           fdr <= 0.05) %>% 
+  select(Parent_haplotype,
+         fdr,
+         Avg_logFC,
+         `Number_of_genes`) %>% 
+  distinct()
+
+counts = labs_normal %>% 
+  count(Parent_haplotype)
+
+# Labels for top 5 terms by fdr
+top = plot_dat %>% 
+  slice_min(order_by = fdr, n = 5) %>% 
+  rbind(labs_normal) %>% 
+  distinct() %>% 
+  mutate(Gene_type = ifelse(Avg_logFC >= 0, 'Susceptibility', 'Resistance'))
+
+```
+
+## NEM_3Y Make plot2
+
+```{r fig.height=6, fig.width=9, warning=FALSE, message=FALSE}
+
+NEM_3Y = ggplot(top, aes(x = Gene_type, y = reorder(Parent_haplotype, Avg_logFC), color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1, color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1), shape = 1, stroke = 0.25, color = 'black')+
+  labs(title = 'Subcellular locus Kolmogorov-Smirnov Test P. vulnus 3Y',
+       x = 'Gene Type',
+       y = 'Subcellular Loci',
+       color = 'Mean log2\nExpression\nFold Change',
+       size = 'log10(fdr)*-1')+
+  theme_grey(base_size = 12)+
+  theme(plot.title = element_text(hjust = 0.9))+
+  # geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  # geom_text(aes(min(Avg_logFC), log10(0.05)*-1),
+  #           label = 'FDR 0.05',
+  #           vjust = 1.5,
+  #           hjust = 0.5, 
+  #           color = 'black',
+  #           size = 3)+
+  # geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  # geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),
+  #      y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+
+  # scale_size_continuous(breaks = c(5, 20, 50, 200, 600),
+  #                       limits = c(0, 600))+
+    # facet_wrap(~term.level, ncol = 2, scales = 'free')
+
+save_plot('Subcell_KS_results/SL_Enrich_testing_NEM_3Y.png', 
+          NEM_3Y,
+          width = 18, 
+          height = 15, 
+          dpi = 300)
+```
+
+# Length_3Y Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
+
+```{r}
+impLength_3Y = fread('DGEresults/Limma_results_table_Length_3Y.csv') %>% 
+  distinct(GeneID, name, logFC, Parent_haplotype)
+
+```
+
+## Merge DEG data with BP annotation
+
+```{r}
+impLength_3Y = impLength_3Y %>% 
+  left_join(SL_annotation) %>% 
+  distinct()
+
+length(unique(impLength_3Y$logFC))
+```
+
+# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Subcellular loci are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
+
+## Length_3Y BP KS test
+
+```{r}
+# Make vector of unique logFC values
+ref_Length_3Y = impLength_3Y %>% 
+  distinct(GeneID, logFC) %>% 
+  pull(logFC)
+
+# Conduct KS enrichment testing
+ks_res_Length_3Y = impLength_3Y %>% 
+  group_by(Parent_haplotype) %>% 
+  mutate(p.val = ks.test(logFC, ref_Length_3Y)$p.value,
+         Avg_logFC = mean(logFC),
+         Number_of_genes = n()) %>% 
+  ungroup() %>% 
+  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+
+# KS results without gene names and IDs, less info to sift through
+ks_res_less_Length_3Y = ks_res_Length_3Y %>% 
+  select(!c(GeneID,
+            logFC,
+            name,
+            Parent_haplotype)) %>% 
+  distinct() %>% 
+  mutate(p.val = ifelse(p.val == 0, 0.000000000000001, p.val),
+           fdr = p.adjust(p.val, method = 'fdr')) 
+
+# Some summary stats
+
+print_res$Length_3Y_No_filter = print(paste('Total of',
+            ks_res_Length_3Y %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_Length_3Y %>% pull(Parent_haplotype) %>% unique() %>% length(),
+            'Subcellular loci '))
+            
+print_res$Length_3Y_Filter = print(paste('and with fdr <= 0.05', 
+            ks_res_Length_3Y %>% filter(fdr < 0.05) %>% pull(logFC) %>% unique() %>% length(),
+            'genes mapped to', 
+            ks_res_Length_3Y %>% filter(fdr < 0.05) %>% pull(Parent_haplotype) %>% unique() %>% length(),
+            'Subcellular loci '))
+```
+
+## Summary of KS results
+
+```{r}
+print_res
+```
+
+## Length_3Y Make plotting data
+
+```{r fig.height=8, fig.width=10}
+one = ks_res_less_Length_3Y %>% 
+  # Summarise these terms into broad categories
+  mutate(Parent_haplotype = gsub('with\\sbulged\\sadenosine\\sas\\snucleophile|to\\s', '', Parent_haplotype)) 
+
+# Merge DGE results with GO results
+plot_dat = one %>% 
+  select(Parent_haplotype, 
+         fdr,
+         `Number_of_genes`,
+         Avg_logFC) %>% 
+  distinct() %>%
+  drop_na() %>% 
+  filter(fdr <= 0.05)
+  
+
+# Make new table for combining DEG results with GO results and writing out
+impLength_3Y_Enrichment_out = plot_dat %>% 
+  mutate(Trait = 'Length_3Y')
+
+labs_normal = plot_dat %>% 
+  # Make labels for terms containing these strings and fdr less than or equal to 0.05
+  filter(Parent_haplotype %like% 'RNA|cell wall|polysaccharide|cellulose|glucan|defense|hormone|jasmonic acid|abscisic acid|salicylic acid|ethylene' &
+           fdr <= 0.05) %>% 
+  select(Parent_haplotype,
+         fdr,
+         Avg_logFC,
+         `Number_of_genes`) %>% 
+  distinct()
+
+counts = labs_normal %>% 
+  count(Parent_haplotype)
+
+# Labels for top 5 terms by fdr
+top = plot_dat %>% 
+  slice_min(order_by = fdr, n = 5) %>% 
+  rbind(labs_normal) %>% 
+  distinct() %>% 
+  mutate(Gene_type = ifelse(Avg_logFC >= 0, 'Susceptibility', 'Resistance'))
+
+```
+
+## Length_3Y Make plot2
+
+```{r fig.height=6, fig.width=9, warning=FALSE, message=FALSE}
+
+Length_3Y = ggplot(top, aes(x = Gene_type, y = reorder(Parent_haplotype, Avg_logFC), color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1, color = Avg_logFC))+
+  geom_point(aes(size = log10(fdr)*-1), shape = 1, stroke = 0.25, color = 'black')+
+  labs(title = 'Subcellular locus Kolmogorov-Smirnov Test Tree Length 3Y',
+       x = 'Gene Type',
+       y = 'Subcellular Loci',
+       color = 'Mean log2\nExpression\nFold Change',
+       size = 'log10(fdr)*-1')+
+  theme_grey(base_size = 12)+
+  theme(plot.title = element_text(hjust = 0.9))+
+  # geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  # geom_text(aes(min(Avg_logFC), log10(0.05)*-1),
+  #           label = 'FDR 0.05',
+  #           vjust = 1.5,
+  #           hjust = 0.5, 
+  #           color = 'black',
+  #           size = 3)+
+  # geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  # geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  # lims(x = c(sqrt(max(plot_dat$logFC^2))*-1, sqrt(max(plot_dat$logFC^2))),
+  #      y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')
+
+  # scale_size_continuous(breaks = c(5, 20, 50, 200, 600),
+  #                       limits = c(0, 600))+
+    # facet_wrap(~term.level, ncol = 2, scales = 'free')
+
+save_plot('Subcell_KS_results/SL_Enrich_testing_Length_3Y.png', 
+          Length_3Y,
+          width = 18, 
+          height = 15, 
+          dpi = 300)
+```
+
+
+
+# Write out full results for supplementary data
+
+```{r}
+total_results = impCG_Enrichment_out %>% 
+  rbind(impPHY_Enrichment_out) %>% 
+  rbind(impNEM_3Y_Enrichment_out) %>% 
+  rbind(impLength_3Y_Enrichment_out)
+
+fwrite(total_results, 'Biological_Process_KS_results/Full_supplementary_results_KS.csv')
+```
+

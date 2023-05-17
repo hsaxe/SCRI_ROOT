@@ -1,0 +1,872 @@
+{"statistical_enrichment": {
+    "input_list": {"organism": "Juglans regia"},
+    "result": [
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.19043027145702685,
+            "mapped_id_list": {"mapped_id": "LOC109021176"},
+            "term": {
+                "id": "GO:0000209",
+                "label": "protein polyubiquitination"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 2,
+            "fdr": 1,
+            "pValue": 0.241566600161362,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176"
+            ]},
+            "term": {
+                "id": "GO:0016567",
+                "label": "protein ubiquitination"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 2,
+            "fdr": 1,
+            "pValue": 0.241566600161362,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176"
+            ]},
+            "term": {
+                "id": "GO:0070647",
+                "label": "protein modification by small protein conjugation or removal"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 2,
+            "fdr": 1,
+            "pValue": 0.241566600161362,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176"
+            ]},
+            "term": {
+                "id": "GO:0032446",
+                "label": "protein modification by small protein conjugation"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 2,
+            "fdr": 1,
+            "pValue": 0.37977547664716127,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108995063",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0044237",
+                "label": "cellular metabolic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 2,
+            "fdr": 1,
+            "pValue": 0.37977547664716127,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108995063",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0009987",
+                "label": "cellular process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.3827330905172426,
+            "mapped_id_list": {"mapped_id": "LOC109018797"},
+            "term": {
+                "id": "GO:0023052",
+                "label": "signaling"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.3827330905172426,
+            "mapped_id_list": {"mapped_id": "LOC109018797"},
+            "term": {
+                "id": "GO:0006468",
+                "label": "protein phosphorylation"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.3827330905172426,
+            "mapped_id_list": {"mapped_id": "LOC109018797"},
+            "term": {
+                "id": "GO:0007166",
+                "label": "cell surface receptor signaling pathway"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.3827330905172426,
+            "mapped_id_list": {"mapped_id": "LOC109018797"},
+            "term": {
+                "id": "GO:0007165",
+                "label": "signal transduction"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.3827330905172426,
+            "mapped_id_list": {"mapped_id": "LOC109018797"},
+            "term": {
+                "id": "GO:0050896",
+                "label": "response to stimulus"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.3827330905172426,
+            "mapped_id_list": {"mapped_id": "LOC109018797"},
+            "term": {
+                "id": "GO:0007154",
+                "label": "cell communication"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.3827330905172426,
+            "mapped_id_list": {"mapped_id": "LOC109018797"},
+            "term": {
+                "id": "GO:0006796",
+                "label": "phosphate-containing compound metabolic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.3827330905172426,
+            "mapped_id_list": {"mapped_id": "LOC109018797"},
+            "term": {
+                "id": "GO:0006793",
+                "label": "phosphorus metabolic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.3827330905172426,
+            "mapped_id_list": {"mapped_id": "LOC109018797"},
+            "term": {
+                "id": "GO:0051716",
+                "label": "cellular response to stimulus"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.3827330905172426,
+            "mapped_id_list": {"mapped_id": "LOC109018797"},
+            "term": {
+                "id": "GO:0016310",
+                "label": "phosphorylation"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 2,
+            "fdr": 1,
+            "pValue": 0.5581846495321534,
+            "mapped_id_list": {"mapped_id": [
+                "LOC109013014",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0065007",
+                "label": "biological regulation"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 2,
+            "fdr": 1,
+            "pValue": 0.5581846495321534,
+            "mapped_id_list": {"mapped_id": [
+                "LOC109013014",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0050794",
+                "label": "regulation of cellular process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 2,
+            "fdr": 1,
+            "pValue": 0.5581846495321534,
+            "mapped_id_list": {"mapped_id": [
+                "LOC109013014",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0050789",
+                "label": "regulation of biological process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 3,
+            "fdr": 1,
+            "pValue": 0.6485033798503002,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0043412",
+                "label": "macromolecule modification"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 3,
+            "fdr": 1,
+            "pValue": 0.6485033798503002,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0043170",
+                "label": "macromolecule metabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 3,
+            "fdr": 1,
+            "pValue": 0.6485033798503002,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0036211",
+                "label": "protein modification process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 3,
+            "fdr": 1,
+            "pValue": 0.6485033798503002,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0019538",
+                "label": "protein metabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0046394",
+                "label": "carboxylic acid biosynthetic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0006082",
+                "label": "organic acid metabolic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:1901576",
+                "label": "organic substance biosynthetic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108983635"},
+            "term": {
+                "id": "GO:1901575",
+                "label": "organic substance catabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108983635"},
+            "term": {
+                "id": "GO:0051603",
+                "label": "proteolysis involved in protein catabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0009084",
+                "label": "glutamine family amino acid biosynthetic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108983635"},
+            "term": {
+                "id": "GO:0006508",
+                "label": "proteolysis"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:1901607",
+                "label": "alpha-amino acid biosynthetic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0044283",
+                "label": "small molecule biosynthetic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:1901605",
+                "label": "alpha-amino acid metabolic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0044281",
+                "label": "small molecule metabolic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0019752",
+                "label": "carboxylic acid metabolic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:1901566",
+                "label": "organonitrogen compound biosynthetic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108983635"},
+            "term": {
+                "id": "GO:1901565",
+                "label": "organonitrogen compound catabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108983635"},
+            "term": {
+                "id": "GO:0019941",
+                "label": "modification-dependent protein catabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0016053",
+                "label": "organic acid biosynthetic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0008652",
+                "label": "amino acid biosynthetic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0009064",
+                "label": "glutamine family amino acid metabolic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0006542",
+                "label": "glutamine biosynthetic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0006541",
+                "label": "glutamine metabolic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0009058",
+                "label": "biosynthetic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108983635"},
+            "term": {
+                "id": "GO:0009057",
+                "label": "macromolecule catabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108983635"},
+            "term": {
+                "id": "GO:0009056",
+                "label": "catabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108983635"},
+            "term": {
+                "id": "GO:0030163",
+                "label": "protein catabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 0.9937808754790812,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0044249",
+                "label": "cellular biosynthetic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 0.9734996331223652,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108983635"},
+            "term": {
+                "id": "GO:0043632",
+                "label": "modification-dependent macromolecule catabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 0.9540296404599179,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0006520",
+                "label": "amino acid metabolic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 0.9353231769214881,
+            "pValue": 0.6625205836527208,
+            "mapped_id_list": {"mapped_id": "LOC108995063"},
+            "term": {
+                "id": "GO:0043436",
+                "label": "oxoacid metabolic process"
+            },
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 2,
+            "fdr": 1,
+            "pValue": 0.7696979438811087,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108984415",
+                "LOC109011537"
+            ]},
+            "term": {"label": "UNCLASSIFIED"},
+            "plus_minus": "+"
+        },
+        {
+            "number_in_list": 4,
+            "fdr": 1,
+            "pValue": 0.8501067391390632,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176",
+                "LOC108995063",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0044238",
+                "label": "primary metabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 4,
+            "fdr": 1,
+            "pValue": 0.8501067391390632,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176",
+                "LOC108995063",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0006807",
+                "label": "nitrogen compound metabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 4,
+            "fdr": 1,
+            "pValue": 0.8501067391390632,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176",
+                "LOC108995063",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:1901564",
+                "label": "organonitrogen compound metabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 4,
+            "fdr": 1,
+            "pValue": 0.8501067391390632,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176",
+                "LOC108995063",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0008152",
+                "label": "metabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 4,
+            "fdr": 1,
+            "pValue": 0.8501067391390632,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176",
+                "LOC108995063",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0071704",
+                "label": "organic substance metabolic process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 5,
+            "fdr": 1,
+            "pValue": 0.870991194862839,
+            "mapped_id_list": {"mapped_id": [
+                "LOC108983635",
+                "LOC109021176",
+                "LOC108995063",
+                "LOC109013014",
+                "LOC109018797"
+            ]},
+            "term": {
+                "id": "GO:0008150",
+                "label": "biological_process"
+            },
+            "plus_minus": "-"
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0019219",
+                "label": "regulation of nucleobase-containing compound metabolic process"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0010556",
+                "label": "regulation of macromolecule biosynthetic process"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0051171",
+                "label": "regulation of nitrogen compound metabolic process"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:2001141",
+                "label": "regulation of RNA biosynthetic process"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0060255",
+                "label": "regulation of macromolecule metabolic process"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0031326",
+                "label": "regulation of cellular biosynthetic process"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0031323",
+                "label": "regulation of cellular metabolic process"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0080090",
+                "label": "regulation of primary metabolic process"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:1903506",
+                "label": "regulation of nucleic acid-templated transcription"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0051252",
+                "label": "regulation of RNA metabolic process"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0006355",
+                "label": "regulation of DNA-templated transcription"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0009889",
+                "label": "regulation of biosynthetic process"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0019222",
+                "label": "regulation of metabolic process"
+            },
+            "plus_minus": 0
+        },
+        {
+            "number_in_list": 1,
+            "fdr": 1,
+            "pValue": 1,
+            "mapped_id_list": {"mapped_id": "LOC109013014"},
+            "term": {
+                "id": "GO:0010468",
+                "label": "regulation of gene expression"
+            },
+            "plus_minus": 0
+        }
+    ],
+    "tool_release_date": 20221017,
+    "data_version_release_date": "GO Ontology database DOI:  10.5281/zenodo.7709866 Released 2023-03-06",
+    "annotation_type": "GO biological process complete",
+    "correction": "FDR"
+}}

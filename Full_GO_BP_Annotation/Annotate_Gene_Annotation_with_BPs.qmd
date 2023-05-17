@@ -1,0 +1,54 @@
+# Load libraries
+
+```{r}
+pacman::p_load(dplyr, 
+               tibble, 
+               readr, 
+               stringr, 
+               data.table, 
+               ggplot2, 
+               sjPlot, 
+               ggpubr, 
+               tidyr, 
+               jsonlite,
+               openxlsx)
+```
+
+# Annotate annotation with BPs
+
+```{r}
+test = fromJSON(txt = 'C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/Full_GO_BP_Annotation/Full_BP_annotation.json', flatten = T)
+
+df = as.data.frame(test$overrepresentation$group)
+
+df2 = lapply(df[[1]], function(x){
+  
+  y = as.data.frame(x)
+  
+  z = y %>% 
+    rename_with( ~ gsub('input_list.mapped_id_list.mapped_id', 'input_list.mapped_id', .)) %>% 
+    mutate(across(where(is.character), as.list))
+  
+    }
+  )
+
+df3 = bind_rows(df2) %>% 
+ # unnest(mapped_id)
+  # rename_with( ~ gsub('input_list.', '', .)) %>% 
+  unnest(c(input_list.mapped_id)) %>% 
+  mutate(across(where(is.list), as.character)) %>% 
+  mutate(mapped_id = gsub('LOC', '', input_list.mapped_id) %>% 
+           as.numeric(.)) %>% 
+  select(!c(input_list.mapped_id)) %>% 
+  distinct(term.id, 
+           term.label,
+           term.level,
+           mapped_id)
+
+```
+
+## Merge with current genome annotation
+
+```{r}
+fwrite(df3, 'Full_Jr_Genes_BP_Annotated.csv')
+```

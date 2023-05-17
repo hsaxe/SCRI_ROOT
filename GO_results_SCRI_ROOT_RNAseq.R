@@ -1,0 +1,523 @@
+## ----setup, include=FALSE---------------------------------------------------------------------------------------------------------------------
+knitr::opts_chunk$set(echo = TRUE)
+
+
+## ---------------------------------------------------------------------------------------------------------------------------------------------
+pacman::p_load(dplyr, 
+               # plyr, 
+               tibble, 
+               readr, 
+               stringr, 
+               data.table, 
+               ggplot2, 
+               sjPlot, 
+               ggpubr, 
+               tidyr, 
+               jsonlite,
+               openxlsx)
+
+
+## ---------------------------------------------------------------------------------------------------------------------------------------------
+test = fromJSON(txt = 'C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/CG_BP.json', flatten = T)
+
+df = as.data.frame(test$overrepresentation$group)
+
+df = lapply(df[[1]], function(x){
+  
+  y = as.data.frame(x)
+  
+  y = y %>% 
+    rename_with( ~ gsub('input_list.mapped_id_list.mapped_id', 'input_list.mapped_id', .)) %>% 
+    mutate(across(where(is.character), as.list))
+  
+    }
+  )
+
+df2 = bind_rows(df) %>% 
+  rename_with( ~ gsub('input_list.', '', .)) %>% 
+  unnest(mapped_id) %>% 
+  mutate(across(where(is.list), as.character))
+
+# Number of significant terms
+df2 %>% filter(fdr <= 0.05) %>% 
+  distinct(term.label) %>%
+  pull(term.label) %>% 
+  length()
+
+length(unique(df2$mapped_id))
+
+
+
+## ---------------------------------------------------------------------------------------------------------------------------------------------
+test_f1 = fromJSON(txt = 'C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/CG_BP_anno.json', flatten = T)
+
+df_f = test_f1$overrepresentation$group
+
+
+df_f = lapply(df_f[[1]], function(x){
+
+  y = as.data.frame(x)
+
+  y = y %>%
+    rename_with( ~ gsub('input_list.mapped_id_list.mapped_id', 'input_list.mapped_id', .)) %>%
+    mutate(across(where(is.character), as.list))
+
+    }
+  )
+
+impCG = fread('DGEresults/Limma_results_table_CG.csv') %>% 
+  select(GeneID, name, logFC)
+
+df_f = df_f %>% 
+  bind_rows() %>%  
+  rename_with( ~ gsub('input_list.|input_list.mapped_id_list.', '', .)) %>% 
+  unnest(mapped_id) %>% 
+  mutate(across(where(is.list), as.character),
+         mapped_id = as.numeric(gsub('LOC', '', mapped_id))) %>% 
+  drop_na() %>% 
+  left_join(impCG, by = c('mapped_id' = 'GeneID'))
+ 
+length(unique(df_f$term.label))
+
+length(unique(df_f %>% pull(mapped_id)))
+
+
+## ---------------------------------------------------------------------------------------------------------------------------------------------
+final = df2 %>% 
+  left_join(select(df_f, term.id, term.label, mapped_id, name, logFC), by = 'term.id') %>% 
+  drop_na() %>%
+  select(!c(mapped_id.x, term.label.x)) %>%
+  mutate(Diff = number_in_list - expected,
+         Number_of_Genes = number_in_list + number_in_reference,
+         NIL_Mod = ifelse(number_in_list == 0, min(expected)-0.1, number_in_list),
+         log_FE_Mod = log2(NIL_Mod/expected)) %>%
+  select(number_in_reference, number_in_list, Number_of_Genes, NIL_Mod, fold_enrichment, Diff, expected, log_FE_Mod, fdr, pValue, list_name, plus_minus, term.id, term.label.y, mapped_id.y, name, logFC) %>% 
+  distinct() %>% 
+  group_by(term.label.y) %>% 
+  # Make variable for mean log fold change of gene expression by term label
+  mutate(Term_label_logFC = mean(logFC)) %>% 
+  ungroup() %>% 
+  distinct()
+
+fwrite(final %>% rename_with(~ paste('BP_', .x, sep = '')), 'GOresults/BP_Results_Table_CG.csv')
+
+sigCG = final %>% 
+  filter(fdr <= 0.05)
+
+
+## ----fig.height=8, fig.width=10---------------------------------------------------------------------------------------------------------------
+one = final %>%
+  # filter(term.label.y %like% 'cell wall|cellulose|polys|glucan|defense|jasm|absci|salicyl|ethylene|RNA') %>%
+  # Summarise these terms into broad categories
+  mutate(term.label.y = gsub('stimulus|pathway|cellular|with\\sbulged\\sadenosine\\sas\\snucleophile|to\\s', '', term.label.y),
+         term.label.mod = as.factor(gsub('defense', 'DEF',
+                                         gsub('jasmonic acid', 'JA',
+                                              gsub('abscisic acid', 'ABA',
+                                                   gsub('salicylic acid', 'SA',
+                                                        gsub('ethylene', 'ETH',
+                                                             gsub('cell wall', 'CW', 
+                                                                  gsub('polysaccharide', 'PS',
+                                                                       gsub('metabolic', 'MET',
+                                                                            gsub('biosynthetic', 'BIOS', term.label.y)))))))))))
+
+# Merge DGE results with GO results
+plot_dat = one %>% 
+  select(term.label.y, term.label.mod,  log_FE_Mod, fdr, `Number_of_Genes`, name, logFC, Term_label_logFC) %>% 
+  distinct() %>%
+  drop_na() 
+  
+
+# Make new table for combining DEG results with GO results and writing out
+impCG_BP_out = plot_dat %>% 
+  mutate(Trait = 'CG')
+
+labs_normal = plot_dat %>% 
+  # Make labels for terms containing these strings and fdr less than or equal to 0.05
+  filter(term.label.y %like% 'RNA|cell wall|polysaccharide|cellulose|glucan|defense|jasmonic acid|abscisic acid|salicylic acid|ethylene' &
+           fdr <= 0.05) %>% 
+  select( term.label.y, term.label.mod, fdr,  log_FE_Mod, Term_label_logFC, `Number_of_Genes`) %>% 
+  distinct()
+
+counts = labs_normal %>% 
+  count(term.label.mod)
+
+# Labels for top 5 terms by fdr
+top = plot_dat %>% 
+  select(term.label.y, term.label.mod, fdr,  log_FE_Mod, Term_label_logFC, `Number_of_Genes`) %>% 
+  distinct() %>% 
+  slice_min(fdr, n = 5, with_ties = F) %>% 
+  rbind(labs_normal) %>% 
+  distinct()
+
+
+
+## ----fig.height=6, fig.width=9, warning=FALSE, message=FALSE----------------------------------------------------------------------------------
+
+CG = ggplot(plot_dat, aes(x = Term_label_logFC, y = log10(fdr)*-1, color = log_FE_Mod))+
+  geom_point(aes(size = `Number_of_Genes`, color = log_FE_Mod))+
+  geom_point(aes(size = `Number_of_Genes`), shape = 1, stroke = 0.25, color = 'black')+
+  ggrepel::geom_label_repel(data = top, aes(label = term.label.mod),
+                            size = 4,
+                            color = 'black', 
+                            box.padding = 0.4,
+                            label.padding = 0.1,
+                            max.overlaps = Inf)+
+  labs(title = 'Biological Process Fisher\'s Exact Test CG',
+       x = 'Mean log2 Expression Fold Change',
+       color = 'Mean log2 GO\nFold Enrichment',
+       size = 'Number of Genes')+
+  theme_grey(base_size = 16)+
+  theme(plot.title = element_text(hjust = 0.5))+
+  geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  geom_text(aes(min(Term_label_logFC), log10(0.05)*-1),
+            label = 'FDR 0.05',
+            vjust = 1.5,
+            hjust = 0.5, 
+            color = 'black',
+            size = 3)+
+  geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  lims(x = c(sqrt(max(plot_dat$Term_label_logFC^2))*-1, sqrt(max(plot_dat$Term_label_logFC^2))),
+       y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')+
+  scale_size_continuous(breaks = c(5, 20, 50, 200, 600),
+                        limits = c(0, 600))
+
+save_plot('GOresults/BP_testing_CG.png', width = 30, height = 20, dpi = 300)
+
+
+## ---------------------------------------------------------------------------------------------------------------------------------------------
+test = fromJSON(txt = 'C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/PHY_BP.json', flatten = T)
+
+df = as.data.frame(test$overrepresentation$group)
+
+df = lapply(df[[1]], function(x){
+  
+  y = as.data.frame(x)
+  
+  y = y %>% 
+    rename_with( ~ gsub('input_list.mapped_id_list.mapped_id', 'input_list.mapped_id', .)) %>% 
+    mutate(across(where(is.character), as.list))
+  
+    }
+  )
+
+df2 = bind_rows(df) %>% 
+  rename_with( ~ gsub('input_list.', '', .)) %>% 
+  unnest(mapped_id) %>% 
+  mutate(across(where(is.list), as.character))
+
+# Number of significant terms
+df2 %>% filter(fdr <= 0.05) %>% 
+  distinct(term.label) %>%
+  pull(term.label) %>% 
+  length()
+
+length(unique(df2$mapped_id))
+
+
+
+## ---------------------------------------------------------------------------------------------------------------------------------------------
+test_f1 = fromJSON(txt = 'C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/PHY_BP_anno.json', flatten = T)
+
+df_f = test_f1$overrepresentation$group
+
+
+df_f = lapply(df_f[[1]], function(x){
+
+  y = as.data.frame(x)
+
+  y = y %>%
+    rename_with( ~ gsub('input_list.mapped_id_list.mapped_id', 'input_list.mapped_id', .)) %>%
+    mutate(across(where(is.character), as.list))
+
+    }
+  )
+
+impPHY = fread('DGEresults/Limma_results_table_PHY.csv') %>% 
+  select(GeneID, name, logFC)
+
+df_f = df_f %>% 
+  bind_rows() %>%  
+  rename_with( ~ gsub('input_list.|input_list.mapped_id_list.', '', .)) %>% 
+  unnest(mapped_id) %>% 
+  mutate(across(where(is.list), as.character),
+         mapped_id = as.numeric(gsub('LOC', '', mapped_id))) %>% 
+  drop_na() %>% 
+  left_join(impPHY, by = c('mapped_id' = 'GeneID'))
+ 
+length(unique(df_f$term.label))
+
+length(unique(df_f %>% pull(mapped_id)))
+
+
+## ---------------------------------------------------------------------------------------------------------------------------------------------
+final = df2 %>% 
+  left_join(select(df_f, term.id, term.label, mapped_id, name, logFC), by = 'term.id') %>% 
+  drop_na() %>%
+  select(!c(mapped_id.x, term.label.x)) %>%
+  mutate(Diff = number_in_list - expected,
+         Number_of_Genes = number_in_list + number_in_reference,
+         NIL_Mod = ifelse(number_in_list == 0, min(expected)-0.1, number_in_list),
+         log_FE_Mod = log2(NIL_Mod/expected)) %>%
+  select(number_in_reference, number_in_list, Number_of_Genes, NIL_Mod, fold_enrichment, Diff, expected, log_FE_Mod, fdr, pValue, list_name, plus_minus, term.id, term.label.y, mapped_id.y, name, logFC) %>% 
+  distinct() %>% 
+  group_by(term.label.y) %>% 
+  # Make variable for mean log fold change of gene expression by term label
+  mutate(Term_label_logFC = mean(logFC)) %>% 
+  ungroup() %>% 
+  distinct()
+
+fwrite(final %>% rename_with(~ paste('BP_', .x, sep = '')), 'GOresults/BP_Results_Table_PHY.csv')
+
+length(unique(final$mapped_id.y))
+
+sigPHY = final %>% 
+  filter(fdr <= 0.05)
+
+
+## ----fig.height=8, fig.width=10---------------------------------------------------------------------------------------------------------------
+one = final %>%
+  # filter(term.label.y %like% 'cell wall|cellulose|polys|glucan|defense|jasm|absci|salicyl|ethylene|RNA') %>%
+  # Summarise these terms into broad categories
+  mutate(term.label.y = gsub('stimulus|pathway|cellular|with\\sbulged\\sadenosine\\sas\\snucleophile|to\\s', '', term.label.y),
+         term.label.mod = as.factor(gsub('defense', 'DEF',
+                                         gsub('jasmonic acid', 'JA',
+                                              gsub('abscisic acid', 'ABA',
+                                                   gsub('salicylic acid', 'SA',
+                                                        gsub('ethylene', 'ETH',
+                                                             gsub('cell wall', 'CW', 
+                                                                  gsub('polysaccharide', 'PS',
+                                                                       gsub('metabolic', 'MET',
+                                                                            gsub('biosynthetic', 'BIOS', term.label.y)))))))))))
+
+# Merge DGE results with GO results
+plot_dat = one %>% 
+  select(term.label.y, term.label.mod,  log_FE_Mod, fdr, `Number_of_Genes`, name, logFC, Term_label_logFC) %>% 
+  distinct() %>%
+  drop_na() 
+  
+
+# Make new table for combining DEG results with GO results and writing out
+impPHY_BP_out = plot_dat %>% 
+  mutate(Trait = 'PHY')
+
+labs_normal = plot_dat %>% 
+  # Make labels for terms containing these strings and fdr less than or equal to 0.05
+  filter(term.label.y %like% 'RNA|cell wall|polysaccharide|cellulose|glucan|defense|jasmonic acid|abscisic acid|salicylic acid|ethylene' &
+           fdr <= 0.05) %>% 
+  select( term.label.y, term.label.mod, fdr,  log_FE_Mod, Term_label_logFC, `Number_of_Genes`) %>% 
+  distinct()
+
+# Labels for top 5 terms by fdr
+top = plot_dat %>% 
+  select(term.label.y, term.label.mod, fdr,  log_FE_Mod, Term_label_logFC, `Number_of_Genes`) %>% 
+  distinct() %>% 
+  slice_min(fdr, n = 5, with_ties = F) %>% 
+  rbind(labs_normal) %>% 
+  distinct()
+
+
+
+## ----fig.height=6, fig.width=9, warning=FALSE, message=FALSE----------------------------------------------------------------------------------
+
+PHY = ggplot(plot_dat, aes(x = Term_label_logFC, y = log10(fdr)*-1, color = log_FE_Mod))+
+  geom_point(aes(size = `Number_of_Genes`, color = log_FE_Mod))+
+  geom_point(aes(size = `Number_of_Genes`), shape = 1, stroke = 0.25, color = 'black')+
+  ggrepel::geom_label_repel(data = top, aes(label = term.label.mod),
+                            size = 4,
+                            color = 'black', 
+                            box.padding = 0.4,
+                            label.padding = 0.1,
+                            max.overlaps = Inf)+
+  labs(title = 'Biological Process Fisher\'s Exact Test PHY',
+       x = 'Mean log2 Expression Fold Change',
+       color = 'Mean log2 GO\nFold Enrichment',
+       size = 'Number of Genes')+
+  theme_grey(base_size = 16)+
+  theme(plot.title = element_text(hjust = 0.5))+
+  geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  geom_text(aes(min(Term_label_logFC), log10(0.05)*-1),
+            label = 'FDR 0.05',
+            vjust = 1.5,
+            hjust = 0.5, 
+            color = 'black',
+            size = 3)+
+  geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  lims(x = c(sqrt(max(plot_dat$Term_label_logFC^2))*-1, sqrt(max(plot_dat$Term_label_logFC^2))),
+       y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')+
+  scale_size_continuous(breaks = c(5, 20, 50, 200, 600),
+                        limits = c(0, 600))
+
+save_plot('GOresults/BP_testing_PHY.png', width = 30, height = 20, dpi = 300)
+
+
+## ---------------------------------------------------------------------------------------------------------------------------------------------
+test = fromJSON(txt = 'C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/NEM_BP.json', flatten = T)
+
+df = as.data.frame(test$overrepresentation$group)
+
+df = lapply(df[[1]], function(x){
+  
+  y = as.data.frame(x)
+  
+  y = y %>% 
+    rename_with( ~ gsub('input_list.mapped_id_list.mapped_id', 'input_list.mapped_id', .)) %>% 
+    mutate(across(where(is.character), as.list))
+  
+    }
+  )
+
+df2 = bind_rows(df) %>% 
+  rename_with( ~ gsub('input_list.', '', .)) %>% 
+  unnest(mapped_id) %>% 
+  mutate(across(where(is.list), as.character))
+
+# Number of significant terms
+df2 %>% filter(fdr <= 0.05) %>% 
+  distinct(term.label) %>%
+  pull(term.label) %>% 
+  length()
+
+length(unique(df2$mapped_id))
+
+
+
+## ---------------------------------------------------------------------------------------------------------------------------------------------
+test_f1 = fromJSON(txt = 'C:/Users/hsaxe/OneDrive/Documents/ALAB/GitHub/SCRI_ROOT_2/GOresults/raw/NEM_BP_anno.json', flatten = T)
+
+df_f = test_f1$overrepresentation$group
+
+
+df_f = lapply(df_f[[1]], function(x){
+
+  y = as.data.frame(x)
+
+  y = y %>%
+    rename_with( ~ gsub('input_list.mapped_id_list.mapped_id', 'input_list.mapped_id', .)) %>%
+    mutate(across(where(is.character), as.list))
+
+    }
+  )
+
+impNEM = fread('DGEresults/Limma_results_table_NEM.csv') %>% 
+  select(GeneID, name, logFC)
+
+df_f = df_f %>% 
+  bind_rows() %>%  
+  rename_with( ~ gsub('input_list.|input_list.mapped_id_list.', '', .)) %>% 
+  unnest(mapped_id) %>% 
+  mutate(across(where(is.list), as.character),
+         mapped_id = as.numeric(gsub('LOC', '', mapped_id))) %>% 
+  drop_na() %>% 
+  left_join(impNEM, by = c('mapped_id' = 'GeneID'))
+ 
+length(unique(df_f$term.label))
+
+length(unique(df_f %>% pull(mapped_id)))
+
+
+## ---------------------------------------------------------------------------------------------------------------------------------------------
+final = df2 %>% 
+  left_join(select(df_f, term.id, term.label, mapped_id, name, logFC), by = 'term.id') %>% 
+  drop_na() %>%
+  select(!c(mapped_id.x, term.label.x)) %>%
+  mutate(Diff = number_in_list - expected,
+         Number_of_Genes = number_in_list + number_in_reference,
+         NIL_Mod = ifelse(number_in_list == 0, min(expected)-0.1, number_in_list),
+         log_FE_Mod = log2(NIL_Mod/expected)) %>%
+  select(number_in_reference, number_in_list, Number_of_Genes, NIL_Mod, fold_enrichment, Diff, expected, log_FE_Mod, fdr, pValue, list_name, plus_minus, term.id, term.label.y, mapped_id.y, name, logFC) %>% 
+  distinct() %>% 
+  group_by(term.label.y) %>% 
+  # Make variable for mean log fold change of gene expression by term label
+  mutate(Term_label_logFC = mean(logFC)) %>% 
+  ungroup() %>% 
+  distinct()
+
+fwrite(final %>% rename_with(~ paste('BP_', .x, sep = '')), 'GOresults/BP_Results_Table_NEM.csv')
+
+length(unique(final$mapped_id.y))
+
+sigNEM = final %>% 
+  filter(fdr <= 0.05)
+
+
+## ----fig.height=8, fig.width=10---------------------------------------------------------------------------------------------------------------
+one = final %>%
+  # filter(term.label.y %like% 'cell wall|cellulose|polys|glucan|defense|jasm|absci|salicyl|ethylene|RNA') %>%
+  # Summarise these terms into broad categories
+  mutate(term.label.y = gsub('stimulus|pathway|cellular|with\\sbulged\\sadenosine\\sas\\snucleophile|to\\s', '', term.label.y),
+         term.label.mod = as.factor(gsub('defense', 'DEF',
+                                         gsub('jasmonic acid', 'JA',
+                                              gsub('abscisic acid', 'ABA',
+                                                   gsub('salicylic acid', 'SA',
+                                                        gsub('ethylene', 'ETH',
+                                                             gsub('cell wall', 'CW', 
+                                                                  gsub('polysaccharide', 'PS',
+                                                                       gsub('metabolic', 'MET',
+                                                                            gsub('biosynthetic', 'BIOS', term.label.y)))))))))))
+
+# Merge DGE results with GO results
+plot_dat = one %>% 
+  select(term.label.y, term.label.mod,  log_FE_Mod, fdr, `Number_of_Genes`, name, logFC, Term_label_logFC) %>% 
+  distinct() %>%
+  drop_na() 
+  
+
+# Make new table for combining DEG results with GO results and writing out
+impNEM_BP_out = plot_dat %>% 
+  mutate(Trait = 'NEM')
+
+labs_normal = plot_dat %>% 
+  # Make labels for terms containing these strings and fdr less than or equal to 0.05
+  filter(term.label.y %like% 'RNA|cell wall|polysaccharide|cellulose|glucan|defense|jasmonic acid|abscisic acid|salicylic acid|ethylene' &
+           fdr <= 0.05) %>% 
+  select( term.label.y, term.label.mod, fdr,  log_FE_Mod, Term_label_logFC, `Number_of_Genes`) %>% 
+  distinct()
+
+# Labels for top 5 terms by fdr
+top = plot_dat %>% 
+  select(term.label.y, term.label.mod, fdr,  log_FE_Mod, Term_label_logFC, `Number_of_Genes`) %>% 
+  distinct() %>% 
+  slice_min(fdr, n = 5, with_ties = F) %>% 
+  rbind(labs_normal) %>% 
+  distinct()
+
+
+
+## ----fig.height=6, fig.width=9, warning=FALSE, message=FALSE----------------------------------------------------------------------------------
+
+NEM = ggplot(plot_dat, aes(x = Term_label_logFC, y = log10(fdr)*-1, color = log_FE_Mod))+
+  geom_point(aes(size = `Number_of_Genes`, color = log_FE_Mod))+
+  geom_point(aes(size = `Number_of_Genes`), shape = 1, stroke = 0.25, color = 'black')+
+  ggrepel::geom_label_repel(data = top, aes(label = term.label.mod),
+                            size = 4,
+                            color = 'black', 
+                            box.padding = 0.4,
+                            label.padding = 0.1,
+                            max.overlaps = Inf)+
+  labs(title = 'Biological Process Fisher\'s Exact Test NEM',
+       x = 'Mean log2 Expression Fold Change',
+       color = 'Mean log2 GO\nFold Enrichment',
+       size = 'Number of Genes')+
+  theme_grey(base_size = 16)+
+  theme(plot.title = element_text(hjust = 0.5))+
+  geom_hline(yintercept = log10(0.05)*-1, linetype = 'dashed', color = 'red')+
+  geom_text(aes(min(Term_label_logFC), log10(0.05)*-1),
+            label = 'FDR 0.05',
+            vjust = 1.5,
+            hjust = 0.5, 
+            color = 'black',
+            size = 3)+
+  geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'black')+
+  lims(x = c(sqrt(max(plot_dat$Term_label_logFC^2))*-1, sqrt(max(plot_dat$Term_label_logFC^2))),
+       y = c(-1, max(log10(plot_dat$fdr)*-1)))+
+  scale_color_gradient2(low = 'blue', high = 'red')+
+  scale_size_continuous(breaks = c(5, 20, 50, 200, 600),
+                        limits = c(0, 600))
+
+save_plot('GOresults/BP_testing_NEM.png', width = 30, height = 20, dpi = 300)
+

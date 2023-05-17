@@ -1,0 +1,75 @@
+---
+title: "Make Citations"
+author: "Houston Saxe"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load neccessary libraries
+```{r echo=TRUE}
+pacman::p_load(base,
+               stringr,
+               dplyr,
+               tidyr)
+```
+
+# Get Packages used
+```{r}
+knitr::purl('Jm3101_v1.0_and_Walnut_2.0_ref.rmd')
+
+knitr::purl('GO_results_SCRI_ROOT_RNAseq.Rmd')
+
+knitr::purl('EBH_Plotting_Jm3101_v1.0_and_Walnut_2.0_ref.rmd')
+
+knitr::purl('Subcellular_Localization_Analysis.Rmd')
+
+knitr::purl('Make_GO_and_Subcell_Results_Workbook.Rmd')
+
+knitr::purl('Make Citations.Rmd')
+
+packages_and_functions = NCmisc::list.functions.in.file('Jm3101_v1.0_and_Walnut_2.0_ref.R')
+
+files_to_cite =  list.files(pattern = '.R$')
+
+packages_and_functions = lapply(files_to_cite, FUN = NCmisc::list.functions.in.file)
+
+packages = lapply(packages_and_functions, FUN = names)
+
+```
+
+#### Make character vector of packages
+```{r}
+packages2 = sapply(packages, function(x){
+  x %>% 
+  gsub('c\\(|package:|\\\\|\\)', '', .) %>% 
+  gsub('"', '', .) %>% 
+  paste(collapse = ', ') %>% 
+  str_split(., ', ') %>% 
+  unlist() %>% 
+  unique()
+  
+})
+
+packages2 = as.character(packages2)%>% 
+  gsub('c\\(|package:|\\\\|\\)', '', .) %>% 
+  gsub('"', '', .) %>% 
+  paste(collapse = ', ') %>% 
+  str_split(., ', ') %>% 
+  unlist() %>% 
+  unique()
+  
+
+packages3 = packages2[!packages2 %in% c(".GlobalEnv", "character(0")] %>% 
+  c('knitr', 'rmarkdown')
+
+packages3
+```
+
+#### Make .bib file for Mendeley
+```{r}
+knitr::write_bib(packages3, file = 'SCRI_RNAs.bib')
+```
