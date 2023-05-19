@@ -765,7 +765,7 @@ cpmd2 = cpm(d2)
 ## NEM_3Y Plot PCA to look in R
 
 ```{r}
-pca3 = plot_pca(cpmd, metadata,
+pca3 = plot_pca(cpmd2, metadata,
                join_by_name = 'Sample',
                plotting_factors_in = 'col_names',
                # Using 'Group' here becuase 'Hybrid' is already in metadata. Will cause error if I used 'Hybrid'
@@ -781,6 +781,66 @@ pca3 = plot_pca(cpmd, metadata,
 
 ```{r}
 pca3$plot
+```
+
+```{r}
+pca_scatter = plot_pca(cpmd, metadata,
+               join_by_name = 'Hybrid',
+               plotting_factors_in = 'col_names',
+               # Using 'Group' here becuase 'Hybrid' is already in metadata. Will cause error if I used 'Hybrid'
+               plotting_factors_name = Hybrid, 
+               x = 'PC1',
+               y = 'PC2',
+               scale = T, 
+               center = T, 
+               color = 'Hybrid',
+               fill = 'Hybrid',
+               plot_type = 'scatter')
+  
+plot_dat = pca_scatter$plot_dat %>%
+  select(Hybrid, 
+         RLN_3Y,
+         PC1,
+         PC2,
+         PC3, 
+         PC4, 
+         PC5) %>% 
+  pivot_longer(!c(Hybrid, RLN_3Y), names_to = 'PC')
+
+ggplot(plot_dat, aes(value, RLN_3Y))+
+  geom_point()+
+  geom_smooth(method = 'lm')+
+  facet_wrap(~PC)
+```
+
+PC5 looks correlated with NEM_3Y
+
+```{r}
+cor.test(pca_scatter$plot_dat$PC2, pca_scatter$plot_dat$RLN_3Y)
+# not actually correlated
+```
+
+```{r}
+plot_dat = pca_scatter$plot_dat %>%
+  select(Hybrid, 
+         length_3Y,
+         PC1,
+         PC2,
+         PC3, 
+         PC4, 
+         PC5) %>% 
+  pivot_longer(!c(Hybrid, length_3Y), names_to = 'PC')
+
+ggplot(plot_dat, aes(value, length_3Y))+
+  geom_point()+
+  geom_smooth(method = 'lm')+
+  facet_wrap(~PC)
+```
+
+## PC2 looks correlated with length_3Y
+
+```{r}
+cor.test(pca_scatter$plot_dat$PC2, pca_scatter$plot_dat$length_3Y)
 ```
 
 ```{r}
