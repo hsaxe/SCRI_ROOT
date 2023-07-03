@@ -245,7 +245,7 @@ A
 # Length_3Y Read in results
 ```{r}
 impLength_3Y = fread('DGEresults/Limma_results_table_Length_3Y.csv') %>% 
-  mutate(Gene_type = ifelse(logFC > 0, 'Susceptiblity', 'Resistance'),
+  mutate(Gene_type = ifelse(logFC > 0, 'Long', 'Short'),
          Parent_haplotype = factor(Parent_haplotype, levels = c('J.regia', 'J.microcarpa')))
 
 length(unique(impLength_3Y$GeneID))
@@ -318,11 +318,11 @@ D = ggplot(all)+
   theme_grey(base_size = 14)+
     theme(legend.position = 'none',
           strip.text = element_text(face = 'italic'))+
-  facet_wrap(~Pathogen+Stats)
+  facet_wrap(~Pathogen+Stats, scales = 'free')
 
 D
 
-sjPlot::save_plot('Final_Figs_and_Draft_Manuscript_SCRI_ROOT/CG_PHY_NEM_EBH_3.png', 
+sjPlot::save_plot('Final_Figs_and_Draft_Manuscript_SCRI_ROOT/Fig. 3.png', 
                   D,
                   height = 20, 
                   width = 18)

@@ -100,7 +100,7 @@ length(unique(impCG_BP$logFC))
 length(duplicated(impCG_BP$logFC))
 ```
 
-## Maked list for KS test results
+## Make list for KS test results
 
 ```{r}
 print_res = list()
@@ -121,7 +121,8 @@ ks_res_CG = impCG_BP %>%
          Avg_logFC = mean(logFC),
          Number_of_genes = n()) %>% 
   ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+  mutate(fdr = p.adjust(p.val, method = 'fdr')) %>% 
+  filter(term.level <= 2)
 
 ks_res_less_CG = ks_res_CG %>% 
   select(!c(GeneID, 
@@ -240,6 +241,12 @@ save_plot('Biological_Process_KS_results/BP_Enrich_testing_CG.png',
           width = 25, 
           height = 30, 
           dpi = 300)
+
+save_plot('Final_Figs_and_Draft_Manuscript_SCRI_ROOT/Fig. 4.png', 
+          CG,
+          width = 25, 
+          height = 30, 
+          dpi = 300)
 ```
 
 # PHY Get logFCs from limma results for J.regia and J.microcarpa and merge with GO results
@@ -310,12 +317,6 @@ length(unique(impPHY_BP$logFC))
 length(duplicated(impPHY_BP$logFC))
 ```
 
-## Maked list for KS test results
-
-```{r}
-print_res = list()
-```
-
 # Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular biological process are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
 
 ## PHY BP KS test
@@ -331,7 +332,8 @@ ks_res_PHY = impPHY_BP %>%
          Avg_logFC = mean(logFC),
          Number_of_genes = n()) %>% 
   ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+  mutate(fdr = p.adjust(p.val, method = 'fdr')) %>% 
+  filter(term.level <= 2)
 
 ks_res_less_PHY = ks_res_PHY %>% 
   select(!c(GeneID, 
@@ -450,6 +452,12 @@ save_plot('Biological_Process_KS_results/BP_Enrich_testing_PHY.png',
           width = 25, 
           height = 30, 
           dpi = 300)
+
+save_plot('Final_Figs_and_Draft_Manuscript_SCRI_ROOT/Fig. 5.png', 
+          PHY,
+          width = 25, 
+          height = 30, 
+          dpi = 300)
 ```
 
 # NEM_3Y Get logFCs from limma results for J.regia and J.microcarpa and merge with GO results
@@ -520,12 +528,6 @@ length(unique(impNEM_3Y_BP$logFC))
 length(duplicated(impNEM_3Y_BP$logFC))
 ```
 
-## Maked list for KS test results
-
-```{r}
-print_res = list()
-```
-
 # Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular biological process are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
 
 ## NEM_3Y BP KS test
@@ -541,7 +543,8 @@ ks_res_NEM_3Y = impNEM_3Y_BP %>%
          Avg_logFC = mean(logFC),
          Number_of_genes = n()) %>% 
   ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+  mutate(fdr = p.adjust(p.val, method = 'fdr')) %>% 
+  filter(term.level <= 2)
 
 ks_res_less_NEM_3Y = ks_res_NEM_3Y %>% 
   select(!c(GeneID, 
@@ -660,6 +663,7 @@ save_plot('Biological_Process_KS_results/BP_Enrich_testing_NEM_3Y.png',
           width = 25, 
           height = 30, 
           dpi = 300)
+
 ```
 
 # Length_3Y Get logFCs from limma results for J.regia and J.microcarpa and merge with GO results
@@ -730,12 +734,6 @@ length(unique(impLength_3Y_BP$logFC))
 length(duplicated(impLength_3Y_BP$logFC))
 ```
 
-## Maked list for KS test results
-
-```{r}
-print_res = list()
-```
-
 # Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular biological process are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
 
 ## Length_3Y BP KS test
@@ -751,7 +749,8 @@ ks_res_Length_3Y = impLength_3Y_BP %>%
          Avg_logFC = mean(logFC),
          Number_of_genes = n()) %>% 
   ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
+  mutate(fdr = p.adjust(p.val, method = 'fdr')) %>% 
+  filter(term.level <= 2)
 
 ks_res_less_Length_3Y = ks_res_Length_3Y %>% 
   select(!c(GeneID, 
@@ -870,6 +869,15 @@ save_plot('Biological_Process_KS_results/BP_Enrich_testing_Length_3Y.png',
           width = 25, 
           height = 30, 
           dpi = 300)
+
+save_plot('Final_Figs_and_Draft_Manuscript_SCRI_ROOT/Fig. 6.png', 
+          Length_3Y,
+          width = 25, 
+          height = 30, 
+          dpi = 300)
+```
+```{r}
+print_res
 ```
 
 # Write out full results for supplementary data
@@ -880,5 +888,11 @@ total_results = impCG_BP_Enrichment_out %>%
   rbind(impNEM_3Y_BP_Enrichment_out) %>% 
   rbind(impLength_3Y_BP_Enrichment_out)
 
-fwrite(total_results, 'Biological_Process_KS_results/Full_supplementary_results_KS_BP.csv')
+wb = createWorkbook()
+
+addWorksheet(wb, "BP Enrichment")
+
+writeData(wb, 1, x = total_results, withFilter = TRUE)
+
+saveWorkbook(wb, 'Final_Figs_and_Draft_Manuscript_SCRI_ROOT/File S1.xlsx')
 ```

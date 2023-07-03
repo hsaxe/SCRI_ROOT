@@ -1,0 +1,193 @@
+---
+title: "Make_GO_and_Subcell_KS_results_Workbook"
+author: "Houston Saxe"
+date: "8/15/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load neccessary libraries
+
+```{r echo=TRUE}
+pacman::p_load(rlang, 
+               data.table, 
+               ggplot2,
+               ggfortify, 
+               stringr, 
+               dplyr, 
+               statmod, 
+               tibble,
+               ggpubr, 
+               sjPlot, 
+               tidyr,
+               tidytext, 
+               OmicsAnalyst,
+               tidytable, 
+               gridExtra,
+               openxlsx)
+```
+
+# Read in results
+```{r}
+subcell_CG = fread('Subcell_KS_results/Subcell_KS_results_Table_CG.csv')
+
+BP_CG = fread('Biological_Process_KS_results/BP_Results_Table_CG.csv')
+
+
+subcell_PHY = fread('Subcell_KS_results/Subcell_KS_results_Table_PHY.csv')
+
+BP_PHY = fread('Biological_Process_KS_results/BP_Results_Table_PHY.csv')
+
+
+subcell_NEM = fread('Subcell_KS_results/Subcell_KS_results_Table_NEM.csv')
+
+BP_NEM = fread('Biological_Process_KS_results/BP_Results_Table_NEM.csv')
+```
+
+
+# CG make results worksheet
+```{r}
+full_results = subcell_CG %>% 
+  left_join(BP_CG, by = c('Subcell_GeneID' = 'BP_mapped_id.y'))
+
+wb = createWorkbook()
+
+addWorksheet(wb, sheetName = 'Crown Gall', gridLines = F)
+
+writeDataTable(wb, sheet = 1, x = full_results)
+```
+
+# CG make results worksheet
+```{r}
+quick_results = subcell_CG %>% 
+  select(Subcell_Subcell_loc, Subcell_FDR, Subcell_fold_enrichment, Subcell_GeneID, Subcell_name, Subcell_logFC, Subcell_Term_logFC) %>% 
+  left_join(BP_CG %>% select(BP_log_FE_Mod, BP_fdr, BP_term.label.y, BP_mapped_id.y, BP_Term_label_logFC), 
+            by = c('Subcell_GeneID' = 'BP_mapped_id.y')) %>% 
+  rename(Gene_name = Subcell_name, logFC = Subcell_logFC, Biological_process = BP_term.label.y)
+
+wb2 = createWorkbook()
+
+addWorksheet(wb2, sheetName = 'Crown Gall', gridLines = F)
+
+writeDataTable(wb2, sheet = 1, x = quick_results)
+```
+
+# PHY make results worksheet
+```{r}
+full_results = subcell_PHY %>% 
+  left_join(BP_PHY, by = c('Subcell_GeneID' = 'BP_mapped_id.y'))
+
+addWorksheet(wb, sheetName = 'Phytophthora', gridLines = F)
+
+writeDataTable(wb, sheet = 2, x = full_results)
+```
+
+# PHY make results worksheet
+```{r}
+quick_results = subcell_PHY %>% 
+  select(Subcell_Subcell_loc, Subcell_FDR, Subcell_fold_enrichment, Subcell_GeneID, Subcell_name, Subcell_logFC, Subcell_Term_logFC) %>% 
+  left_join(BP_PHY %>% select(BP_log_FE_Mod, BP_fdr, BP_term.label.y, BP_mapped_id.y, BP_Term_label_logFC), 
+            by = c('Subcell_GeneID' = 'BP_mapped_id.y')) %>% 
+  rename(Gene_name = Subcell_name, logFC = Subcell_logFC, Biological_process = BP_term.label.y)
+
+addWorksheet(wb2, sheetName = 'Phytophthora', gridLines = F)
+
+writeDataTable(wb2, sheet = 2, x = quick_results)
+```
+
+# NEM make results worksheet
+```{r}
+full_results = subcell_NEM %>% 
+  left_join(BP_NEM, by = c('Subcell_GeneID' = 'BP_mapped_id.y'))
+
+addWorksheet(wb, sheetName = 'Nematodes', gridLines = F)
+
+writeDataTable(wb, sheet = 3, x = full_results)
+```
+
+# NEM make results worksheet
+```{r}
+quick_results = subcell_NEM %>% 
+  select(Subcell_Subcell_loc, Subcell_FDR, Subcell_fold_enrichment, Subcell_GeneID, Subcell_name, Subcell_logFC, Subcell_Term_logFC) %>% 
+  left_join(BP_NEM %>% select(BP_log_FE_Mod, BP_fdr, BP_term.label.y, BP_mapped_id.y, BP_Term_label_logFC), 
+            by = c('Subcell_GeneID' = 'BP_mapped_id.y')) %>% 
+  rename(Gene_name = Subcell_name, logFC = Subcell_logFC, Biological_process = BP_term.label.y)
+
+
+addWorksheet(wb2, sheetName = 'Nematodes', gridLines = F)
+
+writeDataTable(wb2, sheet = 3, x = quick_results)
+```
+
+# Write workbook of results
+```{r}
+saveWorkbook(wb, 'Final_Figs_and_Draft_Manuscript_SCRI_ROOT/File_S1_GO_BP_Subcell_full_results.xlsx', overwrite = T)
+
+saveWorkbook(wb2, 'Final_Figs_and_Draft_Manuscript_SCRI_ROOT/File_S1_GO_BP_Subcell_quick_results.xlsx', overwrite = T)
+```
+
+
+# Make DEG results workbook
+# Read in resulst
+```{r}
+CG = fread('DGEresults/Limma_results_table_CG.csv') %>% 
+  mutate(Analysis = 'CG')
+
+PHY = fread('DGEresults/Limma_results_table_PHY.csv')%>% 
+  mutate(Analysis = 'PHY')
+
+NEM = fread('DGEresults/Limma_results_table_NEM_3Y.csv')%>% 
+  mutate(Analysis = 'NEM')
+
+Height = fread('DGEresults/Limma_results_table_Length_3Y.csv')%>% 
+  mutate(Analysis = 'Height')
+```
+
+```{r}
+# in_common2 = CG %>% 
+#   left_join(PHY, by = 'GeneID') %>% 
+#   left_join(NEM, by = 'GeneID') %>% 
+#   select(matches('GeneID|chromosome|Jr|name|Subcell|P.val|logFC')) %>% 
+#   filter(name.x %like% 'cellulose synthase' & 
+#            name.y %like% 'cellulose synthase' &
+#            name %like% 'cellulose synthase')
+
+in_common2 = CG %>% 
+  rbind(PHY) %>% 
+  rbind(NEM) %>% 
+  select(matches('GeneID|chromosome|Jr|name|start|end|Subcell|P.val|logFC|Analysis')) %>% 
+  filter(name %like% 'cellulose synthase')
+
+fwrite(in_common2, 'CESA_Genes_for_Paulo.csv')
+
+```
+
+
+
+```{r}
+wb = createWorkbook()
+
+addWorksheet(wb, sheetName = 'Crown Gall DEGs', gridLines = F)
+
+writeDataTable(wb, sheet = 1, x = CG, withFilter = T)
+
+addWorksheet(wb, sheetName = 'Phytophtora DEGs', gridLines = F)
+
+writeDataTable(wb, sheet = 2, x = PHY, withFilter = T)
+
+addWorksheet(wb, sheetName = 'Nematode DEGs', gridLines = F)
+
+writeDataTable(wb, sheet = 3, x = NEM, withFilter = T)
+
+addWorksheet(wb, sheetName = 'Height DEGs', gridLines = F)
+
+writeDataTable(wb, sheet = 4, x = Height, withFilter = T)
+
+saveWorkbook(wb, 'Final_Figs_and_Draft_Manuscript_SCRI_ROOT/File S3.xlsx', 
+             overwrite = T)
+```
+
+

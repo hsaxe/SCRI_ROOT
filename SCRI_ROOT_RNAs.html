@@ -1679,7 +1679,7 @@ Up           18621       189</code></pre>
 <section id="nem_3y-plot-pca-to-look-in-r" class="level2">
 <h2 class="anchored" data-anchor-id="nem_3y-plot-pca-to-look-in-r">NEM_3Y Plot PCA to look in R</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a>pca3 <span class="ot">=</span> <span class="fu">plot_pca</span>(cpmd, metadata,</span>
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a>pca3 <span class="ot">=</span> <span class="fu">plot_pca</span>(cpmd2, metadata,</span>
 <span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">join_by_name =</span> <span class="st">'Sample'</span>,</span>
 <span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
 <span id="cb118-4"><a href="#cb118-4" aria-hidden="true" tabindex="-1"></a>               <span class="co"># Using 'Group' here becuase 'Hybrid' is already in metadata. Will cause error if I used 'Hybrid'</span></span>
@@ -1702,27 +1702,135 @@ Up           18621       189</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>c3 <span class="ot">=</span> <span class="fu">plot_pca</span>(cpmd2, metadata,</span>
-<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>             <span class="co"># Having to use 'Hybrid' here to get it into the plotting data because the function drops everything but the join_by_name when summarizing for scatter</span></span>
-<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">join_by_name =</span> <span class="st">'Hybrid'</span>,</span>
-<span id="cb121-4"><a href="#cb121-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
-<span id="cb121-5"><a href="#cb121-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">plotting_factors_name =</span> Hybrid, </span>
-<span id="cb121-6"><a href="#cb121-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">x =</span> <span class="st">'PC7'</span>,</span>
-<span id="cb121-7"><a href="#cb121-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="st">'RLN_3Y'</span>,</span>
-<span id="cb121-8"><a href="#cb121-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">scale =</span> T, </span>
-<span id="cb121-9"><a href="#cb121-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">center =</span> T, </span>
-<span id="cb121-10"><a href="#cb121-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">'Hybrid'</span>,</span>
-<span id="cb121-11"><a href="#cb121-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">plot_type =</span> <span class="st">'scatter'</span>,</span>
-<span id="cb121-12"><a href="#cb121-12" aria-hidden="true" tabindex="-1"></a>             <span class="at">summarise_for_scatter =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>pca_scatter <span class="ot">=</span> <span class="fu">plot_pca</span>(cpmd, metadata,</span>
+<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">join_by_name =</span> <span class="st">'Hybrid'</span>,</span>
+<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
+<span id="cb121-4"><a href="#cb121-4" aria-hidden="true" tabindex="-1"></a>               <span class="co"># Using 'Group' here becuase 'Hybrid' is already in metadata. Will cause error if I used 'Hybrid'</span></span>
+<span id="cb121-5"><a href="#cb121-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_name =</span> Hybrid, </span>
+<span id="cb121-6"><a href="#cb121-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">x =</span> <span class="st">'PC1'</span>,</span>
+<span id="cb121-7"><a href="#cb121-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="st">'PC2'</span>,</span>
+<span id="cb121-8"><a href="#cb121-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">scale =</span> T, </span>
+<span id="cb121-9"><a href="#cb121-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">center =</span> T, </span>
+<span id="cb121-10"><a href="#cb121-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">'Hybrid'</span>,</span>
+<span id="cb121-11"><a href="#cb121-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">fill =</span> <span class="st">'Hybrid'</span>,</span>
+<span id="cb121-12"><a href="#cb121-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">plot_type =</span> <span class="st">'scatter'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Make sure no numeric identifiers are in data as this will drastically impact PCA</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb123"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a>c3<span class="sc">$</span>plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb123"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a>plot_dat <span class="ot">=</span> pca_scatter<span class="sc">$</span>plot_dat <span class="sc">%&gt;%</span></span>
+<span id="cb123-2"><a href="#cb123-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Hybrid, </span>
+<span id="cb123-3"><a href="#cb123-3" aria-hidden="true" tabindex="-1"></a>         RLN_3Y,</span>
+<span id="cb123-4"><a href="#cb123-4" aria-hidden="true" tabindex="-1"></a>         PC1,</span>
+<span id="cb123-5"><a href="#cb123-5" aria-hidden="true" tabindex="-1"></a>         PC2,</span>
+<span id="cb123-6"><a href="#cb123-6" aria-hidden="true" tabindex="-1"></a>         PC3, </span>
+<span id="cb123-7"><a href="#cb123-7" aria-hidden="true" tabindex="-1"></a>         PC4, </span>
+<span id="cb123-8"><a href="#cb123-8" aria-hidden="true" tabindex="-1"></a>         PC5) <span class="sc">%&gt;%</span> </span>
+<span id="cb123-9"><a href="#cb123-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">!</span><span class="fu">c</span>(Hybrid, RLN_3Y), <span class="at">names_to =</span> <span class="st">'PC'</span>)</span>
+<span id="cb123-10"><a href="#cb123-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb123-11"><a href="#cb123-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_dat, <span class="fu">aes</span>(value, RLN_3Y))<span class="sc">+</span></span>
+<span id="cb123-12"><a href="#cb123-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb123-13"><a href="#cb123-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">'lm'</span>)<span class="sc">+</span></span>
+<span id="cb123-14"><a href="#cb123-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>PC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 10 rows containing non-finite values (`stat_smooth()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 10 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>PC5 looks correlated with NEM_3Y</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb127"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(pca_scatter<span class="sc">$</span>plot_dat<span class="sc">$</span>PC2, pca_scatter<span class="sc">$</span>plot_dat<span class="sc">$</span>RLN_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's product-moment correlation
+
+data:  pca_scatter$plot_dat$PC2 and pca_scatter$plot_dat$RLN_3Y
+t = -1.2139, df = 3, p-value = 0.3116
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ -0.9666998  0.6246129
+sample estimates:
+       cor 
+-0.5739344 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb129"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true" tabindex="-1"></a><span class="co"># not actually correlated</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>plot_dat <span class="ot">=</span> pca_scatter<span class="sc">$</span>plot_dat <span class="sc">%&gt;%</span></span>
+<span id="cb130-2"><a href="#cb130-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Hybrid, </span>
+<span id="cb130-3"><a href="#cb130-3" aria-hidden="true" tabindex="-1"></a>         length_3Y,</span>
+<span id="cb130-4"><a href="#cb130-4" aria-hidden="true" tabindex="-1"></a>         PC1,</span>
+<span id="cb130-5"><a href="#cb130-5" aria-hidden="true" tabindex="-1"></a>         PC2,</span>
+<span id="cb130-6"><a href="#cb130-6" aria-hidden="true" tabindex="-1"></a>         PC3, </span>
+<span id="cb130-7"><a href="#cb130-7" aria-hidden="true" tabindex="-1"></a>         PC4, </span>
+<span id="cb130-8"><a href="#cb130-8" aria-hidden="true" tabindex="-1"></a>         PC5) <span class="sc">%&gt;%</span> </span>
+<span id="cb130-9"><a href="#cb130-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">!</span><span class="fu">c</span>(Hybrid, length_3Y), <span class="at">names_to =</span> <span class="st">'PC'</span>)</span>
+<span id="cb130-10"><a href="#cb130-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb130-11"><a href="#cb130-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_dat, <span class="fu">aes</span>(value, length_3Y))<span class="sc">+</span></span>
+<span id="cb130-12"><a href="#cb130-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb130-13"><a href="#cb130-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">'lm'</span>)<span class="sc">+</span></span>
+<span id="cb130-14"><a href="#cb130-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>PC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 10 rows containing non-finite values (`stat_smooth()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 10 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="pc2-looks-correlated-with-length_3y" class="level2">
+<h2 class="anchored" data-anchor-id="pc2-looks-correlated-with-length_3y">PC2 looks correlated with length_3Y</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb134"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(pca_scatter<span class="sc">$</span>plot_dat<span class="sc">$</span>PC2, pca_scatter<span class="sc">$</span>plot_dat<span class="sc">$</span>length_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's product-moment correlation
+
+data:  pca_scatter$plot_dat$PC2 and pca_scatter$plot_dat$length_3Y
+t = -3.6199, df = 3, p-value = 0.03625
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ -0.99357916 -0.09695561
+sample estimates:
+       cor 
+-0.9020593 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a>c3 <span class="ot">=</span> <span class="fu">plot_pca</span>(cpmd2, metadata,</span>
+<span id="cb136-2"><a href="#cb136-2" aria-hidden="true" tabindex="-1"></a>             <span class="co"># Having to use 'Hybrid' here to get it into the plotting data because the function drops everything but the join_by_name when summarizing for scatter</span></span>
+<span id="cb136-3"><a href="#cb136-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">join_by_name =</span> <span class="st">'Hybrid'</span>,</span>
+<span id="cb136-4"><a href="#cb136-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
+<span id="cb136-5"><a href="#cb136-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">plotting_factors_name =</span> Hybrid, </span>
+<span id="cb136-6"><a href="#cb136-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">x =</span> <span class="st">'PC7'</span>,</span>
+<span id="cb136-7"><a href="#cb136-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="st">'RLN_3Y'</span>,</span>
+<span id="cb136-8"><a href="#cb136-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">scale =</span> T, </span>
+<span id="cb136-9"><a href="#cb136-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">center =</span> T, </span>
+<span id="cb136-10"><a href="#cb136-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">'Hybrid'</span>,</span>
+<span id="cb136-11"><a href="#cb136-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">plot_type =</span> <span class="st">'scatter'</span>,</span>
+<span id="cb136-12"><a href="#cb136-12" aria-hidden="true" tabindex="-1"></a>             <span class="at">summarise_for_scatter =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Make sure no numeric identifiers are in data as this will drastically impact PCA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb138"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb138-1"><a href="#cb138-1" aria-hidden="true" tabindex="-1"></a>c3<span class="sc">$</span>plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid" width="672"></p>
+<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-50-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -1730,10 +1838,10 @@ Up           18621       189</code></pre>
 <section id="nem_3y-fit-model-for-genes-associated-with-nem-score" class="level1">
 <h1>NEM_3Y Fit model for genes associated with NEM score</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb125"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a>mm_NEM_3Y <span class="ot">=</span> <span class="fu">model.matrix</span>(<span class="sc">~</span>RLN_3Y, </span>
-<span id="cb125-2"><a href="#cb125-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">data =</span> metadata_S2)</span>
-<span id="cb125-3"><a href="#cb125-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb125-4"><a href="#cb125-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mm_NEM_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb140"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb140-1"><a href="#cb140-1" aria-hidden="true" tabindex="-1"></a>mm_NEM_3Y <span class="ot">=</span> <span class="fu">model.matrix</span>(<span class="sc">~</span>RLN_3Y, </span>
+<span id="cb140-2"><a href="#cb140-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">data =</span> metadata_S2)</span>
+<span id="cb140-3"><a href="#cb140-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-4"><a href="#cb140-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mm_NEM_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          (Intercept)     RLN_3Y
 29JM-11-1           1 -0.9237004
@@ -1747,37 +1855,37 @@ Up           18621       189</code></pre>
 <section id="filtered-mean-variance-trend-nem" class="level2">
 <h2 class="anchored" data-anchor-id="filtered-mean-variance-trend-nem">Filtered mean-variance trend NEM</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb127"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a>y_NEM_3Y <span class="ot">&lt;-</span> <span class="fu">voom</span>(d2, </span>
-<span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a>                 mm_NEM_3Y,</span>
-<span id="cb127-3"><a href="#cb127-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">plot =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb142"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb142-1"><a href="#cb142-1" aria-hidden="true" tabindex="-1"></a>y_NEM_3Y <span class="ot">&lt;-</span> <span class="fu">voom</span>(d2, </span>
+<span id="cb142-2"><a href="#cb142-2" aria-hidden="true" tabindex="-1"></a>                 mm_NEM_3Y,</span>
+<span id="cb142-3"><a href="#cb142-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">plot =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid" width="672"></p>
+<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-52-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="fitting-linear-models-in-limma-with-random-effects-nem_3y" class="level2">
 <h2 class="anchored" data-anchor-id="fitting-linear-models-in-limma-with-random-effects-nem_3y">Fitting linear models in limma with random effects NEM_3Y</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Need to tell limma where the within class correlation is coming from</span></span>
-<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>dupcor_NEM_3Y <span class="ot">=</span> <span class="fu">duplicateCorrelation</span>(y_NEM_3Y,</span>
-<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a>                                      mm_NEM_3Y, </span>
-<span id="cb128-4"><a href="#cb128-4" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">block =</span> metadata_S2<span class="sc">$</span>Hybrid)</span>
-<span id="cb128-5"><a href="#cb128-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb128-6"><a href="#cb128-6" aria-hidden="true" tabindex="-1"></a><span class="do">## How correlated are the hybrid replicates on average?</span></span>
-<span id="cb128-7"><a href="#cb128-7" aria-hidden="true" tabindex="-1"></a>consensus.corr._NEM_3Y <span class="ot">=</span> dupcor_NEM_3Y<span class="sc">$</span>consensus.correlation</span>
-<span id="cb128-8"><a href="#cb128-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb128-9"><a href="#cb128-9" aria-hidden="true" tabindex="-1"></a>consensus.corr._NEM_3Y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb143"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb143-1"><a href="#cb143-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Need to tell limma where the within class correlation is coming from</span></span>
+<span id="cb143-2"><a href="#cb143-2" aria-hidden="true" tabindex="-1"></a>dupcor_NEM_3Y <span class="ot">=</span> <span class="fu">duplicateCorrelation</span>(y_NEM_3Y,</span>
+<span id="cb143-3"><a href="#cb143-3" aria-hidden="true" tabindex="-1"></a>                                      mm_NEM_3Y, </span>
+<span id="cb143-4"><a href="#cb143-4" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">block =</span> metadata_S2<span class="sc">$</span>Hybrid)</span>
+<span id="cb143-5"><a href="#cb143-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb143-6"><a href="#cb143-6" aria-hidden="true" tabindex="-1"></a><span class="do">## How correlated are the hybrid replicates on average?</span></span>
+<span id="cb143-7"><a href="#cb143-7" aria-hidden="true" tabindex="-1"></a>consensus.corr._NEM_3Y <span class="ot">=</span> dupcor_NEM_3Y<span class="sc">$</span>consensus.correlation</span>
+<span id="cb143-8"><a href="#cb143-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb143-9"><a href="#cb143-9" aria-hidden="true" tabindex="-1"></a>consensus.corr._NEM_3Y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.5873101</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmFit fits a linear model using weighted least squares for each gene:</span></span>
-<span id="cb130-2"><a href="#cb130-2" aria-hidden="true" tabindex="-1"></a>fit_NEM_3Y <span class="ot">=</span> <span class="fu">lmFit</span>(y_NEM_3Y, </span>
-<span id="cb130-3"><a href="#cb130-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">design =</span> mm_NEM_3Y, </span>
-<span id="cb130-4"><a href="#cb130-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">block =</span> metadata_S2<span class="sc">$</span>Hybrid,</span>
-<span id="cb130-5"><a href="#cb130-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">correlation =</span> consensus.corr._NEM_3Y) </span>
-<span id="cb130-6"><a href="#cb130-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb130-7"><a href="#cb130-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Ebayes</span></span>
-<span id="cb130-8"><a href="#cb130-8" aria-hidden="true" tabindex="-1"></a>BlockFit_NEM_3Y <span class="ot">=</span> <span class="fu">eBayes</span>(fit_NEM_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb145"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmFit fits a linear model using weighted least squares for each gene:</span></span>
+<span id="cb145-2"><a href="#cb145-2" aria-hidden="true" tabindex="-1"></a>fit_NEM_3Y <span class="ot">=</span> <span class="fu">lmFit</span>(y_NEM_3Y, </span>
+<span id="cb145-3"><a href="#cb145-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">design =</span> mm_NEM_3Y, </span>
+<span id="cb145-4"><a href="#cb145-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">block =</span> metadata_S2<span class="sc">$</span>Hybrid,</span>
+<span id="cb145-5"><a href="#cb145-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">correlation =</span> consensus.corr._NEM_3Y) </span>
+<span id="cb145-6"><a href="#cb145-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb145-7"><a href="#cb145-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Ebayes</span></span>
+<span id="cb145-8"><a href="#cb145-8" aria-hidden="true" tabindex="-1"></a>BlockFit_NEM_3Y <span class="ot">=</span> <span class="fu">eBayes</span>(fit_NEM_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -1786,9 +1894,9 @@ Up           18621       189</code></pre>
 <section id="result-summary" class="level2">
 <h2 class="anchored" data-anchor-id="result-summary">Result summary</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb131"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true" tabindex="-1"></a>res_summaries_NEM_3Y <span class="ot">=</span> BlockFit_NEM_3Y <span class="sc">%&gt;%</span> <span class="fu">decideTests</span>() <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span>
-<span id="cb131-2"><a href="#cb131-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb131-3"><a href="#cb131-3" aria-hidden="true" tabindex="-1"></a>res_summaries_NEM_3Y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb146"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true" tabindex="-1"></a>res_summaries_NEM_3Y <span class="ot">=</span> BlockFit_NEM_3Y <span class="sc">%&gt;%</span> <span class="fu">decideTests</span>() <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span>
+<span id="cb146-2"><a href="#cb146-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb146-3"><a href="#cb146-3" aria-hidden="true" tabindex="-1"></a>res_summaries_NEM_3Y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       (Intercept) RLN_3Y
 Down             3     13
@@ -1800,23 +1908,23 @@ Up           17413      7</code></pre>
 <section id="table-of-results-_nem_3y" class="level2">
 <h2 class="anchored" data-anchor-id="table-of-results-_nem_3y">Table of results _NEM_3Y</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb133"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a>impNEM_3Y <span class="ot">=</span> <span class="fu">topTable</span>(BlockFit_NEM_3Y,</span>
-<span id="cb133-2"><a href="#cb133-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sort.by =</span> <span class="st">"logFC"</span>,</span>
-<span id="cb133-3"><a href="#cb133-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">p.value =</span> <span class="fl">0.05</span>,</span>
-<span id="cb133-4"><a href="#cb133-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">adjust.method =</span> <span class="st">"BH"</span>,</span>
-<span id="cb133-5"><a href="#cb133-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">number =</span> <span class="cn">Inf</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb133-6"><a href="#cb133-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb133-7"><a href="#cb133-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">R =</span> <span class="fu">sqrt</span>(t<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(t<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="dv">40</span>)), <span class="at">AveExpr =</span> <span class="dv">2</span><span class="sc">^</span>AveExpr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb148"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true" tabindex="-1"></a>impNEM_3Y <span class="ot">=</span> <span class="fu">topTable</span>(BlockFit_NEM_3Y,</span>
+<span id="cb148-2"><a href="#cb148-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sort.by =</span> <span class="st">"logFC"</span>,</span>
+<span id="cb148-3"><a href="#cb148-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">p.value =</span> <span class="fl">0.05</span>,</span>
+<span id="cb148-4"><a href="#cb148-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">adjust.method =</span> <span class="st">"BH"</span>,</span>
+<span id="cb148-5"><a href="#cb148-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">number =</span> <span class="cn">Inf</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb148-6"><a href="#cb148-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb148-7"><a href="#cb148-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">R =</span> <span class="fu">sqrt</span>(t<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(t<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="dv">40</span>)), <span class="at">AveExpr =</span> <span class="dv">2</span><span class="sc">^</span>AveExpr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Removing intercept from test coefficients</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb135"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(impNEM_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb150"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb150-1"><a href="#cb150-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(impNEM_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 20  8</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb137"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="do">## adding Hybrid as a blocking variable reduced DEGs by several thousand</span></span>
-<span id="cb137-2"><a href="#cb137-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb137-3"><a href="#cb137-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(impNEM_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb152"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb152-1"><a href="#cb152-1" aria-hidden="true" tabindex="-1"></a><span class="do">## adding Hybrid as a blocking variable reduced DEGs by several thousand</span></span>
+<span id="cb152-2"><a href="#cb152-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb152-3"><a href="#cb152-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(impNEM_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     GeneID     logFC   AveExpr         t      P.Value    adj.P.Val        B
 1 109021176 -7.104981  1.377514 -7.129332 4.245672e-08 0.0002909522 4.632277
@@ -1838,10 +1946,10 @@ Up           17413      7</code></pre>
 <section id="merge-annotation-with-results-_nem_3y" class="level2">
 <h2 class="anchored" data-anchor-id="merge-annotation-with-results-_nem_3y">Merge annotation with results _NEM_3Y</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb139"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a>impNEM_3Y <span class="ot">=</span> impNEM_3Y <span class="sc">%&gt;%</span></span>
-<span id="cb139-2"><a href="#cb139-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(annotation_combined, <span class="at">by =</span> <span class="st">"GeneID"</span>)</span>
-<span id="cb139-3"><a href="#cb139-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb139-4"><a href="#cb139-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(impNEM_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb154"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb154-1"><a href="#cb154-1" aria-hidden="true" tabindex="-1"></a>impNEM_3Y <span class="ot">=</span> impNEM_3Y <span class="sc">%&gt;%</span></span>
+<span id="cb154-2"><a href="#cb154-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(annotation_combined, <span class="at">by =</span> <span class="st">"GeneID"</span>)</span>
+<span id="cb154-3"><a href="#cb154-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb154-4"><a href="#cb154-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(impNEM_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     GeneID     logFC  AveExpr         t      P.Value    adj.P.Val        B
 1 109021176 -7.104981 1.377514 -7.129332 4.245672e-08 0.0002909522 4.632277
@@ -1872,91 +1980,91 @@ Up           17413      7</code></pre>
 5             8 endomembrane system     J.microcarpa
 6          &lt;NA&gt; extracellular space          J.regia</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fwrite</span>(impNEM_3Y, <span class="st">'DGEresults/Limma_results_table_NEM_3Y.csv'</span>)</span>
-<span id="cb141-2"><a href="#cb141-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb141-3"><a href="#cb141-3" aria-hidden="true" tabindex="-1"></a>impNEM_3Y <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_NEM_3Y.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb156"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb156-1"><a href="#cb156-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fwrite</span>(impNEM_3Y, <span class="st">'DGEresults/Limma_results_table_NEM_3Y.csv'</span>)</span>
+<span id="cb156-2"><a href="#cb156-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-3"><a href="#cb156-3" aria-hidden="true" tabindex="-1"></a>impNEM_3Y <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_NEM_3Y.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="pca-of-_nem_3y-degs" class="level2">
 <h2 class="anchored" data-anchor-id="pca-of-_nem_3y-degs">PCA of _NEM_3Y DEGs</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb142"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb142-1"><a href="#cb142-1" aria-hidden="true" tabindex="-1"></a>ids <span class="ot">=</span> impNEM_3Y <span class="sc">%&gt;%</span> </span>
-<span id="cb142-2"><a href="#cb142-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
-<span id="cb142-3"><a href="#cb142-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">GeneID =</span> <span class="fu">as.character</span>(GeneID))</span>
-<span id="cb142-4"><a href="#cb142-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb142-5"><a href="#cb142-5" aria-hidden="true" tabindex="-1"></a>PCA_NEM_3Y <span class="ot">=</span> cpmd2 <span class="sc">%&gt;%</span> </span>
-<span id="cb142-6"><a href="#cb142-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb142-7"><a href="#cb142-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb142-8"><a href="#cb142-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(ids) <span class="sc">%&gt;%</span> </span>
-<span id="cb142-9"><a href="#cb142-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a>ids <span class="ot">=</span> impNEM_3Y <span class="sc">%&gt;%</span> </span>
+<span id="cb157-2"><a href="#cb157-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
+<span id="cb157-3"><a href="#cb157-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">GeneID =</span> <span class="fu">as.character</span>(GeneID))</span>
+<span id="cb157-4"><a href="#cb157-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb157-5"><a href="#cb157-5" aria-hidden="true" tabindex="-1"></a>PCA_NEM_3Y <span class="ot">=</span> cpmd2 <span class="sc">%&gt;%</span> </span>
+<span id="cb157-6"><a href="#cb157-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb157-7"><a href="#cb157-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb157-8"><a href="#cb157-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(ids) <span class="sc">%&gt;%</span> </span>
+<span id="cb157-9"><a href="#cb157-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Joining with `by = join_by(GeneID)`</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb144"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb144-1"><a href="#cb144-1" aria-hidden="true" tabindex="-1"></a>pca_plot_NEM_3Y <span class="ot">=</span> <span class="fu">plot_pca</span>(PCA_NEM_3Y, metadata,</span>
-<span id="cb144-2"><a href="#cb144-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">join_by_name =</span> <span class="st">'Sample'</span>,</span>
-<span id="cb144-3"><a href="#cb144-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
-<span id="cb144-4"><a href="#cb144-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_name =</span> Group, </span>
-<span id="cb144-5"><a href="#cb144-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">x =</span> <span class="st">'PC1'</span>,</span>
-<span id="cb144-6"><a href="#cb144-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="st">'PC2'</span>,</span>
-<span id="cb144-7"><a href="#cb144-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">scale =</span> T, </span>
-<span id="cb144-8"><a href="#cb144-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">center =</span> T, </span>
-<span id="cb144-9"><a href="#cb144-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">'RLN_3Y'</span>,</span>
-<span id="cb144-10"><a href="#cb144-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">fill =</span> <span class="st">'RLN_3Y'</span>,</span>
-<span id="cb144-11"><a href="#cb144-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">plot_type =</span> <span class="st">'2D'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb159"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true" tabindex="-1"></a>pca_plot_NEM_3Y <span class="ot">=</span> <span class="fu">plot_pca</span>(PCA_NEM_3Y, metadata,</span>
+<span id="cb159-2"><a href="#cb159-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">join_by_name =</span> <span class="st">'Sample'</span>,</span>
+<span id="cb159-3"><a href="#cb159-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
+<span id="cb159-4"><a href="#cb159-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_name =</span> Group, </span>
+<span id="cb159-5"><a href="#cb159-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">x =</span> <span class="st">'PC1'</span>,</span>
+<span id="cb159-6"><a href="#cb159-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="st">'PC2'</span>,</span>
+<span id="cb159-7"><a href="#cb159-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">scale =</span> T, </span>
+<span id="cb159-8"><a href="#cb159-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">center =</span> T, </span>
+<span id="cb159-9"><a href="#cb159-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">'RLN_3Y'</span>,</span>
+<span id="cb159-10"><a href="#cb159-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">fill =</span> <span class="st">'RLN_3Y'</span>,</span>
+<span id="cb159-11"><a href="#cb159-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">plot_type =</span> <span class="st">'2D'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Make sure no numeric identifiers are in data as this will drastically impact PCA</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb146"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true" tabindex="-1"></a>pca_plot_NEM_3Y<span class="sc">$</span>plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb161"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb161-1"><a href="#cb161-1" aria-hidden="true" tabindex="-1"></a>pca_plot_NEM_3Y<span class="sc">$</span>plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-53-1.png" class="img-fluid" width="672"></p>
+<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-57-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="read-in-_nem_3y-results" class="level2">
 <h2 class="anchored" data-anchor-id="read-in-_nem_3y-results">Read in _NEM_3Y results</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb147"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb147-1"><a href="#cb147-1" aria-hidden="true" tabindex="-1"></a>impNEM_3Y <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_NEM_3Y.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb162"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb162-1"><a href="#cb162-1" aria-hidden="true" tabindex="-1"></a>impNEM_3Y <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_NEM_3Y.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb148"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true" tabindex="-1"></a>pca3 <span class="ot">=</span> <span class="fu">plot_pca</span>(cpmd, metadata,</span>
-<span id="cb148-2"><a href="#cb148-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">join_by_name =</span> <span class="st">'Sample'</span>,</span>
-<span id="cb148-3"><a href="#cb148-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
-<span id="cb148-4"><a href="#cb148-4" aria-hidden="true" tabindex="-1"></a>               <span class="co"># Using 'Group' here becuase 'Hybrid' is already in metadata. Will cause error if I used 'Hybrid'</span></span>
-<span id="cb148-5"><a href="#cb148-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_name =</span> Group, </span>
-<span id="cb148-6"><a href="#cb148-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">x =</span> <span class="st">'PC1'</span>,</span>
-<span id="cb148-7"><a href="#cb148-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="st">'PC2'</span>,</span>
-<span id="cb148-8"><a href="#cb148-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">scale =</span> T, </span>
-<span id="cb148-9"><a href="#cb148-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">center =</span> T, </span>
-<span id="cb148-10"><a href="#cb148-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">'length_3Y'</span>,</span>
-<span id="cb148-11"><a href="#cb148-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">fill =</span> <span class="st">'length_3Y'</span>,</span>
-<span id="cb148-12"><a href="#cb148-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">plot_type =</span> <span class="st">'2D'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb163"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a>pca3 <span class="ot">=</span> <span class="fu">plot_pca</span>(cpmd, metadata,</span>
+<span id="cb163-2"><a href="#cb163-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">join_by_name =</span> <span class="st">'Sample'</span>,</span>
+<span id="cb163-3"><a href="#cb163-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
+<span id="cb163-4"><a href="#cb163-4" aria-hidden="true" tabindex="-1"></a>               <span class="co"># Using 'Group' here becuase 'Hybrid' is already in metadata. Will cause error if I used 'Hybrid'</span></span>
+<span id="cb163-5"><a href="#cb163-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_name =</span> Group, </span>
+<span id="cb163-6"><a href="#cb163-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">x =</span> <span class="st">'PC1'</span>,</span>
+<span id="cb163-7"><a href="#cb163-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="st">'PC2'</span>,</span>
+<span id="cb163-8"><a href="#cb163-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">scale =</span> T, </span>
+<span id="cb163-9"><a href="#cb163-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">center =</span> T, </span>
+<span id="cb163-10"><a href="#cb163-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">'length_3Y'</span>,</span>
+<span id="cb163-11"><a href="#cb163-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">fill =</span> <span class="st">'length_3Y'</span>,</span>
+<span id="cb163-12"><a href="#cb163-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">plot_type =</span> <span class="st">'2D'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Make sure no numeric identifiers are in data as this will drastically impact PCA</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb150"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb150-1"><a href="#cb150-1" aria-hidden="true" tabindex="-1"></a>pca3<span class="sc">$</span>plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb165"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb165-1"><a href="#cb165-1" aria-hidden="true" tabindex="-1"></a>pca3<span class="sc">$</span>plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-56-1.png" class="img-fluid" width="672"></p>
+<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-60-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb151"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true" tabindex="-1"></a>c3 <span class="ot">=</span> <span class="fu">plot_pca</span>(cpmd, metadata,</span>
-<span id="cb151-2"><a href="#cb151-2" aria-hidden="true" tabindex="-1"></a>             <span class="co"># Having to use 'Hybrid' here to get it into the plotting data because the function drops everything but the join_by_name when summarizing for scatter</span></span>
-<span id="cb151-3"><a href="#cb151-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">join_by_name =</span> <span class="st">'Hybrid'</span>,</span>
-<span id="cb151-4"><a href="#cb151-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
-<span id="cb151-5"><a href="#cb151-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">plotting_factors_name =</span> Hybrid, </span>
-<span id="cb151-6"><a href="#cb151-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">x =</span> <span class="st">'PC7'</span>,</span>
-<span id="cb151-7"><a href="#cb151-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="st">'length_3Y'</span>,</span>
-<span id="cb151-8"><a href="#cb151-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">scale =</span> T, </span>
-<span id="cb151-9"><a href="#cb151-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">center =</span> T, </span>
-<span id="cb151-10"><a href="#cb151-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">'Hybrid'</span>,</span>
-<span id="cb151-11"><a href="#cb151-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">plot_type =</span> <span class="st">'scatter'</span>,</span>
-<span id="cb151-12"><a href="#cb151-12" aria-hidden="true" tabindex="-1"></a>             <span class="at">summarise_for_scatter =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb166"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb166-1"><a href="#cb166-1" aria-hidden="true" tabindex="-1"></a>c3 <span class="ot">=</span> <span class="fu">plot_pca</span>(cpmd, metadata,</span>
+<span id="cb166-2"><a href="#cb166-2" aria-hidden="true" tabindex="-1"></a>             <span class="co"># Having to use 'Hybrid' here to get it into the plotting data because the function drops everything but the join_by_name when summarizing for scatter</span></span>
+<span id="cb166-3"><a href="#cb166-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">join_by_name =</span> <span class="st">'Hybrid'</span>,</span>
+<span id="cb166-4"><a href="#cb166-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
+<span id="cb166-5"><a href="#cb166-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">plotting_factors_name =</span> Hybrid, </span>
+<span id="cb166-6"><a href="#cb166-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">x =</span> <span class="st">'PC7'</span>,</span>
+<span id="cb166-7"><a href="#cb166-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="st">'length_3Y'</span>,</span>
+<span id="cb166-8"><a href="#cb166-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">scale =</span> T, </span>
+<span id="cb166-9"><a href="#cb166-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">center =</span> T, </span>
+<span id="cb166-10"><a href="#cb166-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">'Hybrid'</span>,</span>
+<span id="cb166-11"><a href="#cb166-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">plot_type =</span> <span class="st">'scatter'</span>,</span>
+<span id="cb166-12"><a href="#cb166-12" aria-hidden="true" tabindex="-1"></a>             <span class="at">summarise_for_scatter =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Make sure no numeric identifiers are in data as this will drastically impact PCA</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb153"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb153-1"><a href="#cb153-1" aria-hidden="true" tabindex="-1"></a>c3<span class="sc">$</span>plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb168"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb168-1"><a href="#cb168-1" aria-hidden="true" tabindex="-1"></a>c3<span class="sc">$</span>plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 2 rows containing non-finite values (`stat_smooth()`).</code></pre>
 </div>
@@ -1976,7 +2084,7 @@ Up           17413      7</code></pre>
 <pre><code>Warning: Removed 1 rows containing missing values (`geom_text()`).</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-57-1.png" class="img-fluid" width="672"></p>
+<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-61-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -1987,10 +2095,10 @@ Up           17413      7</code></pre>
 <section id="length_3y-fit-model-for-genes-associated-with-nem-score" class="level1">
 <h1>Length_3Y Fit model for genes associated with NEM score</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb160"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb160-1"><a href="#cb160-1" aria-hidden="true" tabindex="-1"></a>mm_Length_3Y <span class="ot">=</span> <span class="fu">model.matrix</span>(<span class="sc">~</span>length_3Y, </span>
-<span id="cb160-2"><a href="#cb160-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">data =</span> metadata_S2)</span>
-<span id="cb160-3"><a href="#cb160-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb160-4"><a href="#cb160-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mm_Length_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb175"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a>mm_Length_3Y <span class="ot">=</span> <span class="fu">model.matrix</span>(<span class="sc">~</span>length_3Y, </span>
+<span id="cb175-2"><a href="#cb175-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">data =</span> metadata_S2)</span>
+<span id="cb175-3"><a href="#cb175-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb175-4"><a href="#cb175-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mm_Length_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          (Intercept) length_3Y
 29JM-11-1           1 0.7477421
@@ -2004,37 +2112,37 @@ Up           17413      7</code></pre>
 <section id="filtered-mean-variance-trend-nem-1" class="level2">
 <h2 class="anchored" data-anchor-id="filtered-mean-variance-trend-nem-1">Filtered mean-variance trend NEM</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb162"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb162-1"><a href="#cb162-1" aria-hidden="true" tabindex="-1"></a>y_Length_3Y <span class="ot">&lt;-</span> <span class="fu">voom</span>(d2, </span>
-<span id="cb162-2"><a href="#cb162-2" aria-hidden="true" tabindex="-1"></a>                 mm_Length_3Y,</span>
-<span id="cb162-3"><a href="#cb162-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">plot =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb177"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb177-1"><a href="#cb177-1" aria-hidden="true" tabindex="-1"></a>y_Length_3Y <span class="ot">&lt;-</span> <span class="fu">voom</span>(d2, </span>
+<span id="cb177-2"><a href="#cb177-2" aria-hidden="true" tabindex="-1"></a>                 mm_Length_3Y,</span>
+<span id="cb177-3"><a href="#cb177-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">plot =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-59-1.png" class="img-fluid" width="672"></p>
+<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-63-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="fitting-linear-models-in-limma-with-random-effects-length_3y" class="level2">
 <h2 class="anchored" data-anchor-id="fitting-linear-models-in-limma-with-random-effects-length_3y">Fitting linear models in limma with random effects Length_3Y</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb163"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Need to tell limma where the within class correlation is coming from</span></span>
-<span id="cb163-2"><a href="#cb163-2" aria-hidden="true" tabindex="-1"></a>dupcor_Length_3Y <span class="ot">=</span> <span class="fu">duplicateCorrelation</span>(y_Length_3Y,</span>
-<span id="cb163-3"><a href="#cb163-3" aria-hidden="true" tabindex="-1"></a>                                      mm_Length_3Y, </span>
-<span id="cb163-4"><a href="#cb163-4" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">block =</span> metadata_S2<span class="sc">$</span>Hybrid)</span>
-<span id="cb163-5"><a href="#cb163-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb163-6"><a href="#cb163-6" aria-hidden="true" tabindex="-1"></a><span class="do">## How correlated are the hybrid replicates on average?</span></span>
-<span id="cb163-7"><a href="#cb163-7" aria-hidden="true" tabindex="-1"></a>consensus.corr._Length_3Y <span class="ot">=</span> dupcor_Length_3Y<span class="sc">$</span>consensus.correlation</span>
-<span id="cb163-8"><a href="#cb163-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb163-9"><a href="#cb163-9" aria-hidden="true" tabindex="-1"></a>consensus.corr._Length_3Y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb178"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb178-1"><a href="#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Need to tell limma where the within class correlation is coming from</span></span>
+<span id="cb178-2"><a href="#cb178-2" aria-hidden="true" tabindex="-1"></a>dupcor_Length_3Y <span class="ot">=</span> <span class="fu">duplicateCorrelation</span>(y_Length_3Y,</span>
+<span id="cb178-3"><a href="#cb178-3" aria-hidden="true" tabindex="-1"></a>                                      mm_Length_3Y, </span>
+<span id="cb178-4"><a href="#cb178-4" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">block =</span> metadata_S2<span class="sc">$</span>Hybrid)</span>
+<span id="cb178-5"><a href="#cb178-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb178-6"><a href="#cb178-6" aria-hidden="true" tabindex="-1"></a><span class="do">## How correlated are the hybrid replicates on average?</span></span>
+<span id="cb178-7"><a href="#cb178-7" aria-hidden="true" tabindex="-1"></a>consensus.corr._Length_3Y <span class="ot">=</span> dupcor_Length_3Y<span class="sc">$</span>consensus.correlation</span>
+<span id="cb178-8"><a href="#cb178-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb178-9"><a href="#cb178-9" aria-hidden="true" tabindex="-1"></a>consensus.corr._Length_3Y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.4824957</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb165"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb165-1"><a href="#cb165-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmFit fits a linear model using weighted least squares for each gene:</span></span>
-<span id="cb165-2"><a href="#cb165-2" aria-hidden="true" tabindex="-1"></a>fit_Length_3Y <span class="ot">=</span> <span class="fu">lmFit</span>(y_Length_3Y, </span>
-<span id="cb165-3"><a href="#cb165-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">design =</span> mm_Length_3Y, </span>
-<span id="cb165-4"><a href="#cb165-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">block =</span> metadata_S2<span class="sc">$</span>Hybrid,</span>
-<span id="cb165-5"><a href="#cb165-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">correlation =</span> consensus.corr._Length_3Y) </span>
-<span id="cb165-6"><a href="#cb165-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb165-7"><a href="#cb165-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Ebayes</span></span>
-<span id="cb165-8"><a href="#cb165-8" aria-hidden="true" tabindex="-1"></a>BlockFit_Length_3Y <span class="ot">=</span> <span class="fu">eBayes</span>(fit_Length_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb180"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb180-1"><a href="#cb180-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmFit fits a linear model using weighted least squares for each gene:</span></span>
+<span id="cb180-2"><a href="#cb180-2" aria-hidden="true" tabindex="-1"></a>fit_Length_3Y <span class="ot">=</span> <span class="fu">lmFit</span>(y_Length_3Y, </span>
+<span id="cb180-3"><a href="#cb180-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">design =</span> mm_Length_3Y, </span>
+<span id="cb180-4"><a href="#cb180-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">block =</span> metadata_S2<span class="sc">$</span>Hybrid,</span>
+<span id="cb180-5"><a href="#cb180-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">correlation =</span> consensus.corr._Length_3Y) </span>
+<span id="cb180-6"><a href="#cb180-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb180-7"><a href="#cb180-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Ebayes</span></span>
+<span id="cb180-8"><a href="#cb180-8" aria-hidden="true" tabindex="-1"></a>BlockFit_Length_3Y <span class="ot">=</span> <span class="fu">eBayes</span>(fit_Length_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -2043,9 +2151,9 @@ Up           17413      7</code></pre>
 <section id="result-summary-1" class="level2">
 <h2 class="anchored" data-anchor-id="result-summary-1">Result summary</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb166"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb166-1"><a href="#cb166-1" aria-hidden="true" tabindex="-1"></a>res_summaries_Length_3Y <span class="ot">=</span> BlockFit_Length_3Y <span class="sc">%&gt;%</span> <span class="fu">decideTests</span>() <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span>
-<span id="cb166-2"><a href="#cb166-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb166-3"><a href="#cb166-3" aria-hidden="true" tabindex="-1"></a>res_summaries_Length_3Y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb181"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb181-1"><a href="#cb181-1" aria-hidden="true" tabindex="-1"></a>res_summaries_Length_3Y <span class="ot">=</span> BlockFit_Length_3Y <span class="sc">%&gt;%</span> <span class="fu">decideTests</span>() <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span>
+<span id="cb181-2"><a href="#cb181-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb181-3"><a href="#cb181-3" aria-hidden="true" tabindex="-1"></a>res_summaries_Length_3Y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       (Intercept) length_3Y
 Down             8      3381
@@ -2057,23 +2165,23 @@ Up           17460      1943</code></pre>
 <section id="table-of-results-_length_3y" class="level2">
 <h2 class="anchored" data-anchor-id="table-of-results-_length_3y">Table of results _Length_3Y</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb168"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb168-1"><a href="#cb168-1" aria-hidden="true" tabindex="-1"></a>impLength_3Y <span class="ot">=</span> <span class="fu">topTable</span>(BlockFit_Length_3Y,</span>
-<span id="cb168-2"><a href="#cb168-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sort.by =</span> <span class="st">"logFC"</span>,</span>
-<span id="cb168-3"><a href="#cb168-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">p.value =</span> <span class="fl">0.05</span>,</span>
-<span id="cb168-4"><a href="#cb168-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">adjust.method =</span> <span class="st">"BH"</span>,</span>
-<span id="cb168-5"><a href="#cb168-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">number =</span> <span class="cn">Inf</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb168-6"><a href="#cb168-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb168-7"><a href="#cb168-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">R =</span> <span class="fu">sqrt</span>(t<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(t<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="dv">40</span>)), <span class="at">AveExpr =</span> <span class="dv">2</span><span class="sc">^</span>AveExpr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb183"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb183-1"><a href="#cb183-1" aria-hidden="true" tabindex="-1"></a>impLength_3Y <span class="ot">=</span> <span class="fu">topTable</span>(BlockFit_Length_3Y,</span>
+<span id="cb183-2"><a href="#cb183-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sort.by =</span> <span class="st">"logFC"</span>,</span>
+<span id="cb183-3"><a href="#cb183-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">p.value =</span> <span class="fl">0.05</span>,</span>
+<span id="cb183-4"><a href="#cb183-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">adjust.method =</span> <span class="st">"BH"</span>,</span>
+<span id="cb183-5"><a href="#cb183-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">number =</span> <span class="cn">Inf</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb183-6"><a href="#cb183-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb183-7"><a href="#cb183-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">R =</span> <span class="fu">sqrt</span>(t<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(t<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="dv">40</span>)), <span class="at">AveExpr =</span> <span class="dv">2</span><span class="sc">^</span>AveExpr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Removing intercept from test coefficients</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb170"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(impLength_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb185"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb185-1"><a href="#cb185-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(impLength_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 5324    8</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb172"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb172-1"><a href="#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="do">## adding Hybrid as a blocking variable reduced DEGs by several thousand</span></span>
-<span id="cb172-2"><a href="#cb172-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb172-3"><a href="#cb172-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(impLength_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb187"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb187-1"><a href="#cb187-1" aria-hidden="true" tabindex="-1"></a><span class="do">## adding Hybrid as a blocking variable reduced DEGs by several thousand</span></span>
+<span id="cb187-2"><a href="#cb187-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb187-3"><a href="#cb187-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(impLength_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     GeneID    logFC  AveExpr        t      P.Value    adj.P.Val          B
 1 121248876 5.301599 3.425589 5.264151 8.968987e-06 0.0008765235  2.4011184
@@ -2095,10 +2203,10 @@ Up           17460      1943</code></pre>
 <section id="merge-annotation-with-results-_length_3y" class="level2">
 <h2 class="anchored" data-anchor-id="merge-annotation-with-results-_length_3y">Merge annotation with results _Length_3Y</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb174"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb174-1"><a href="#cb174-1" aria-hidden="true" tabindex="-1"></a>impLength_3Y <span class="ot">=</span> impLength_3Y <span class="sc">%&gt;%</span></span>
-<span id="cb174-2"><a href="#cb174-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(annotation_combined, <span class="at">by =</span> <span class="st">"GeneID"</span>)</span>
-<span id="cb174-3"><a href="#cb174-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb174-4"><a href="#cb174-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(impLength_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb189"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb189-1"><a href="#cb189-1" aria-hidden="true" tabindex="-1"></a>impLength_3Y <span class="ot">=</span> impLength_3Y <span class="sc">%&gt;%</span></span>
+<span id="cb189-2"><a href="#cb189-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(annotation_combined, <span class="at">by =</span> <span class="st">"GeneID"</span>)</span>
+<span id="cb189-3"><a href="#cb189-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb189-4"><a href="#cb189-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(impLength_3Y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     GeneID    logFC  AveExpr        t      P.Value    adj.P.Val          B
 1 121248876 5.301599 3.425589 5.264151 8.968987e-06 0.0008765235  2.4011184
@@ -2129,164 +2237,164 @@ Up           17460      1943</code></pre>
 5             8 endomembrane system     J.microcarpa
 6          &lt;NA&gt;             nucleus          J.regia</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb176"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb176-1"><a href="#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fwrite</span>(impLength_3Y, <span class="st">'DGEresults/Limma_results_table_Length_3Y.csv'</span>)</span>
-<span id="cb176-2"><a href="#cb176-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb176-3"><a href="#cb176-3" aria-hidden="true" tabindex="-1"></a>impLength_3Y <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_Length_3Y.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb191"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb191-1"><a href="#cb191-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fwrite</span>(impLength_3Y, <span class="st">'DGEresults/Limma_results_table_Length_3Y.csv'</span>)</span>
+<span id="cb191-2"><a href="#cb191-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb191-3"><a href="#cb191-3" aria-hidden="true" tabindex="-1"></a>impLength_3Y <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_Length_3Y.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="pca-of-_length_3y-degs" class="level2">
 <h2 class="anchored" data-anchor-id="pca-of-_length_3y-degs">PCA of _Length_3Y DEGs</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb177"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb177-1"><a href="#cb177-1" aria-hidden="true" tabindex="-1"></a>ids <span class="ot">=</span> impLength_3Y <span class="sc">%&gt;%</span> </span>
-<span id="cb177-2"><a href="#cb177-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
-<span id="cb177-3"><a href="#cb177-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">GeneID =</span> <span class="fu">as.character</span>(GeneID))</span>
-<span id="cb177-4"><a href="#cb177-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb177-5"><a href="#cb177-5" aria-hidden="true" tabindex="-1"></a>PCA_Length_3Y <span class="ot">=</span> cpmd2 <span class="sc">%&gt;%</span> </span>
-<span id="cb177-6"><a href="#cb177-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb177-7"><a href="#cb177-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb177-8"><a href="#cb177-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(ids) <span class="sc">%&gt;%</span> </span>
-<span id="cb177-9"><a href="#cb177-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb192"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb192-1"><a href="#cb192-1" aria-hidden="true" tabindex="-1"></a>ids <span class="ot">=</span> impLength_3Y <span class="sc">%&gt;%</span> </span>
+<span id="cb192-2"><a href="#cb192-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
+<span id="cb192-3"><a href="#cb192-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">GeneID =</span> <span class="fu">as.character</span>(GeneID))</span>
+<span id="cb192-4"><a href="#cb192-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb192-5"><a href="#cb192-5" aria-hidden="true" tabindex="-1"></a>PCA_Length_3Y <span class="ot">=</span> cpmd2 <span class="sc">%&gt;%</span> </span>
+<span id="cb192-6"><a href="#cb192-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb192-7"><a href="#cb192-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb192-8"><a href="#cb192-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(ids) <span class="sc">%&gt;%</span> </span>
+<span id="cb192-9"><a href="#cb192-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">'GeneID'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Joining with `by = join_by(GeneID)`</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb179"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb179-1"><a href="#cb179-1" aria-hidden="true" tabindex="-1"></a>pca_plot_Length_3Y <span class="ot">=</span> <span class="fu">plot_pca</span>(PCA_Length_3Y, metadata,</span>
-<span id="cb179-2"><a href="#cb179-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">join_by_name =</span> <span class="st">'Sample'</span>,</span>
-<span id="cb179-3"><a href="#cb179-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
-<span id="cb179-4"><a href="#cb179-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_name =</span> Group, </span>
-<span id="cb179-5"><a href="#cb179-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">x =</span> <span class="st">'PC1'</span>,</span>
-<span id="cb179-6"><a href="#cb179-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="st">'PC2'</span>,</span>
-<span id="cb179-7"><a href="#cb179-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">scale =</span> T, </span>
-<span id="cb179-8"><a href="#cb179-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">center =</span> T, </span>
-<span id="cb179-9"><a href="#cb179-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">'length_3Y'</span>,</span>
-<span id="cb179-10"><a href="#cb179-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">fill =</span> <span class="st">'length_3Y'</span>,</span>
-<span id="cb179-11"><a href="#cb179-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">plot_type =</span> <span class="st">'2D'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb194"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb194-1"><a href="#cb194-1" aria-hidden="true" tabindex="-1"></a>pca_plot_Length_3Y <span class="ot">=</span> <span class="fu">plot_pca</span>(PCA_Length_3Y, metadata,</span>
+<span id="cb194-2"><a href="#cb194-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">join_by_name =</span> <span class="st">'Sample'</span>,</span>
+<span id="cb194-3"><a href="#cb194-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_in =</span> <span class="st">'col_names'</span>,</span>
+<span id="cb194-4"><a href="#cb194-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">plotting_factors_name =</span> Group, </span>
+<span id="cb194-5"><a href="#cb194-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">x =</span> <span class="st">'PC1'</span>,</span>
+<span id="cb194-6"><a href="#cb194-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="st">'PC2'</span>,</span>
+<span id="cb194-7"><a href="#cb194-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">scale =</span> T, </span>
+<span id="cb194-8"><a href="#cb194-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">center =</span> T, </span>
+<span id="cb194-9"><a href="#cb194-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">'length_3Y'</span>,</span>
+<span id="cb194-10"><a href="#cb194-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">fill =</span> <span class="st">'length_3Y'</span>,</span>
+<span id="cb194-11"><a href="#cb194-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">plot_type =</span> <span class="st">'2D'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Make sure no numeric identifiers are in data as this will drastically impact PCA</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb181"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb181-1"><a href="#cb181-1" aria-hidden="true" tabindex="-1"></a>pca_plot_Length_3Y<span class="sc">$</span>plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb196"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb196-1"><a href="#cb196-1" aria-hidden="true" tabindex="-1"></a>pca_plot_Length_3Y<span class="sc">$</span>plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-64-1.png" class="img-fluid" width="672"></p>
+<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-68-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="read-in-_length_3y-results" class="level2">
 <h2 class="anchored" data-anchor-id="read-in-_length_3y-results">Read in _Length_3Y results</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb182"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb182-1"><a href="#cb182-1" aria-hidden="true" tabindex="-1"></a>impLength_3Y <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_Length_3Y.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb197"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb197-1"><a href="#cb197-1" aria-hidden="true" tabindex="-1"></a>impLength_3Y <span class="ot">=</span> <span class="fu">fread</span>(<span class="st">'DGEresults/Limma_results_table_Length_3Y.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
 <section id="venn-diagram-positive-genes" class="level1">
 <h1>Venn Diagram positive genes</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb183"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb183-1"><a href="#cb183-1" aria-hidden="true" tabindex="-1"></a>CG_pos <span class="ot">=</span> impCG <span class="sc">%&gt;%</span></span>
-<span id="cb183-2"><a href="#cb183-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb183-3"><a href="#cb183-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
-<span id="cb183-4"><a href="#cb183-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
-<span id="cb183-5"><a href="#cb183-5" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb183-6"><a href="#cb183-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb183-7"><a href="#cb183-7" aria-hidden="true" tabindex="-1"></a>PHY_pos <span class="ot">=</span> impPHY <span class="sc">%&gt;%</span></span>
-<span id="cb183-8"><a href="#cb183-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb183-9"><a href="#cb183-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
-<span id="cb183-10"><a href="#cb183-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
-<span id="cb183-11"><a href="#cb183-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb183-12"><a href="#cb183-12" aria-hidden="true" tabindex="-1"></a>NEM_pos <span class="ot">=</span> impNEM_3Y <span class="sc">%&gt;%</span></span>
-<span id="cb183-13"><a href="#cb183-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb183-14"><a href="#cb183-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID)  <span class="sc">%&gt;%</span> </span>
-<span id="cb183-15"><a href="#cb183-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
-<span id="cb183-16"><a href="#cb183-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb183-17"><a href="#cb183-17" aria-hidden="true" tabindex="-1"></a>Length_pos <span class="ot">=</span> impLength_3Y <span class="sc">%&gt;%</span></span>
-<span id="cb183-18"><a href="#cb183-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb183-19"><a href="#cb183-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID)  <span class="sc">%&gt;%</span> </span>
-<span id="cb183-20"><a href="#cb183-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
-<span id="cb183-21"><a href="#cb183-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb183-22"><a href="#cb183-22" aria-hidden="true" tabindex="-1"></a>venn_pos <span class="ot">=</span> <span class="fu">list</span>(<span class="at">CG_pos =</span> CG_pos, </span>
-<span id="cb183-23"><a href="#cb183-23" aria-hidden="true" tabindex="-1"></a>                <span class="at">PHY_pos =</span> PHY_pos,</span>
-<span id="cb183-24"><a href="#cb183-24" aria-hidden="true" tabindex="-1"></a>                <span class="at">NEM_pos =</span> NEM_pos,</span>
-<span id="cb183-25"><a href="#cb183-25" aria-hidden="true" tabindex="-1"></a>                <span class="at">Length_pos =</span> Length_pos)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb198"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb198-1"><a href="#cb198-1" aria-hidden="true" tabindex="-1"></a>CG_pos <span class="ot">=</span> impCG <span class="sc">%&gt;%</span></span>
+<span id="cb198-2"><a href="#cb198-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb198-3"><a href="#cb198-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
+<span id="cb198-4"><a href="#cb198-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
+<span id="cb198-5"><a href="#cb198-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb198-6"><a href="#cb198-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb198-7"><a href="#cb198-7" aria-hidden="true" tabindex="-1"></a>PHY_pos <span class="ot">=</span> impPHY <span class="sc">%&gt;%</span></span>
+<span id="cb198-8"><a href="#cb198-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb198-9"><a href="#cb198-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
+<span id="cb198-10"><a href="#cb198-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
+<span id="cb198-11"><a href="#cb198-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb198-12"><a href="#cb198-12" aria-hidden="true" tabindex="-1"></a>NEM_pos <span class="ot">=</span> impNEM_3Y <span class="sc">%&gt;%</span></span>
+<span id="cb198-13"><a href="#cb198-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb198-14"><a href="#cb198-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID)  <span class="sc">%&gt;%</span> </span>
+<span id="cb198-15"><a href="#cb198-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
+<span id="cb198-16"><a href="#cb198-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb198-17"><a href="#cb198-17" aria-hidden="true" tabindex="-1"></a>Length_pos <span class="ot">=</span> impLength_3Y <span class="sc">%&gt;%</span></span>
+<span id="cb198-18"><a href="#cb198-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb198-19"><a href="#cb198-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID)  <span class="sc">%&gt;%</span> </span>
+<span id="cb198-20"><a href="#cb198-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
+<span id="cb198-21"><a href="#cb198-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb198-22"><a href="#cb198-22" aria-hidden="true" tabindex="-1"></a>venn_pos <span class="ot">=</span> <span class="fu">list</span>(<span class="at">CG_pos =</span> CG_pos, </span>
+<span id="cb198-23"><a href="#cb198-23" aria-hidden="true" tabindex="-1"></a>                <span class="at">PHY_pos =</span> PHY_pos,</span>
+<span id="cb198-24"><a href="#cb198-24" aria-hidden="true" tabindex="-1"></a>                <span class="at">NEM_pos =</span> NEM_pos,</span>
+<span id="cb198-25"><a href="#cb198-25" aria-hidden="true" tabindex="-1"></a>                <span class="at">Length_pos =</span> Length_pos)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="venn-diagram-negative-genes" class="level1">
 <h1>Venn Diagram negative genes</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb184"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb184-1"><a href="#cb184-1" aria-hidden="true" tabindex="-1"></a>CG_neg <span class="ot">=</span> impCG <span class="sc">%&gt;%</span></span>
-<span id="cb184-2"><a href="#cb184-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb184-3"><a href="#cb184-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
-<span id="cb184-4"><a href="#cb184-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
-<span id="cb184-5"><a href="#cb184-5" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb184-6"><a href="#cb184-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb184-7"><a href="#cb184-7" aria-hidden="true" tabindex="-1"></a>PHY_neg <span class="ot">=</span> impPHY <span class="sc">%&gt;%</span></span>
-<span id="cb184-8"><a href="#cb184-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb184-9"><a href="#cb184-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
-<span id="cb184-10"><a href="#cb184-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
-<span id="cb184-11"><a href="#cb184-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb184-12"><a href="#cb184-12" aria-hidden="true" tabindex="-1"></a>NEM_neg <span class="ot">=</span> impNEM_3Y <span class="sc">%&gt;%</span></span>
-<span id="cb184-13"><a href="#cb184-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb184-14"><a href="#cb184-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID)  <span class="sc">%&gt;%</span> </span>
-<span id="cb184-15"><a href="#cb184-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
-<span id="cb184-16"><a href="#cb184-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb184-17"><a href="#cb184-17" aria-hidden="true" tabindex="-1"></a>Length_neg <span class="ot">=</span> impLength_3Y <span class="sc">%&gt;%</span></span>
-<span id="cb184-18"><a href="#cb184-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb184-19"><a href="#cb184-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID)  <span class="sc">%&gt;%</span> </span>
-<span id="cb184-20"><a href="#cb184-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
-<span id="cb184-21"><a href="#cb184-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb184-22"><a href="#cb184-22" aria-hidden="true" tabindex="-1"></a>venn_neg <span class="ot">=</span> <span class="fu">list</span>(<span class="at">CG_neg =</span> CG_neg,</span>
-<span id="cb184-23"><a href="#cb184-23" aria-hidden="true" tabindex="-1"></a>                <span class="at">PHY_neg =</span> PHY_neg, </span>
-<span id="cb184-24"><a href="#cb184-24" aria-hidden="true" tabindex="-1"></a>                <span class="at">NEM_neg =</span> NEM_neg,</span>
-<span id="cb184-25"><a href="#cb184-25" aria-hidden="true" tabindex="-1"></a>                <span class="at">Length_neg =</span> Length_neg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb199"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb199-1"><a href="#cb199-1" aria-hidden="true" tabindex="-1"></a>CG_neg <span class="ot">=</span> impCG <span class="sc">%&gt;%</span></span>
+<span id="cb199-2"><a href="#cb199-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb199-3"><a href="#cb199-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
+<span id="cb199-4"><a href="#cb199-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
+<span id="cb199-5"><a href="#cb199-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb199-6"><a href="#cb199-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb199-7"><a href="#cb199-7" aria-hidden="true" tabindex="-1"></a>PHY_neg <span class="ot">=</span> impPHY <span class="sc">%&gt;%</span></span>
+<span id="cb199-8"><a href="#cb199-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb199-9"><a href="#cb199-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID) <span class="sc">%&gt;%</span> </span>
+<span id="cb199-10"><a href="#cb199-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
+<span id="cb199-11"><a href="#cb199-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb199-12"><a href="#cb199-12" aria-hidden="true" tabindex="-1"></a>NEM_neg <span class="ot">=</span> impNEM_3Y <span class="sc">%&gt;%</span></span>
+<span id="cb199-13"><a href="#cb199-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb199-14"><a href="#cb199-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID)  <span class="sc">%&gt;%</span> </span>
+<span id="cb199-15"><a href="#cb199-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
+<span id="cb199-16"><a href="#cb199-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb199-17"><a href="#cb199-17" aria-hidden="true" tabindex="-1"></a>Length_neg <span class="ot">=</span> impLength_3Y <span class="sc">%&gt;%</span></span>
+<span id="cb199-18"><a href="#cb199-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(logFC <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb199-19"><a href="#cb199-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GeneID)  <span class="sc">%&gt;%</span> </span>
+<span id="cb199-20"><a href="#cb199-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(GeneID)</span>
+<span id="cb199-21"><a href="#cb199-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb199-22"><a href="#cb199-22" aria-hidden="true" tabindex="-1"></a>venn_neg <span class="ot">=</span> <span class="fu">list</span>(<span class="at">CG_neg =</span> CG_neg,</span>
+<span id="cb199-23"><a href="#cb199-23" aria-hidden="true" tabindex="-1"></a>                <span class="at">PHY_neg =</span> PHY_neg, </span>
+<span id="cb199-24"><a href="#cb199-24" aria-hidden="true" tabindex="-1"></a>                <span class="at">NEM_neg =</span> NEM_neg,</span>
+<span id="cb199-25"><a href="#cb199-25" aria-hidden="true" tabindex="-1"></a>                <span class="at">Length_neg =</span> Length_neg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="plot-and-save-venn-diagram-figure-with-results-summaries" class="level1">
 <h1>Plot and save venn diagram figure with results summaries</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb185"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb185-1"><a href="#cb185-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggvenn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb200"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb200-1"><a href="#cb200-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggvenn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'ggvenn' was built under R version 4.2.3</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Loading required package: grid</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb188"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb188-1"><a href="#cb188-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">=</span> <span class="fu">ggvenn</span>(venn_pos, <span class="at">text_size =</span> <span class="dv">6</span>)</span>
-<span id="cb188-2"><a href="#cb188-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb188-3"><a href="#cb188-3" aria-hidden="true" tabindex="-1"></a>b <span class="ot">=</span> <span class="fu">ggvenn</span>(venn_neg, <span class="at">text_size =</span> <span class="dv">6</span>)</span>
-<span id="cb188-4"><a href="#cb188-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb188-5"><a href="#cb188-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggarrange</span>(a, b, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">'A)'</span>, <span class="st">'B)'</span>), <span class="at">label.y =</span> <span class="fl">0.75</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb203"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb203-1"><a href="#cb203-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">=</span> <span class="fu">ggvenn</span>(venn_pos, <span class="at">text_size =</span> <span class="dv">6</span>)</span>
+<span id="cb203-2"><a href="#cb203-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb203-3"><a href="#cb203-3" aria-hidden="true" tabindex="-1"></a>b <span class="ot">=</span> <span class="fu">ggvenn</span>(venn_neg, <span class="at">text_size =</span> <span class="dv">6</span>)</span>
+<span id="cb203-4"><a href="#cb203-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb203-5"><a href="#cb203-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggarrange</span>(a, b, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">'A)'</span>, <span class="st">'B)'</span>), <span class="at">label.y =</span> <span class="fl">0.75</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-68-1.png" class="img-fluid" width="672"></p>
+<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-72-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb189"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb189-1"><a href="#cb189-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save_plot</span>(<span class="st">'DGEresults/Venn_Pos_Neg.png'</span>,</span>
-<span id="cb189-2"><a href="#cb189-2" aria-hidden="true" tabindex="-1"></a>          <span class="fu">ggarrange</span>(a, b, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">'A)'</span>, <span class="st">'B)'</span>), </span>
-<span id="cb189-3"><a href="#cb189-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">font.label =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">25</span>),</span>
-<span id="cb189-4"><a href="#cb189-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">label.y =</span> <span class="fl">0.75</span>, </span>
-<span id="cb189-5"><a href="#cb189-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">heights =</span> <span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">1</span>)),</span>
-<span id="cb189-6"><a href="#cb189-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">width =</span> <span class="dv">45</span>, </span>
-<span id="cb189-7"><a href="#cb189-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">height =</span> <span class="dv">23</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb204"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb204-1"><a href="#cb204-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save_plot</span>(<span class="st">'DGEresults/Venn_Pos_Neg.png'</span>,</span>
+<span id="cb204-2"><a href="#cb204-2" aria-hidden="true" tabindex="-1"></a>          <span class="fu">ggarrange</span>(a, b, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">'A)'</span>, <span class="st">'B)'</span>), </span>
+<span id="cb204-3"><a href="#cb204-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">font.label =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">25</span>),</span>
+<span id="cb204-4"><a href="#cb204-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">label.y =</span> <span class="fl">0.75</span>, </span>
+<span id="cb204-5"><a href="#cb204-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">heights =</span> <span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">1</span>)),</span>
+<span id="cb204-6"><a href="#cb204-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">width =</span> <span class="dv">45</span>, </span>
+<span id="cb204-7"><a href="#cb204-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">height =</span> <span class="dv">23</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>png 
   2 </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb191"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb191-1"><a href="#cb191-1" aria-hidden="true" tabindex="-1"></a>all_res_summaries <span class="ot">=</span> <span class="fu">cbind</span>(res_summaries_CG, </span>
-<span id="cb191-2"><a href="#cb191-2" aria-hidden="true" tabindex="-1"></a>                          res_summaries_PHY,</span>
-<span id="cb191-3"><a href="#cb191-3" aria-hidden="true" tabindex="-1"></a>                          res_summaries_NEM_3Y,</span>
-<span id="cb191-4"><a href="#cb191-4" aria-hidden="true" tabindex="-1"></a>                          res_summaries_Length_3Y) <span class="sc">%&gt;%</span> </span>
-<span id="cb191-5"><a href="#cb191-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb191-6"><a href="#cb191-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span><span class="fu">matches</span>(<span class="st">'Intercept'</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb191-7"><a href="#cb191-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="st">'A. tumefaciens'</span>,</span>
-<span id="cb191-8"><a href="#cb191-8" aria-hidden="true" tabindex="-1"></a>          <span class="st">'Phytophthora spp.'</span>,</span>
-<span id="cb191-9"><a href="#cb191-9" aria-hidden="true" tabindex="-1"></a>          <span class="st">'P. vulnus'</span>,</span>
-<span id="cb191-10"><a href="#cb191-10" aria-hidden="true" tabindex="-1"></a>          <span class="st">'three year tree length'</span>))</span>
-<span id="cb191-11"><a href="#cb191-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb191-12"><a href="#cb191-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb191-13"><a href="#cb191-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb191-14"><a href="#cb191-14" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(all_res_summaries, <span class="at">FUN =</span> <span class="cf">function</span>(x){</span>
-<span id="cb191-15"><a href="#cb191-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste0</span>(<span class="fu">paste0</span>(x[<span class="dv">1</span>], <span class="st">' genes negatively associated with'</span>),</span>
-<span id="cb191-16"><a href="#cb191-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">', '</span>,</span>
-<span id="cb191-17"><a href="#cb191-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">paste0</span>(x[<span class="dv">3</span>], <span class="st">' genes positively associated with'</span>),</span>
-<span id="cb191-18"><a href="#cb191-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">', and '</span>,</span>
-<span id="cb191-19"><a href="#cb191-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">paste0</span>(x[<span class="dv">2</span>], <span class="st">' genes not associated with '</span>, x[<span class="dv">4</span>]))</span>
-<span id="cb191-20"><a href="#cb191-20" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb206"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb206-1"><a href="#cb206-1" aria-hidden="true" tabindex="-1"></a>all_res_summaries <span class="ot">=</span> <span class="fu">cbind</span>(res_summaries_CG, </span>
+<span id="cb206-2"><a href="#cb206-2" aria-hidden="true" tabindex="-1"></a>                          res_summaries_PHY,</span>
+<span id="cb206-3"><a href="#cb206-3" aria-hidden="true" tabindex="-1"></a>                          res_summaries_NEM_3Y,</span>
+<span id="cb206-4"><a href="#cb206-4" aria-hidden="true" tabindex="-1"></a>                          res_summaries_Length_3Y) <span class="sc">%&gt;%</span> </span>
+<span id="cb206-5"><a href="#cb206-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb206-6"><a href="#cb206-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span><span class="fu">matches</span>(<span class="st">'Intercept'</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb206-7"><a href="#cb206-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="st">'A. tumefaciens'</span>,</span>
+<span id="cb206-8"><a href="#cb206-8" aria-hidden="true" tabindex="-1"></a>          <span class="st">'Phytophthora spp.'</span>,</span>
+<span id="cb206-9"><a href="#cb206-9" aria-hidden="true" tabindex="-1"></a>          <span class="st">'P. vulnus'</span>,</span>
+<span id="cb206-10"><a href="#cb206-10" aria-hidden="true" tabindex="-1"></a>          <span class="st">'three year tree length'</span>))</span>
+<span id="cb206-11"><a href="#cb206-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb206-12"><a href="#cb206-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb206-13"><a href="#cb206-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb206-14"><a href="#cb206-14" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(all_res_summaries, <span class="at">FUN =</span> <span class="cf">function</span>(x){</span>
+<span id="cb206-15"><a href="#cb206-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste0</span>(<span class="fu">paste0</span>(x[<span class="dv">1</span>], <span class="st">' genes negatively associated with'</span>),</span>
+<span id="cb206-16"><a href="#cb206-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">', '</span>,</span>
+<span id="cb206-17"><a href="#cb206-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">paste0</span>(x[<span class="dv">3</span>], <span class="st">' genes positively associated with'</span>),</span>
+<span id="cb206-18"><a href="#cb206-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">', and '</span>,</span>
+<span id="cb206-19"><a href="#cb206-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">paste0</span>(x[<span class="dv">2</span>], <span class="st">' genes not associated with '</span>, x[<span class="dv">4</span>]))</span>
+<span id="cb206-20"><a href="#cb206-20" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$CG_Avg
 [1] "3888 genes negatively associated with, 2021 genes positively associated with, and 13290 genes not associated with A. tumefaciens"
@@ -2309,30 +2417,30 @@ $length_3Y
 <section id="trait-data-have-some-collinearity" class="level1">
 <h1>Trait data have some collinearity</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb193"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb193-1"><a href="#cb193-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggcorrplot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb208"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb208-1"><a href="#cb208-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggcorrplot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'ggcorrplot' was built under R version 4.2.3</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb195"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb195-1"><a href="#cb195-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get matrix for correlation</span></span>
-<span id="cb195-2"><a href="#cb195-2" aria-hidden="true" tabindex="-1"></a>cordat <span class="ot">=</span>  metadata_S <span class="sc">%&gt;%</span></span>
-<span id="cb195-3"><a href="#cb195-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CG_Avg, PHY_Avg, RLN_2Y) <span class="sc">%&gt;%</span></span>
-<span id="cb195-4"><a href="#cb195-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb195-5"><a href="#cb195-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
-<span id="cb195-6"><a href="#cb195-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb195-7"><a href="#cb195-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate p-values</span></span>
-<span id="cb195-8"><a href="#cb195-8" aria-hidden="true" tabindex="-1"></a>corpmat1 <span class="ot">=</span> <span class="fu">cor_pmat</span>(cordat, <span class="at">method =</span> <span class="st">'pearson'</span>)</span>
-<span id="cb195-9"><a href="#cb195-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb195-10"><a href="#cb195-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate correlation coefficients</span></span>
-<span id="cb195-11"><a href="#cb195-11" aria-hidden="true" tabindex="-1"></a>cormat1 <span class="ot">=</span><span class="fu">cor</span>(cordat, <span class="at">method =</span> <span class="st">'pearson'</span>)</span>
-<span id="cb195-12"><a href="#cb195-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb195-13"><a href="#cb195-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot. All relationships are significant</span></span>
-<span id="cb195-14"><a href="#cb195-14" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> <span class="fu">ggcorrplot</span>(cormat1, <span class="at">type =</span> <span class="st">'lower'</span>, <span class="at">hc.order =</span> T, <span class="at">lab =</span> T, <span class="at">p.mat =</span> corpmat1)</span>
-<span id="cb195-15"><a href="#cb195-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb195-16"><a href="#cb195-16" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb210"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb210-1"><a href="#cb210-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get matrix for correlation</span></span>
+<span id="cb210-2"><a href="#cb210-2" aria-hidden="true" tabindex="-1"></a>cordat <span class="ot">=</span>  metadata_S <span class="sc">%&gt;%</span></span>
+<span id="cb210-3"><a href="#cb210-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CG_Avg, PHY_Avg, RLN_2Y) <span class="sc">%&gt;%</span></span>
+<span id="cb210-4"><a href="#cb210-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb210-5"><a href="#cb210-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
+<span id="cb210-6"><a href="#cb210-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb210-7"><a href="#cb210-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate p-values</span></span>
+<span id="cb210-8"><a href="#cb210-8" aria-hidden="true" tabindex="-1"></a>corpmat1 <span class="ot">=</span> <span class="fu">cor_pmat</span>(cordat, <span class="at">method =</span> <span class="st">'pearson'</span>)</span>
+<span id="cb210-9"><a href="#cb210-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb210-10"><a href="#cb210-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate correlation coefficients</span></span>
+<span id="cb210-11"><a href="#cb210-11" aria-hidden="true" tabindex="-1"></a>cormat1 <span class="ot">=</span><span class="fu">cor</span>(cordat, <span class="at">method =</span> <span class="st">'pearson'</span>)</span>
+<span id="cb210-12"><a href="#cb210-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb210-13"><a href="#cb210-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot. All relationships are significant</span></span>
+<span id="cb210-14"><a href="#cb210-14" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> <span class="fu">ggcorrplot</span>(cormat1, <span class="at">type =</span> <span class="st">'lower'</span>, <span class="at">hc.order =</span> T, <span class="at">lab =</span> T, <span class="at">p.mat =</span> corpmat1)</span>
+<span id="cb210-15"><a href="#cb210-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb210-16"><a href="#cb210-16" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-70-1.png" class="img-fluid" width="672"></p>
+<p><img src="SCRI_ROOT_RNAs_files/figure-html/unnamed-chunk-74-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb196"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb196-1"><a href="#cb196-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save_plot</span>(<span class="st">'DGEresults/Pheno_corrplot.png'</span>, p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb211"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb211-1"><a href="#cb211-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save_plot</span>(<span class="st">'DGEresults/Pheno_corrplot.png'</span>, p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>png 
   2 </code></pre>

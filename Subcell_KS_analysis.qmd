@@ -25,18 +25,6 @@ pacman::p_load(dplyr,
                openxlsx)
 ```
 
-# Get GO Subcellular loci annotation for J. regia genome
-
-```{r}
-SL_annotation = fread('C:/Users/hsaxe/OneDrive/Documents/ALAB/Genome_info/Genomic_Annotation_2/Jm_x_Jr/Jm_x_Jr_Genomic_annotation.csv') 
-
-SL_annotation = SL_annotation %>% 
-  select(GeneID, Subcell_loc)
-
-SL_annotation[SL_annotation == ''] <- 'Unmapped'
-
-```
-
 # CG Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
 
 ```{r}
@@ -46,7 +34,14 @@ impCG = fread('DGEresults/Limma_results_table_CG.csv') %>%
            logFC, 
            Subcell_loc,
            feature,
-           Parent_haplotype)
+           class,
+           Parent_haplotype) %>% 
+  filter(!feature == 'misc_RNA') %>% 
+  mutate(feature_class = paste0(feature, '->', class),
+         name = gsub('AMSH-like ubiquitin thioesterase .*$',
+                     'AMSH-like ubiquitin thioesterase', 
+                     name)) %>% 
+  distinct()
 
 
 ```
@@ -55,10 +50,15 @@ impCG = fread('DGEresults/Limma_results_table_CG.csv') %>%
 
 ```{r}
 impCG_SL = impCG 
-  # left_join(SL_annotation) %>% 
-  # distinct()
 
 impCG_SL[impCG_SL == ''] <- 'Unmapped'
+
+impCG_SL = impCG_SL %>% 
+  mutate(Subcell_loc = ifelse(Subcell_loc == 'Unmapped', feature_class, Subcell_loc))
+
+dups = impCG_SL %>% 
+  group_by(GeneID, logFC) %>% 
+  filter(n() > 1)
 
 length(unique(impCG_SL$logFC))
 ```
@@ -137,7 +137,7 @@ plot_dat = one %>%
   
 
 # Make new table for combining DEG results with GO results and writing out
-impCG_SL_Enrichment_out = plot_dat %>% 
+impCG_SL_Enrichment_out = ks_res_CG %>% 
   mutate(Trait = 'CG')
 
 labs_normal = plot_dat %>% 
@@ -198,19 +198,31 @@ save_plot('Subcell_KS_results/SL_Enrich_testing_CG.png',
           width = 18, 
           height = 15, 
           dpi = 300)
+
+save_plot('Final_Figs_and_Draft_Manuscript_SCRI_ROOT/Fig. 7.png', 
+          CG,
+          width = 18, 
+          height = 15, 
+          dpi = 300)
 ```
 
 # PHY Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
 
 ```{r}
 impPHY = fread('DGEresults/Limma_results_table_PHY.csv') %>% 
-  distinct(GeneID,
+  distinct(GeneID, 
            name, 
            logFC, 
            Subcell_loc,
            feature,
            class,
-           Parent_haplotype)
+           Parent_haplotype) %>% 
+  filter(!feature == 'misc_RNA') %>% 
+  mutate(feature_class = paste0(feature, '->', class),
+         name = gsub('AMSH-like ubiquitin thioesterase .*$',
+                     'AMSH-like ubiquitin thioesterase', 
+                     name)) %>% 
+  distinct()
 
 ```
 
@@ -218,10 +230,11 @@ impPHY = fread('DGEresults/Limma_results_table_PHY.csv') %>%
 
 ```{r}
 impPHY_SL = impPHY 
-  # left_join(SL_annotation) %>% 
-  # distinct()
 
 impPHY_SL[impPHY_SL == ''] <- 'Unmapped'
+
+impPHY_SL = impPHY_SL %>% 
+  mutate(Subcell_loc = ifelse(Subcell_loc == 'Unmapped', feature_class, Subcell_loc))
 
 length(unique(impPHY_SL$logFC))
 ```
@@ -295,7 +308,7 @@ plot_dat = one %>%
   
 
 # Make new table for combining DEG results with GO results and writing out
-impPHY_SL_Enrichment_out = plot_dat %>% 
+impPHY_SL_Enrichment_out = ks_res_PHY %>% 
   mutate(Trait = 'PHY')
 
 labs_normal = plot_dat %>% 
@@ -356,6 +369,12 @@ save_plot('Subcell_KS_results/SL_Enrich_testing_PHY.png',
           width = 18, 
           height = 15, 
           dpi = 300)
+
+save_plot('Final_Figs_and_Draft_Manuscript_SCRI_ROOT/Fig. 8.png', 
+          PHY,
+          width = 18, 
+          height = 15, 
+          dpi = 300)
 ```
 
 # NEM_3Y Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
@@ -363,10 +382,18 @@ save_plot('Subcell_KS_results/SL_Enrich_testing_PHY.png',
 ```{r}
 impNEM_3Y = fread('DGEresults/Limma_results_table_NEM_3Y.csv') %>% 
   distinct(GeneID, 
-           name,
-           logFC,
+           name, 
+           logFC, 
            Subcell_loc,
-           Parent_haplotype)
+           feature,
+           class,
+           Parent_haplotype) %>% 
+  filter(!feature == 'misc_RNA') %>% 
+  mutate(feature_class = paste0(feature, '->', class),
+         name = gsub('AMSH-like ubiquitin thioesterase .*$',
+                     'AMSH-like ubiquitin thioesterase', 
+                     name)) %>% 
+  distinct()
 
 ```
 
@@ -374,10 +401,11 @@ impNEM_3Y = fread('DGEresults/Limma_results_table_NEM_3Y.csv') %>%
 
 ```{r}
 impNEM_3Y_SL = impNEM_3Y 
-  # left_join(SL_annotation) %>% 
-  # distinct()
 
 impNEM_3Y_SL[impNEM_3Y_SL == ''] <- 'Unmapped'
+
+impNEM_3Y_SL = impNEM_3Y_SL %>% 
+  mutate(Subcell_loc = ifelse(Subcell_loc == 'Unmapped', feature_class, Subcell_loc))
 
 length(unique(impNEM_3Y_SL$logFC))
 ```
@@ -451,7 +479,7 @@ plot_dat = one %>%
   
 
 # Make new table for combining DEG results with GO results and writing out
-impNEM_3Y_SL_Enrichment_out = plot_dat %>% 
+impNEM_3Y_SL_Enrichment_out = ks_res_NEM_3Y %>% 
   mutate(Trait = 'NEM_3Y')
 
 labs_normal = plot_dat %>% 
@@ -518,11 +546,19 @@ save_plot('Subcell_KS_results/SL_Enrich_testing_NEM_3Y.png',
 
 ```{r}
 impLength_3Y = fread('DGEresults/Limma_results_table_Length_3Y.csv') %>% 
-  distinct(GeneID,
+  distinct(GeneID, 
            name, 
-           logFC,
+           logFC, 
            Subcell_loc,
-           Parent_haplotype)
+           feature,
+           class,
+           Parent_haplotype) %>% 
+  filter(!feature == 'misc_RNA') %>% 
+  mutate(feature_class = paste0(feature, '->', class),
+         name = gsub('AMSH-like ubiquitin thioesterase .*$',
+                     'AMSH-like ubiquitin thioesterase', 
+                     name)) %>% 
+  distinct()
 
 ```
 
@@ -530,10 +566,11 @@ impLength_3Y = fread('DGEresults/Limma_results_table_Length_3Y.csv') %>%
 
 ```{r}
 impLength_3Y_SL = impLength_3Y 
-  # left_join(SL_annotation) %>% 
-  # distinct()
 
 impLength_3Y_SL[impLength_3Y_SL == ''] <- 'Unmapped'
+
+impLength_3Y_SL = impLength_3Y_SL %>% 
+  mutate(Subcell_loc = ifelse(Subcell_loc == 'Unmapped', feature_class, Subcell_loc))
 
 length(unique(impLength_3Y_SL$logFC))
 ```
@@ -607,7 +644,7 @@ plot_dat = one %>%
   
 
 # Make new table for combining DEG results with GO results and writing out
-impLength_3Y_SL_Enrichment_out = plot_dat %>% 
+impLength_3Y_SL_Enrichment_out = ks_res_Length_3Y %>% 
   mutate(Trait = 'Length_3Y')
 
 labs_normal = plot_dat %>% 
@@ -668,6 +705,12 @@ save_plot('Subcell_KS_results/SL_Enrich_testing_Length_3Y.png',
           width = 18, 
           height = 15, 
           dpi = 300)
+
+save_plot('Final_Figs_and_Draft_Manuscript_SCRI_ROOT/Fig. 9.png', 
+          Length_3Y,
+          width = 18, 
+          height = 15, 
+          dpi = 300)
 ```
 
 
@@ -680,6 +723,13 @@ total_results = impCG_SL_Enrichment_out %>%
   rbind(impNEM_3Y_SL_Enrichment_out) %>% 
   rbind(impLength_3Y_SL_Enrichment_out)
 
-fwrite(total_results, 'Biological_Process_KS_results/Full_supplementary_results_KS_SL.csv')
+wb = createWorkbook()
+
+addWorksheet(wb, "BP Enrichment")
+
+writeData(wb, 1, x = total_results, withFilter = TRUE)
+
+saveWorkbook(wb, 'Final_Figs_and_Draft_Manuscript_SCRI_ROOT/File S2.xlsx',
+             overwrite = T)
 ```
 

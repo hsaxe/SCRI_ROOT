@@ -47,30 +47,16 @@ BP_annotation = fread('Full_GO_BP_Annotation/Full_Jr_Genes_BP_Annotated.csv')
 ```{r}
 impCG = fread('DGEresults/Limma_results_table_CG.csv') %>% 
   distinct(GeneID, 
-           name, 
-           logFC,
-           `Jr-GeneID`,
-           Parent_haplotype) 
+           adj.P.Val,
+           logFC) 
 ```
-
-## Make list for KS test results
-
-```{r}
-print_res = list()
-```
-
-# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Chromosome are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
-
-## CG Chromosome KS test
 
 ```{r}
 impCG_peaks = impCG %>% 
-  inner_join(peaks,
-             by = 'GeneID') %>% 
-  select(!matches('.*y$')) %>% 
-  inner_join(BP_annotation, by = c('Jr-GeneID.x' = 'mapped_id')) %>% 
+  left_join(peaks) %>% 
+  inner_join(BP_annotation, by = c('Jr-GeneID' = 'mapped_id')) %>% 
   mutate(Trait = 'CG') %>% 
-  filter(term.level < 3)
+  filter(term.level < 2)
 
 length(unique(impCG_peaks$GeneID))
 ```
@@ -163,71 +149,16 @@ save_plot(fig = manhattan_Jm_cg,
           width = 30, 
           height = 30)
 ```
-
-
-```{r}
-ref_CG_peaks = impCG_peaks %>% 
-  distinct(GeneID, logFC) %>% 
-  pull(logFC)
-
-ks_res_CG_peaks_SL = impCG_peaks %>% 
-  distinct(GeneID, 
-           logFC,
-           Subcell_loc) %>%
-  group_by(Subcell_loc) %>% 
-  mutate(p.val = ks.test(logFC, ref_CG_peaks)$p.value,
-         Avg_logFC = mean(logFC),
-         Number_of_genes = n()) %>% 
-  ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
-
-ks_res_less_CG_peaks_SL = ks_res_CG_peaks_SL %>% 
-  select(Subcell_loc,
-         Avg_logFC,
-         fdr) %>% 
-  distinct() 
-```
-
-
-```{r}
-ks_res_CG_peaks_BP = impCG_peaks %>% 
-  distinct(GeneID, 
-           logFC,
-           term.label) %>%
-  group_by(term.label) %>% 
-  mutate(p.val = ks.test(logFC, ref_CG_peaks)$p.value,
-         Avg_logFC = mean(logFC),
-         Number_of_genes = n()) %>% 
-  ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
-
-ks_res_less_CG_peaks_BP = ks_res_CG_peaks_BP %>% 
-  select(term.label,
-         Avg_logFC,
-         fdr) %>% 
-  distinct() 
-```
-
 # PHY Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
 
 ```{r}
 impPHY = fread('DGEresults/Limma_results_table_PHY.csv') %>% 
   distinct(GeneID, 
+           adj.P.Val,
            name, 
-           logFC,
-           `Jr-GeneID`,
-           Parent_haplotype)
+           logFC)
 ```
 
-## Make list for KS test results
-
-```{r}
-print_res = list()
-```
-
-# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Chromosome are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
-
-## PHY Chromosome KS test
 
 ```{r}
 impPHY_peaks = impPHY %>% 
@@ -238,69 +169,16 @@ impPHY_peaks = impPHY %>%
 length(unique(impPHY_peaks$GeneID))
 ```
 
-```{r}
-ref_PHY_peaks = impPHY_peaks %>% 
-  distinct(GeneID, logFC) %>% 
-  pull(logFC)
-
-ks_res_PHY_peaks_SL = impPHY_peaks %>% 
-  distinct(GeneID, 
-           logFC,
-           Subcell_loc) %>%
-  group_by(Subcell_loc) %>% 
-  mutate(p.val = ks.test(logFC, ref_PHY_peaks)$p.value,
-         Avg_logFC = mean(logFC),
-         Number_of_genes = n()) %>% 
-  ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
-
-ks_res_less_PHY_peaks_SL = ks_res_PHY_peaks_SL %>% 
-  select(Subcell_loc,
-         Avg_logFC,
-         fdr) %>% 
-  distinct() 
-```
-
-
-```{r}
-ks_res_PHY_peaks_BP = impPHY_peaks %>% 
-  distinct(GeneID, 
-           logFC,
-           term.label) %>%
-  group_by(term.label) %>% 
-  mutate(p.val = ks.test(logFC, ref_PHY_peaks)$p.value,
-         Avg_logFC = mean(logFC),
-         Number_of_genes = n()) %>% 
-  ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
-
-ks_res_less_PHY_peaks_BP = ks_res_PHY_peaks_BP %>% 
-  select(term.label,
-         Avg_logFC,
-         fdr) %>% 
-  distinct() 
-```
-
 # NEM_3Y Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
 
 ```{r}
 impNEM_3Y = fread('DGEresults/Limma_results_table_NEM_3Y.csv') %>% 
-  distinct(GeneID, 
+  distinct(GeneID,
+           adj.P.Val,
            name, 
-           logFC,
-           `Jr-GeneID`,
-           Parent_haplotype)
+           logFC)
 ```
 
-## Make list for KS test results
-
-```{r}
-print_res = list()
-```
-
-# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Chromosome are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
-
-## NEM_3Y Chromosome KS test
 
 ```{r}
 impNEM_3Y_peaks = impNEM_3Y %>% 
@@ -311,69 +189,17 @@ impNEM_3Y_peaks = impNEM_3Y %>%
 length(unique(impNEM_3Y_peaks$GeneID))
 ```
 
-```{r}
-ref_NEM_3Y_peaks = impNEM_3Y_peaks %>% 
-  distinct(GeneID, logFC) %>% 
-  pull(logFC)
-
-ks_res_NEM_3Y_peaks_SL = impNEM_3Y_peaks %>% 
-  distinct(GeneID, 
-           logFC,
-           Subcell_loc) %>%
-  group_by(Subcell_loc) %>% 
-  mutate(p.val = ks.test(logFC, ref_NEM_3Y_peaks)$p.value,
-         Avg_logFC = mean(logFC),
-         Number_of_genes = n()) %>% 
-  ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
-
-ks_res_less_NEM_3Y_peaks_SL = ks_res_NEM_3Y_peaks_SL %>% 
-  select(Subcell_loc,
-         Avg_logFC,
-         fdr) %>% 
-  distinct() 
-```
-
-
-```{r}
-ks_res_NEM_3Y_peaks_BP = impNEM_3Y_peaks %>% 
-  distinct(GeneID, 
-           logFC,
-           term.label) %>%
-  group_by(term.label) %>% 
-  mutate(p.val = ks.test(logFC, ref_NEM_3Y_peaks)$p.value,
-         Avg_logFC = mean(logFC),
-         Number_of_genes = n()) %>% 
-  ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
-
-ks_res_less_NEM_3Y_peaks_BP = ks_res_NEM_3Y_peaks_BP %>% 
-  select(term.label,
-         Avg_logFC,
-         fdr) %>% 
-  distinct() 
-```
-
 # Length_3Y Get logFCs from limma results for J. regia and J. microcarpa and merge with GO results
 
 ```{r}
 impLength_3Y = fread('DGEresults/Limma_results_table_Length_3Y.csv') %>% 
   distinct(GeneID, 
+           adj.P.Val,
            name, 
-           logFC,
-           `Jr-GeneID`,
-           Parent_haplotype)
+           logFC)
 ```
 
-## Make list for KS test results
 
-```{r}
-print_res = list()
-```
-
-# Panther uses Kolmogorov-Smirnov (KS) test to test that the distribution of logFC values for a particular Chromosome are different from a null distribution. In this case, I'm using the enitre set of DEG logFCs as the null distribution.
-
-## Length_3Y Chromosome KS test
 
 ```{r}
 impLength_3Y_peaks = impLength_3Y %>% 
@@ -382,49 +208,6 @@ impLength_3Y_peaks = impLength_3Y %>%
   mutate(Trait = 'Length_3Y')
 
 length(unique(impLength_3Y_peaks$GeneID))
-```
-
-```{r}
-ref_Length_3Y_peaks = impLength_3Y_peaks %>% 
-  distinct(GeneID, logFC) %>% 
-  pull(logFC)
-
-ks_res_Length_3Y_peaks_SL = impLength_3Y_peaks %>% 
-  distinct(GeneID, 
-           logFC,
-           Subcell_loc) %>%
-  group_by(Subcell_loc) %>% 
-  mutate(p.val = ks.test(logFC, ref_Length_3Y_peaks)$p.value,
-         Avg_logFC = mean(logFC),
-         Number_of_genes = n()) %>% 
-  ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
-
-ks_res_less_Length_3Y_peaks_SL = ks_res_Length_3Y_peaks_SL %>% 
-  select(Subcell_loc,
-         Avg_logFC,
-         fdr) %>% 
-  distinct() 
-```
-
-
-```{r}
-ks_res_Length_3Y_peaks_BP = impLength_3Y_peaks %>% 
-  distinct(GeneID, 
-           logFC,
-           term.label) %>%
-  group_by(term.label) %>% 
-  mutate(p.val = ks.test(logFC, ref_Length_3Y_peaks)$p.value,
-         Avg_logFC = mean(logFC),
-         Number_of_genes = n()) %>% 
-  ungroup() %>% 
-  mutate(fdr = p.adjust(p.val, method = 'fdr'))
-
-ks_res_less_Length_3Y_peaks_BP = ks_res_Length_3Y_peaks_BP %>% 
-  select(term.label,
-         Avg_logFC,
-         fdr) %>% 
-  distinct() 
 ```
 
 # Write out full results for supplementary data
@@ -440,8 +223,16 @@ fwrite(total_results, 'QTL_Peaks_results/Full_supplementary_results_KS_QTL_Peaks
 
 ```{r}
 Simple_total_results = total_results %>% 
-  distinct(name, Trait, logFC) %>%
-  count(Trait)
+  distinct(GeneID,
+           name, 
+           Trait, 
+           logFC,
+           start,
+           end,
+           chromosome) 
+
+write.xlsx(Simple_total_results,
+           'Final_Figs_and_Draft_Manuscript_SCRI_ROOT/Table 3.xlsx')
 ```
 
 
